@@ -3,26 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Julian Brunet | Alpine Ski Racing Coach & Athlete</title>
-  <meta name="description" content="Julian Brunet — Head U18 FIS Coach at Mont Garceau, U18 FIS Quebec Super Series Champion, former Équipe du Québec & Top-500 FIS Racer (34.95 PB)." />
+  <title>Julian Brunet — Alpine Ski Racing Coach &amp; Athlete</title>
+  <meta name="description" content="Julian Brunet — Head U18 FIS Coach at Mont Garceau, U18 FIS Quebec Super Series Champion, former Équipe du Québec &amp; Top-500 FIS Racer (34.95 PB)." />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2306080c'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%2300f0ff'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2307080a'/%3E%3Cpath d='M8 22 L15 10 L20 17 L25 9' stroke='%23f4f6f8' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='25' cy='9' r='2.5' fill='%2338bdf8'/%3E%3C/svg%3E" />
 
   <!-- Open Graph / Social Preview -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://jbrunet.com/" />
-  <meta property="og:title" content="Julian Brunet | Alpine Ski Racing Coach & Athlete" />
-  <meta property="og:description" content="U18 FIS Quebec Super Series Champion • Former Équipe du Québec & Top-500 FIS (34.95 PB) • Head U18 FIS Men's Coach at Mont Garceau." />
+  <meta property="og:title" content="Julian Brunet — Alpine Ski Racing Coach &amp; Athlete" />
+  <meta property="og:description" content="U18 FIS Quebec Super Series Champion • Former Équipe du Québec &amp; Top-500 FIS (34.95 PB) • Head U18 FIS Men's Coach at Mont Garceau." />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- Monospace Font for Telemetry Labels -->
+  <!-- Google Fonts: Inter for high-legibility body copy + JetBrains Mono for telemetry & indices -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    /* Custom Libron Font Family (Checks both root and /fonts folder) */
+    /* ==========================================================================
+       1. CUSTOM LIBRON DISPLAY SERIF & DESIGN TOKENS
+       Inspired by S/C Aesthetic Labs, Tom de Koning, and Autopilot
+       ========================================================================== */
     @font-face {
       font-family: 'Libron';
       src: url('Libron-Regular.woff2') format('woff2'),
@@ -57,20 +60,34 @@
     }
 
     :root {
-      --bg-base: #06080c;
-      --bg-surface: #0b0f17;
-      --bg-card: #101622;
-      --bg-card-hover: #161f30;
-      --border-dim: #1c2638;
-      --border-bright: #2e3d52;
-      --text-main: #f4f7fb;
-      --text-muted: #9aa8bc;
-      --text-dim: #8494aa;
-      --accent-cyan: #00f0ff;
-      --accent-cyan-dim: rgba(0, 240, 255, 0.1);
-      --accent-orange: #ff6b2b;
-      --font-main: 'Libron', -apple-system, BlinkMacSystemFont, Georgia, serif;
+      /* Intentional Minimalist Palette — Deep Carbon & Alabaster with Ice Signal */
+      --bg-base: #07080b;
+      --bg-elevated: #0c0e13;
+      --bg-surface: #11141c;
+      --bg-surface-hover: #161a24;
+      --bg-glass: rgba(12, 14, 19, 0.82);
+
+      --line-subtle: rgba(255, 255, 255, 0.07);
+      --line-medium: rgba(255, 255, 255, 0.13);
+      --line-strong: rgba(255, 255, 255, 0.24);
+
+      --text-primary: #f3f5f8;
+      --text-secondary: #9ba3b0;
+      --text-tertiary: #636b78;
+
+      --signal-ice: #38bdf8;
+      --signal-ice-soft: rgba(56, 189, 248, 0.12);
+      --signal-amber: #f59e0b;
+      --signal-amber-soft: rgba(245, 158, 11, 0.12);
+      --signal-emerald: #34d399;
+
+      --font-display: 'Libron', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
+
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --container-max: 1080px;
     }
 
     * {
@@ -83,686 +100,1732 @@
     html {
       scroll-behavior: smooth;
       background-color: var(--bg-base);
-      color: var(--text-main);
-      font-family: var(--font-main);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
       font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
     }
 
     body {
       background-color: var(--bg-base);
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.06) 0%, transparent 60%);
+      background-image: radial-gradient(ellipse 80% 45% at 50% -10%, rgba(56, 189, 248, 0.06), transparent 70%);
+      color: var(--text-primary);
       line-height: 1.6;
       overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
+      position: relative;
     }
 
-    /* Sticky Mobile-First Header */
-    header {
+    /* Subtle tactile film grain overlay for surface depth */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.022;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* ==========================================================================
+       2. SCROLL REVEAL & MOTION ARCHITECTURE
+       ========================================================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+      will-change: opacity, transform;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.08s; }
+    .reveal-delay-2 { transition-delay: 0.16s; }
+    .reveal-delay-3 { transition-delay: 0.24s; }
+    .reveal-delay-4 { transition-delay: 0.32s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    /* ==========================================================================
+       3. ARCHITECTURAL HEADER & STICKY MOBILE NAVIGATION
+       ========================================================================== */
+    header.site-header {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(6, 8, 12, 0.88);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border-dim);
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line-subtle);
+      transition: border-color 0.3s ease;
     }
 
-    .nav-container {
-      max-width: 960px;
+    .header-inner {
+      max-width: var(--container-max);
       margin: 0 auto;
-      padding: 0.75rem 1.15rem;
+      padding: 0.85rem 1.25rem;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 1rem;
     }
 
-    .brand {
-      font-family: var(--font-main);
+    .brand-mark {
+      display: flex;
+      align-items: baseline;
+      gap: 0.65rem;
+    }
+
+    .brand-name {
+      font-family: var(--font-display);
       font-weight: 700;
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       letter-spacing: 0.02em;
-      color: var(--text-main);
-      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-code {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-tertiary);
+      letter-spacing: 0.06em;
+    }
+
+    .header-controls {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
 
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--accent-cyan);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent-cyan);
-      display: inline-block;
+    .desktop-nav {
+      display: none;
+      align-items: center;
+      gap: 0.25rem;
+      list-style: none;
     }
 
-    .lang-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border-bright);
-      color: var(--accent-cyan);
+    .desktop-nav a {
       font-family: var(--font-mono);
       font-size: 0.72rem;
-      font-weight: 700;
-      padding: 0.35rem 0.7rem;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      color: var(--text-secondary);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      letter-spacing: 0.03em;
+      transition: color 0.2s ease, background-color 0.2s ease;
     }
 
-    .lang-btn:hover {
-      border-color: var(--accent-cyan);
-      background: var(--accent-cyan-dim);
+    .desktop-nav a:hover,
+    .desktop-nav a.active {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    /* Touch-Scrollable Section Pills */
-    .nav-links {
+    .lang-switch {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--text-primary);
+      background: var(--bg-surface);
+      border: 1px solid var(--line-medium);
+      padding: 0.38rem 0.75rem;
+      border-radius: 6px;
+      transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .lang-switch:hover {
+      border-color: var(--line-strong);
+      background: var(--bg-surface-hover);
+    }
+
+    .lang-switch:active {
+      transform: scale(0.97);
+    }
+
+    /* Mobile Scrollable Index Bar */
+    .mobile-nav-bar {
       display: flex;
       align-items: center;
-      gap: 0.45rem;
-      list-style: none;
-      width: 100%;
+      gap: 0.35rem;
       overflow-x: auto;
-      padding-top: 0.55rem;
-      border-top: 1px solid rgba(28, 38, 56, 0.6);
+      padding: 0.5rem 1.25rem 0.6rem;
+      border-top: 1px solid var(--line-subtle);
       scrollbar-width: none;
+      list-style: none;
     }
 
-    .nav-links::-webkit-scrollbar {
+    .mobile-nav-bar::-webkit-scrollbar {
       display: none;
     }
 
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.74rem;
+    .mobile-nav-bar a {
       font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-secondary);
       padding: 0.3rem 0.65rem;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-dim);
-      border-radius: 999px;
+      border-radius: 5px;
       white-space: nowrap;
+      border: 1px solid transparent;
       transition: all 0.2s ease;
     }
 
-    .nav-links a:hover,
-    .nav-links a:active {
-      color: var(--accent-cyan);
-      border-color: var(--accent-cyan);
+    .mobile-nav-bar a.active,
+    .mobile-nav-bar a:active {
+      color: var(--text-primary);
+      background: var(--bg-surface);
+      border-color: var(--line-medium);
     }
 
-    /* Main Container */
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 1.15rem;
-    }
-
-    section {
-      padding: 2.75rem 0;
-      border-bottom: 1px solid var(--border-dim);
-    }
-
-    /* Clean, Uncluttered Hero Section */
+    /* ==========================================================================
+       4. HERO SECTION — INTENTIONAL MINIMALISM & TELEMETRY STRIP
+       ========================================================================== */
     .hero {
-      padding: 2.25rem 0 2.5rem;
+      padding: 2.5rem 0 3.25rem;
+      border-bottom: 1px solid var(--line-subtle);
     }
 
-    .hero-status {
+    /* S/C Labs & Tom de Koning style structured metadata strip */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem 1rem;
+      padding-bottom: 1.75rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--line-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+    }
+
+    .meta-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .meta-label {
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .meta-val {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .meta-val.live {
+      color: var(--text-primary);
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.85rem;
     }
 
-    .hero h1 {
-      font-family: var(--font-main);
-      font-size: clamp(2rem, 7vw, 3.35rem);
+    .status-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--signal-emerald);
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
+      display: inline-block;
+    }
+
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(2.25rem, 7.5vw, 4.35rem);
       font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-      margin-bottom: 0.9rem;
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 1.35rem;
+      max-width: 16ch;
     }
 
-    .hero h1 em {
+    .hero-headline em {
       font-style: italic;
-      color: var(--accent-cyan);
+      font-weight: 400;
+      color: var(--signal-ice);
+    }
+
+    .hero-editorial-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+      align-items: end;
+      margin-bottom: 2.5rem;
     }
 
     .hero-lead {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      max-width: 620px;
-      margin-bottom: 1.5rem;
-      line-height: 1.55;
+      font-size: clamp(0.98rem, 2.2vw, 1.12rem);
+      color: var(--text-secondary);
+      line-height: 1.65;
+      max-width: 60ch;
+      font-weight: 400;
     }
 
-    /* Compact 2x2 Mobile KPI Grid */
-    .kpi-grid {
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 0.78rem 1.15rem;
+      border-radius: 6px;
+      transition: all 0.22s var(--ease-out-expo);
+      white-space: nowrap;
+    }
+
+    .btn-light {
+      background: var(--text-primary);
+      color: var(--bg-base);
+      font-weight: 600;
+    }
+
+    .btn-light:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-outline {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--line-medium);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--line-strong);
+      transform: translateY(-1px);
+    }
+
+    .btn-arrow {
+      transition: transform 0.2s var(--ease-out-expo);
+      display: inline-block;
+    }
+
+    .btn:hover .btn-arrow {
+      transform: translate(2px, -2px);
+    }
+
+    /* Architectural Hairline KPI Matrix (2x2 on mobile, 4x1 on desktop) */
+    .kpi-matrix {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .kpi-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-dim);
-      border-left: 3px solid var(--accent-cyan);
-      padding: 0.85rem 0.95rem;
-      border-radius: 6px;
-    }
-
-    .kpi-card.orange {
-      border-left-color: var(--accent-orange);
-    }
-
-    .kpi-value {
-      font-family: var(--font-main);
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--text-main);
-      line-height: 1.15;
-      margin-bottom: 0.2rem;
-    }
-
-    .kpi-label {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      line-height: 1.3;
-    }
-
-    /* Side-by-Side Mobile CTAs */
-    .cta-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    .btn-primary,
-    .btn-secondary {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 0.8rem 0.9rem;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-
-    .btn-primary {
-      background: var(--accent-cyan);
-      color: #040609;
-    }
-
-    .btn-secondary {
-      background: var(--bg-card);
-      color: var(--text-main);
-      border: 1px solid var(--border-bright);
-    }
-
-    /* Section Headings */
-    .section-tag {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.35rem;
-      display: block;
-    }
-
-    .section-title {
-      font-family: var(--font-main);
-      font-size: clamp(1.5rem, 5vw, 2.1rem);
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 0.6rem;
-    }
-
-    .section-desc {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      max-width: 640px;
-      margin-bottom: 1.5rem;
-    }
-
-    /* Clean Cards */
-    .cards-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.85rem;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-dim);
-      padding: 1.15rem 1.25rem;
-      border-radius: 8px;
-    }
-
-    .card.highlight-orange {
-      border-left: 3px solid var(--accent-orange);
-    }
-
-    .card.highlight-cyan {
-      border-left: 3px solid var(--accent-cyan);
-    }
-
-    .card-tag {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      margin-bottom: 0.3rem;
-      display: block;
-    }
-
-    .card.highlight-orange .card-tag {
-      color: var(--accent-orange);
-    }
-
-    .card h3 {
-      font-family: var(--font-main);
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 0.35rem;
-      color: var(--text-main);
-    }
-
-    .card p {
-      font-size: 0.92rem;
-      color: var(--text-muted);
-    }
-
-    /* Progressive Disclosure Accordions for Mobile Cleanliness */
-    details.drawer {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-bright);
-      border-radius: 8px;
-      margin-top: 1rem;
+      border: 1px solid var(--line-subtle);
+      border-radius: 10px;
+      background: var(--bg-elevated);
       overflow: hidden;
     }
 
-    details.drawer summary {
-      padding: 0.95rem 1.15rem;
+    .kpi-cell {
+      padding: 1.15rem 1.1rem;
+      border-right: 1px solid var(--line-subtle);
+      border-bottom: 1px solid var(--line-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.45rem;
+      position: relative;
+      transition: background-color 0.25s ease;
+    }
+
+    .kpi-cell:hover {
+      background-color: var(--bg-surface);
+    }
+
+    .kpi-cell:nth-child(2n) {
+      border-right: none;
+    }
+
+    .kpi-cell:nth-child(3),
+    .kpi-cell:nth-child(4) {
+      border-bottom: none;
+    }
+
+    .kpi-index {
       font-family: var(--font-mono);
-      font-size: 0.78rem;
+      font-size: 0.64rem;
+      color: var(--text-tertiary);
+      letter-spacing: 0.08em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kpi-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--signal-ice);
+    }
+
+    .kpi-dot.amber {
+      background: var(--signal-amber);
+    }
+
+    .kpi-figure {
+      font-family: var(--font-display);
+      font-size: clamp(1.45rem, 4.5vw, 2rem);
       font-weight: 700;
-      color: var(--accent-cyan);
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      line-height: 1.05;
+    }
+
+    .kpi-caption {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      line-height: 1.35;
+    }
+
+    /* ==========================================================================
+       5. EDITORIAL SECTION STRUCTURE (S/C Aesthetic Labs Inspired)
+       ========================================================================== */
+    section.editorial-section {
+      padding: 3.75rem 0;
+      border-bottom: 1px solid var(--line-subtle);
+    }
+
+    .section-header-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-bottom: 2.25rem;
+    }
+
+    .section-index {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-index::before {
+      content: "";
+      width: 14px;
+      height: 1px;
+      background: var(--signal-ice);
+      display: inline-block;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.65rem, 5vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+    }
+
+    .section-summary {
+      font-size: 0.96rem;
+      color: var(--text-secondary);
+      max-width: 60ch;
+      line-height: 1.65;
+    }
+
+    /* ==========================================================================
+       6. INTERACTIVE PROGRESSION GRAPH (Autopilot Inspired Telemetry Curve)
+       ========================================================================== */
+    .progression-shell {
+      background: var(--bg-elevated);
+      border: 1px solid var(--line-medium);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.75rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 20px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    .graph-toolbar {
+      padding: 1rem 1.15rem;
+      border-bottom: 1px solid var(--line-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.85rem;
+      background: rgba(17, 20, 28, 0.6);
+    }
+
+    .graph-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .graph-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .graph-title {
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Segmented Mode Switcher */
+    .mode-switcher {
+      display: inline-flex;
+      background: var(--bg-base);
+      padding: 0.22rem;
+      border-radius: 7px;
+      border: 1px solid var(--line-subtle);
+    }
+
+    .mode-btn {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 0.36rem 0.7rem;
+      border-radius: 5px;
+      transition: all 0.2s var(--ease-out-expo);
+      white-space: nowrap;
+    }
+
+    .mode-btn.active {
+      background: var(--bg-surface-hover);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Responsive SVG Canvas — Zero Horizontal Scroll on Mobile */
+    .graph-stage {
+      position: relative;
+      padding: 1.15rem 0.65rem 0.5rem;
+      background:
+        radial-gradient(circle at 82% 22%, rgba(56, 189, 248, 0.07), transparent 45%),
+        radial-gradient(circle at 65% 28%, rgba(245, 158, 11, 0.05), transparent 40%);
+      user-select: none;
+    }
+
+    .progression-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    /* Animated SVG Path Styling */
+    .curve-line {
+      fill: none;
+      stroke: url(#lineGradient);
+      stroke-width: 2.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1400;
+      stroke-dashoffset: 1400;
+      transition: stroke-dashoffset 1.6s var(--ease-out-expo);
+    }
+
+    .progression-shell.is-drawn .curve-line {
+      stroke-dashoffset: 0;
+    }
+
+    .cohort-line {
+      fill: none;
+      stroke: rgba(245, 158, 11, 0.55);
+      stroke-width: 1.75;
+      stroke-dasharray: 4 4;
+      stroke-linecap: round;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .cohort-line.visible {
+      opacity: 1;
+    }
+
+    .curve-area {
+      opacity: 0;
+      transition: opacity 1.1s ease 0.25s;
+    }
+
+    .progression-shell.is-drawn .curve-area {
+      opacity: 1;
+    }
+
+    .grid-rule {
+      stroke: rgba(255, 255, 255, 0.055);
+      stroke-width: 1;
+      stroke-dasharray: 2 4;
+    }
+
+    .axis-label {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      fill: var(--text-tertiary);
+      letter-spacing: 0.04em;
+    }
+
+    .node-x-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      fill: var(--text-secondary);
+      transition: fill 0.2s ease, font-weight 0.2s ease;
+    }
+
+    .node-val-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      fill: var(--text-primary);
+      transition: transform 0.25s var(--ease-out-expo), fill 0.2s ease;
+    }
+
+    .graph-node {
+      cursor: pointer;
+    }
+
+    .graph-node .node-hit {
+      fill: transparent;
+    }
+
+    .graph-node .node-ring {
+      fill: none;
+      stroke: var(--signal-ice);
+      stroke-width: 1.5;
+      opacity: 0;
+      transform-origin: center;
+      transform-box: fill-box;
+      transition: opacity 0.25s ease, r 0.25s var(--ease-out-expo);
+    }
+
+    .graph-node .node-dot {
+      fill: var(--bg-base);
+      stroke: var(--signal-ice);
+      stroke-width: 2.25;
+      transition: r 0.2s var(--ease-out-expo), fill 0.2s ease, stroke 0.2s ease;
+    }
+
+    .graph-node.milestone .node-dot {
+      stroke: var(--signal-amber);
+    }
+
+    .graph-node.milestone .node-ring {
+      stroke: var(--signal-amber);
+    }
+
+    .graph-node:hover .node-dot,
+    .graph-node.is-active .node-dot {
+      fill: var(--signal-ice);
+    }
+
+    .graph-node.milestone:hover .node-dot,
+    .graph-node.milestone.is-active .node-dot {
+      fill: var(--signal-amber);
+    }
+
+    .graph-node.is-active .node-ring {
+      opacity: 0.9;
+    }
+
+    .graph-node.is-active .node-x-label {
+      fill: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .active-guide-line {
+      stroke: rgba(255, 255, 255, 0.16);
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+      transition: x1 0.3s var(--ease-out-expo), x2 0.3s var(--ease-out-expo), y1 0.3s var(--ease-out-expo);
+    }
+
+    /* Interactive Stage Pill Selector Bar (Great for Mobile Thumb Scrubbing) */
+    .stage-pill-strip {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.65rem 1.15rem;
+      overflow-x: auto;
+      border-top: 1px solid var(--line-subtle);
+      background: rgba(7, 8, 11, 0.45);
+      scrollbar-width: none;
+    }
+
+    .stage-pill-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .stage-pill {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--text-tertiary);
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: all 0.18s ease;
+    }
+
+    .stage-pill:hover {
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .stage-pill.active {
+      color: var(--text-primary);
+      background: var(--bg-surface);
+      border-color: var(--line-medium);
+    }
+
+    /* Live Telemetry Inspector Readout Below Graph */
+    .graph-inspector {
+      padding: 1.15rem 1.25rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--line-subtle);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+    }
+
+    .inspector-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .inspector-stage-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--signal-ice);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .inspector-stage-tag.amber {
+      color: var(--signal-amber);
+    }
+
+    .inspector-nav-btns {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .step-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--line-medium);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+    }
+
+    .step-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--line-strong);
+      background: var(--bg-surface-hover);
+    }
+
+    .inspector-body {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+      align-items: baseline;
+    }
+
+    .inspector-metric-group {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .inspector-primary-val {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .inspector-sub-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      background: var(--bg-elevated);
+      border: 1px solid var(--line-subtle);
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+    }
+
+    .inspector-narrative {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* Two Verified Career Highlight Cards */
+    .highlights-duo {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .surface-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--line-subtle);
+      border-radius: 10px;
+      padding: 1.4rem 1.35rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: border-color 0.25s ease, background-color 0.25s ease;
+    }
+
+    .surface-card:hover {
+      border-color: var(--line-medium);
+      background: var(--bg-surface);
+    }
+
+    .card-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-eyebrow span.signal-tag {
+      color: var(--signal-ice);
+    }
+
+    .card-eyebrow span.signal-tag.amber {
+      color: var(--signal-amber);
+    }
+
+    .surface-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      line-height: 1.25;
+    }
+
+    .surface-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Minimalist Expandable Data Drawer */
+    details.minimal-drawer {
+      background: var(--bg-elevated);
+      border: 1px solid var(--line-subtle);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+
+    details.minimal-drawer:hover {
+      border-color: var(--line-medium);
+    }
+
+    details.minimal-drawer summary {
+      padding: 0.95rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
       cursor: pointer;
       list-style: none;
       display: flex;
       justify-content: space-between;
       align-items: center;
       user-select: none;
+      transition: color 0.2s ease, background-color 0.2s ease;
     }
 
-    details.drawer summary::-webkit-details-marker {
+    details.minimal-drawer summary::-webkit-details-marker {
       display: none;
     }
 
-    details.drawer summary::after {
-      content: "+ EXPAND";
+    details.minimal-drawer summary:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface);
+    }
+
+    .drawer-indicator {
+      font-family: var(--font-mono);
       font-size: 0.68rem;
-      color: var(--text-dim);
+      color: var(--text-tertiary);
+      transition: transform 0.25s var(--ease-out-expo), color 0.2s ease;
     }
 
-    details.drawer[open] summary {
-      border-bottom: 1px solid var(--border-dim);
-      background: var(--bg-card);
+    details.minimal-drawer[open] summary {
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--line-subtle);
+      background: var(--bg-surface);
     }
 
-    details.drawer[open] summary::after {
-      content: "− CLOSE";
-      color: var(--accent-cyan);
+    details.minimal-drawer[open] .drawer-indicator {
+      color: var(--signal-ice);
     }
 
-    .drawer-content {
-      padding: 1rem;
-    }
-
-    /* Compact Mobile Table */
-    .table-scroll {
+    .table-wrap {
       overflow-x: auto;
     }
 
-    table {
+    table.telemetry-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
     }
 
-    th, td {
-      padding: 0.65rem 0.6rem;
+    .telemetry-table th,
+    .telemetry-table td {
+      padding: 0.75rem 1.15rem;
       text-align: left;
-      border-bottom: 1px solid var(--border-dim);
-      font-family: var(--font-mono);
+      border-bottom: 1px solid var(--line-subtle);
       white-space: nowrap;
     }
 
-    th {
-      font-size: 0.68rem;
+    .telemetry-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .telemetry-table th {
+      font-size: 0.65rem;
       text-transform: uppercase;
-      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      font-weight: 500;
+      background: rgba(7, 8, 11, 0.4);
     }
 
-    .badge {
-      display: inline-block;
-      padding: 0.1rem 0.45rem;
+    .telemetry-table tbody tr {
+      transition: background-color 0.15s ease;
+    }
+
+    .telemetry-table tbody tr:hover {
+      background: var(--bg-surface-hover);
+    }
+
+    .rank-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.12rem 0.5rem;
       border-radius: 4px;
-      font-weight: 700;
       font-size: 0.72rem;
-      background: rgba(148, 163, 184, 0.12);
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-primary);
     }
 
-    .badge.podium {
-      background: var(--accent-cyan-dim);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(0, 240, 255, 0.35);
+    .rank-pill.podium {
+      background: var(--signal-ice-soft);
+      color: var(--signal-ice);
     }
 
-    .badge.top5 {
-      background: rgba(255, 107, 43, 0.15);
-      color: var(--accent-orange);
-      border: 1px solid rgba(255, 107, 43, 0.35);
+    .rank-pill.top5 {
+      background: var(--signal-amber-soft);
+      color: var(--signal-amber);
     }
 
-    /* Timeline Inside Drawer / Section */
-    .timeline {
+    .pts-bar-cell {
       display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
+      align-items: center;
+      gap: 0.6rem;
     }
 
-    .timeline-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border-dim);
-      border-left: 2px solid var(--accent-cyan);
-      padding: 0.95rem 1.1rem;
-      border-radius: 6px;
+    .pts-mini-bar {
+      width: 48px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 2px;
+      overflow: hidden;
+      display: inline-block;
     }
 
-    /* 2-Column Athlete Chip Grid on Mobile */
-    .squad-grid {
+    .pts-mini-fill {
+      height: 100%;
+      background: var(--signal-ice);
+      border-radius: 2px;
+    }
+
+    /* ==========================================================================
+       7. METHODOLOGY — ARCHITECTURAL INDEX LIST (S/C Labs & Tom de Koning)
+       ========================================================================== */
+    .index-list {
+      border-top: 1px solid var(--line-subtle);
+    }
+
+    .index-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding: 1.5rem 0.35rem;
+      border-bottom: 1px solid var(--line-subtle);
+      transition: background-color 0.25s ease, padding-left 0.3s var(--ease-out-expo);
+    }
+
+    .index-row:hover {
+      background-color: rgba(255, 255, 255, 0.018);
+      padding-left: 0.75rem;
+    }
+
+    .index-row-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-tertiary);
+      letter-spacing: 0.06em;
+    }
+
+    .index-num {
+      color: var(--signal-ice);
+      font-weight: 600;
+    }
+
+    .index-row h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .index-row p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.62;
+      max-width: 62ch;
+    }
+
+    /* ==========================================================================
+       8. COACHING & U18 FIS ROSTER MATRIX
+       ========================================================================== */
+    .coaching-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .roster-panel {
+      background: var(--bg-elevated);
+      border: 1px solid var(--line-subtle);
+      border-radius: 10px;
+      padding: 1.4rem 1.35rem;
+    }
+
+    .roster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .roster-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.55rem;
-      margin-top: 1rem;
+      gap: 1px;
+      background: var(--line-subtle);
+      border: 1px solid var(--line-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 1.15rem;
     }
 
-    .athlete-chip {
+    .roster-athlete {
+      background: var(--bg-base);
+      padding: 0.85rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .roster-athlete:hover {
       background: var(--bg-surface);
-      border: 1px solid var(--border-dim);
-      padding: 0.55rem 0.7rem;
-      border-radius: 5px;
-      font-size: 0.85rem;
+    }
+
+    .athlete-idx {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-tertiary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .athlete-idx span.fis-tag {
+      color: var(--signal-ice);
+    }
+
+    .athlete-name {
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       9. TECHNICAL LINEAGE — 5-STAGE CHRONOLOGY
+       ========================================================================== */
+    .lineage-track {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--line-subtle);
+    }
+
+    .lineage-item {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+      padding: 1.35rem 0.35rem;
+      border-bottom: 1px solid var(--line-subtle);
+      transition: background-color 0.25s ease, padding-left 0.3s var(--ease-out-expo);
+    }
+
+    .lineage-item:hover {
+      background-color: rgba(255, 255, 255, 0.018);
+      padding-left: 0.75rem;
+    }
+
+    .lineage-stage {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-tertiary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .lineage-stage strong {
+      color: var(--signal-ice);
+      font-weight: 600;
+      margin-right: 0.35rem;
+    }
+
+    .lineage-mentor {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
       font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .lineage-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 60ch;
+    }
+
+    /* ==========================================================================
+       10. DIGITAL LAB & CONNECT (Tom de Koning Interactive Link Rows)
+       ========================================================================== */
+    .connect-list {
+      border-top: 1px solid var(--line-subtle);
+    }
+
+    .connect-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.35rem;
+      gap: 1rem;
+      padding: 1.25rem 0.5rem;
+      border-bottom: 1px solid var(--line-subtle);
+      transition: background-color 0.25s ease, padding-left 0.3s var(--ease-out-expo), padding-right 0.3s var(--ease-out-expo);
     }
 
-    .athlete-chip span.tag {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      font-weight: 500;
-      color: var(--accent-cyan);
-      background: var(--accent-cyan-dim);
-      padding: 0.1rem 0.35rem;
-      border-radius: 3px;
-      flex-shrink: 0;
+    .connect-row:hover {
+      background-color: var(--bg-elevated);
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
 
-    /* Social Connect Grid */
-    .social-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
-
-    .social-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-dim);
-      padding: 1rem 1.15rem;
-      border-radius: 8px;
-      text-decoration: none;
-      color: var(--text-main);
+    .connect-left {
       display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .connect-platform {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--text-tertiary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .connect-handle {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      transition: color 0.2s ease;
+    }
+
+    .connect-row:hover .connect-handle {
+      color: var(--signal-ice);
+    }
+
+    .connect-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .connect-arrow-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--line-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      transition: all 0.25s var(--ease-out-expo);
+    }
+
+    .connect-row:hover .connect-arrow-box {
+      background: var(--text-primary);
+      color: var(--bg-base);
+      border-color: var(--text-primary);
+      transform: translate(2px, -2px);
+    }
+
+    /* ==========================================================================
+       11. ARCHITECTURAL FOOTER
+       ========================================================================== */
+    footer.site-footer {
+      padding: 2.5rem 0 3.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
-      transition: border-color 0.2s ease;
     }
 
-    .social-card:hover,
-    .social-card:active {
-      border-color: var(--accent-cyan);
+    .footer-top-link {
+      color: var(--text-secondary);
+      padding: 0.35rem 0.7rem;
+      border: 1px solid var(--line-subtle);
+      border-radius: 5px;
+      transition: border-color 0.2s ease, color 0.2s ease;
     }
 
-    .social-platform {
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      margin-bottom: 0.15rem;
+    .footer-top-link:hover {
+      color: var(--text-primary);
+      border-color: var(--line-medium);
     }
 
-    .social-handle {
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin-bottom: 0.15rem;
-    }
-
-    .social-desc {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
-
-    .social-arrow {
-      font-family: var(--font-mono);
-      color: var(--accent-cyan);
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    footer {
-      padding: 2rem 0 2.5rem;
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-dim);
-    }
-
-    /* Desktop Enhancements */
-    @media (min-width: 720px) {
-      .nav-container {
-        flex-wrap: nowrap;
+    /* ==========================================================================
+       12. DESKTOP BREAKPOINTS (Mobile-First Responsive Progression)
+       ========================================================================== */
+    @media (min-width: 768px) {
+      .container,
+      .header-inner {
+        padding-left: 2rem;
+        padding-right: 2rem;
       }
-      .nav-links {
-        width: auto;
-        border-top: none;
-        padding-top: 0;
-      }
-      .hero {
-        padding: 4rem 0 3.5rem;
-      }
-      .kpi-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-      .cta-group {
+
+      .desktop-nav {
         display: flex;
       }
-      .cards-grid {
-        grid-template-columns: repeat(2, 1fr);
+
+      .mobile-nav-bar {
+        display: none;
       }
-      .squad-grid {
+
+      .hero {
+        padding: 4rem 0 4.5rem;
+      }
+
+      .meta-grid {
+        grid-template-columns: repeat(4, 1fr);
+        padding-bottom: 2.25rem;
+        margin-bottom: 2.75rem;
+      }
+
+      .hero-editorial-row {
+        grid-template-columns: 1.25fr 0.75fr;
+      }
+
+      .hero-actions {
+        justify-content: flex-end;
+      }
+
+      .kpi-matrix {
         grid-template-columns: repeat(4, 1fr);
       }
-      .social-grid {
+
+      .kpi-cell {
+        padding: 1.45rem 1.4rem;
+        border-bottom: none !important;
+      }
+
+      .kpi-cell:nth-child(2n) {
+        border-right: 1px solid var(--line-subtle);
+      }
+
+      .kpi-cell:last-child {
+        border-right: none;
+      }
+
+      section.editorial-section {
+        padding: 5.25rem 0;
+      }
+
+      .section-header-grid {
+        grid-template-columns: 260px 1fr;
+        align-items: baseline;
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .graph-stage {
+        padding: 1.5rem 1.5rem 0.75rem;
+      }
+
+      .inspector-body {
+        grid-template-columns: auto 1fr;
+        gap: 2rem;
+      }
+
+      .highlights-duo {
         grid-template-columns: repeat(2, 1fr);
+      }
+
+      .index-row {
+        grid-template-columns: 240px 260px 1fr;
+        align-items: baseline;
+        gap: 1.5rem;
+        padding: 1.85rem 0.5rem;
+      }
+
+      .roster-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .lineage-item {
+        grid-template-columns: 240px 260px 1fr;
+        align-items: baseline;
+        gap: 1.5rem;
+        padding: 1.65rem 0.5rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Clean Sticky Header with Scrollable Mobile Nav -->
-  <header>
-    <div class="nav-container">
-      <a href="#" class="brand">
-        <span class="live-dot"></span> JULIAN BRUNET
+  <!-- Sticky Architectural Header -->
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a href="#top" class="brand-mark" id="brandHomeLink">
+        <span class="brand-name">JULIAN BRUNET</span>
+        <span class="brand-code">FIS #256564</span>
       </a>
-      <button class="lang-btn" id="langToggle" onclick="toggleLanguage()">FR // FRANÇAIS</button>
-      <ul class="nav-links">
-        <li><a href="#results" data-i18n="nav_results">01. Results</a></li>
-        <li><a href="#skills" data-i18n="nav_skills">02. Methodology</a></li>
-        <li><a href="#coaching" data-i18n="nav_coaching">03. U18 Team</a></li>
-        <li><a href="#lineage" data-i18n="nav_lineage">04. Mentors</a></li>
-        <li><a href="#connect" data-i18n="nav_connect">05. Connect</a></li>
-      </ul>
+
+      <div class="header-controls">
+        <ul class="desktop-nav" id="desktopNav">
+          <li><a href="#results" data-i18n="nav_results">01. Progression</a></li>
+          <li><a href="#skills" data-i18n="nav_skills">02. Methodology</a></li>
+          <li><a href="#coaching" data-i18n="nav_coaching">03. U18 Team</a></li>
+          <li><a href="#lineage" data-i18n="nav_lineage">04. Lineage</a></li>
+          <li><a href="#connect" data-i18n="nav_connect">05. Connect</a></li>
+        </ul>
+        <button class="lang-switch" id="langToggle" onclick="toggleLanguage()" aria-label="Switch language">
+          FR // FRANÇAIS
+        </button>
+      </div>
     </div>
+
+    <!-- Touch-Friendly Mobile Section Bar -->
+    <ul class="mobile-nav-bar" id="mobileNav">
+      <li><a href="#results" class="active" data-i18n="nav_results">01. Progression</a></li>
+      <li><a href="#skills" data-i18n="nav_skills">02. Methodology</a></li>
+      <li><a href="#coaching" data-i18n="nav_coaching">03. U18 Team</a></li>
+      <li><a href="#lineage" data-i18n="nav_lineage">04. Lineage</a></li>
+      <li><a href="#connect" data-i18n="nav_connect">05. Connect</a></li>
+    </ul>
   </header>
 
   <main class="container">
-    <!-- Hero: Designed to Fit Cleanly on a Single Mobile Screen -->
+    <!-- ======================================================================
+         HERO — INTENTIONAL MINIMALISM & LIVE METADATA
+         ====================================================================== -->
     <section class="hero">
-      <div class="hero-status" data-i18n="hero_badge">
-        HEAD U18 FIS COACH • MONT GARCEAU • FIS #256564
+      <div class="meta-grid reveal">
+        <div class="meta-cell">
+          <span class="meta-label" data-i18n="meta_role_lbl">Current Assignment</span>
+          <span class="meta-val live">
+            <span class="status-indicator"></span>
+            <span data-i18n="meta_role_val">Head U18 FIS Coach</span>
+          </span>
+        </div>
+        <div class="meta-cell">
+          <span class="meta-label" data-i18n="meta_club_lbl">Base / Club</span>
+          <span class="meta-val">Mont Garceau, QC</span>
+        </div>
+        <div class="meta-cell">
+          <span class="meta-label" data-i18n="meta_fis_lbl">FIS License</span>
+          <span class="meta-val">#256564 (CAN)</span>
+        </div>
+        <div class="meta-cell">
+          <span class="meta-label" data-i18n="meta_time_lbl">Local Telemetry</span>
+          <span class="meta-val" id="localClock">MTL // EST</span>
+        </div>
       </div>
-      <h1 data-i18n="hero_title">
+
+      <h1 class="hero-headline reveal reveal-delay-1" data-i18n="hero_title">
         Engineering Speed on <em>Injected Snow.</em>
       </h1>
-      <p class="hero-lead" data-i18n="hero_sub">
-        Former Top-500 FIS racer, Équipe du Québec alumnus, and U18 FIS Quebec Super Series Champion. Combining active sub-35 FIS point demonstration with trajectory physics and modern biomechanics.
-      </p>
 
-      <!-- 2x2 Mobile Telemetry Strip -->
-      <div class="kpi-grid">
-        <div class="kpi-card orange">
-          <div class="kpi-value" data-i18n="kpi_champ_val">U18 CHAMP</div>
-          <div class="kpi-label" data-i18n="kpi_champ_lbl">FIS Quebec Super Series</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-value">34.95 PB</div>
-          <div class="kpi-label" data-i18n="kpi_1">FIS Points (2-Race Comeback)</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-value">TOP 500</div>
-          <div class="kpi-label" data-i18n="kpi_2">Peak World FIS Ranking</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-value">U18 FIS</div>
-          <div class="kpi-label" data-i18n="kpi_4">Head Coach • Mont Garceau</div>
+      <div class="hero-editorial-row reveal reveal-delay-2">
+        <p class="hero-lead" data-i18n="hero_sub">
+          Former Top-500 FIS racer, Équipe du Québec alumnus, and U18 FIS Quebec Super Series Champion. Combining active sub-35 FIS point demonstration with trajectory physics and modern biomechanics.
+        </p>
+
+        <div class="hero-actions">
+          <a href="https://www.fis-ski.com/DB/general/athlete-biography.html?sectorcode=AL&competitorid=256564&type=result" target="_blank" rel="noopener" class="btn btn-light" id="heroFisBtn">
+            <span data-i18n="cta_fis_results">FIS Profile</span>
+            <span class="btn-arrow">↗</span>
+          </a>
+          <a href="#results" class="btn btn-outline" id="heroGraphBtn" data-i18n="cta_view_graph">
+            View Telemetry ↓
+          </a>
         </div>
       </div>
 
-      <div class="cta-group">
-        <a href="https://www.fis-ski.com/DB/general/athlete-biography.html?sectorcode=AL&competitorid=256564&type=result" target="_blank" rel="noopener" class="btn-primary" data-i18n="cta_fis_results">
-          FIS PROFILE ↗
-        </a>
-        <a href="#connect" class="btn-secondary" data-i18n="cta_connect">
-          @KINGJULIANHQ HUB
-        </a>
+      <!-- 4-Cell Architectural KPI Matrix -->
+      <div class="kpi-matrix reveal reveal-delay-3">
+        <div class="kpi-cell">
+          <div class="kpi-index">
+            <span>01 // TITLE</span>
+            <span class="kpi-dot amber"></span>
+          </div>
+          <div class="kpi-figure" data-i18n="kpi_champ_val">U18 CHAMP</div>
+          <div class="kpi-caption" data-i18n="kpi_champ_lbl">FIS Quebec Super Series</div>
+        </div>
+
+        <div class="kpi-cell">
+          <div class="kpi-index">
+            <span>02 // CAREER PB</span>
+            <span class="kpi-dot"></span>
+          </div>
+          <div class="kpi-figure"><span data-count="34.95" data-decimals="2">34.95</span> PB</div>
+          <div class="kpi-caption" data-i18n="kpi_1">FIS Points (2-Race Comeback)</div>
+        </div>
+
+        <div class="kpi-cell">
+          <div class="kpi-index">
+            <span>03 // WORLD RANK</span>
+            <span class="kpi-dot"></span>
+          </div>
+          <div class="kpi-figure">TOP <span data-count="500" data-decimals="0">500</span></div>
+          <div class="kpi-caption" data-i18n="kpi_2">Peak World FIS Ranking</div>
+        </div>
+
+        <div class="kpi-cell">
+          <div class="kpi-index">
+            <span>04 // COACHING</span>
+            <span class="kpi-dot"></span>
+          </div>
+          <div class="kpi-figure">U18 FIS</div>
+          <div class="kpi-caption" data-i18n="kpi_4">Head Coach • Mont Garceau</div>
+        </div>
       </div>
     </section>
 
-    <!-- 01. Verified Career Highlights & Expandable DLS Data -->
-    <section id="results">
-      <span class="section-tag" data-i18n="sec2_tag">01 // VERIFIED ATHLETE TELEMETRY</span>
-      <h2 class="section-title" data-i18n="sec2_title">Provincial Title & 34.95-Point Comeback</h2>
-      <p class="section-desc" data-i18n="sec2_desc">
-        Built season by season from #29 in first-year U12 to #2 in U16 DLS, U18 FIS Quebec Super Series Champion with S1 Racing, and selection to the Quebec Provincial Team.
-      </p>
+    <!-- ======================================================================
+         01. PROGRESSION GRAPH & VERIFIED TELEMETRY
+         ====================================================================== -->
+    <section id="results" class="editorial-section">
+      <div class="section-header-grid reveal">
+        <div class="section-index" data-i18n="sec2_tag">01 // Telemetry &amp; Progression</div>
+        <div>
+          <h2 class="section-heading" data-i18n="sec2_title">From #29 in U12 to Provincial Champion &amp; 34.95 FIS PB</h2>
+          <p class="section-summary" data-i18n="sec2_desc" style="margin-top: 0.65rem;">
+            Built season by season from #29 in first-year U12 to #2 in U16 DLS, U18 FIS Quebec Super Series Champion with S1 Racing, selection to Équipe du Québec, and a 34.95 FIS point comeback.
+          </p>
+        </div>
+      </div>
 
-      <div class="cards-grid">
-        <div class="card highlight-orange">
-          <span class="card-tag" data-i18n="fis_stat0_tag">SKI QUÉBEC ALPIN // SUPER SÉRIE</span>
-          <h3 data-i18n="fis_stat0_t">🏆 U18 FIS Quebec Super Series Champion</h3>
+      <!-- Interactive Progression Graph Shell -->
+      <div class="progression-shell reveal" id="progressionShell">
+        <div class="graph-toolbar">
+          <div class="graph-title-group">
+            <span class="graph-eyebrow" id="graphEyebrow" data-i18n="graph_eyebrow">VERIFIED PERFORMANCE CURVE // TAP ANY STAGE</span>
+            <span class="graph-title" id="graphMainTitle" data-i18n="graph_title_career">Full Career Trajectory (U12 DLS → FIS Peak &amp; 34.95 PB)</span>
+          </div>
+
+          <div class="mode-switcher" role="tablist" aria-label="Progression Graph View Mode">
+            <button class="mode-btn active" id="modeCareerBtn" onclick="setGraphMode('career')" data-i18n="graph_mode_career">
+              Career Arc (U12–FIS)
+            </button>
+            <button class="mode-btn" id="modeDlsBtn" onclick="setGraphMode('dls')" data-i18n="graph_mode_dls">
+              DLS Rank &amp; Points
+            </button>
+          </div>
+        </div>
+
+        <!-- Responsive SVG Chart (Fits Mobile & Desktop Natively) -->
+        <div class="graph-stage">
+          <svg class="progression-svg" id="progressionSvg" viewBox="0 0 760 270" role="img" aria-label="Julian Brunet Alpine Ski Racing Progression Graph">
+            <defs>
+              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#64748b" />
+                <stop offset="45%" stop-color="#38bdf8" />
+                <stop offset="78%" stop-color="#f59e0b" />
+                <stop offset="100%" stop-color="#38bdf8" />
+              </linearGradient>
+              <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18" />
+                <stop offset="75%" stop-color="#38bdf8" stop-opacity="0.03" />
+                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
+              </linearGradient>
+            </defs>
+
+            <!-- Horizontal Reference Lines -->
+            <g id="svgGridLines">
+              <line x1="42" y1="38" x2="730" y2="38" class="grid-rule" />
+              <line x1="42" y1="98" x2="730" y2="98" class="grid-rule" />
+              <line x1="42" y1="158" x2="730" y2="158" class="grid-rule" />
+              <line x1="42" y1="218" x2="730" y2="218" class="grid-rule" />
+            </g>
+
+            <!-- Left Axis Labels -->
+            <g id="svgYAxisLabels">
+              <text x="8" y="41" class="axis-label" id="yAxisTop">ELITE</text>
+              <text x="8" y="101" class="axis-label" id="yAxisUpper">PODIUM</text>
+              <text x="8" y="161" class="axis-label" id="yAxisMid">TOP 15</text>
+              <text x="8" y="221" class="axis-label" id="yAxisLow">#30</text>
+            </g>
+
+            <!-- Area Fill Under Curve -->
+            <path id="svgAreaPath" class="curve-area" fill="url(#areaGradient)" d="" />
+
+            <!-- Optional Cohort Rank Dashed Comparison Line (in DLS mode) -->
+            <path id="svgCohortPath" class="cohort-line" d="" />
+
+            <!-- Main Trajectory Curve -->
+            <path id="svgCurvePath" class="curve-line" d="" />
+
+            <!-- Active Selection Vertical Hairline -->
+            <line id="svgActiveGuide" class="active-guide-line" x1="0" y1="38" x2="0" y2="224" />
+
+            <!-- Interactive Nodes Group -->
+            <g id="svgNodesGroup"></g>
+          </svg>
+        </div>
+
+        <!-- Thumb-Scrollable Stage Selector Pills -->
+        <div class="stage-pill-strip" id="stagePillStrip" aria-label="Select career stage"></div>
+
+        <!-- Live Telemetry Readout Inspector -->
+        <div class="graph-inspector" aria-live="polite">
+          <div class="inspector-top">
+            <span class="inspector-stage-tag" id="inspectorTag">STAGE 07 // U18 FIS BREAKOUT</span>
+            <div class="inspector-nav-btns">
+              <button class="step-btn" id="prevStageBtn" onclick="stepStage(-1)" aria-label="Previous stage">←</button>
+              <button class="step-btn" id="nextStageBtn" onclick="stepStage(1)" aria-label="Next stage">→</button>
+            </div>
+          </div>
+          <div class="inspector-body">
+            <div class="inspector-metric-group">
+              <span class="inspector-primary-val" id="inspectorMetric">🏆 #1 U18 Champ</span>
+              <span class="inspector-sub-pill" id="inspectorCohort">Super Série Sports Experts</span>
+            </div>
+            <p class="inspector-narrative" id="inspectorDesc">
+              Captured the overall U18 Men's provincial circuit title with S1 Racing before earning selection to Équipe du Québec.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Highlight Cards -->
+      <div class="highlights-duo reveal">
+        <article class="surface-card">
+          <div class="card-eyebrow">
+            <span data-i18n="fis_stat0_tag">SKI QUÉBEC ALPIN // SUPER SÉRIE</span>
+            <span class="signal-tag amber">CHAMPION</span>
+          </div>
+          <h3 data-i18n="fis_stat0_t">U18 FIS Quebec Super Series Champion</h3>
           <p data-i18n="fis_stat0_d">
             Captured the overall U18 Men's provincial circuit title (Super Série Sports Experts) before earning selection to Équipe du Québec and reaching the Top 500 in the world FIS rankings.
           </p>
-        </div>
+        </article>
 
-        <div class="card highlight-cyan">
-          <span class="card-tag" data-i18n="fis_stat1_tag">CONCEPTUAL MASTERY // ZERO GATE TRAINING</span>
+        <article class="surface-card">
+          <div class="card-eyebrow">
+            <span data-i18n="fis_stat1_tag">CONCEPTUAL MASTERY // ZERO GATE TRAINING</span>
+            <span class="signal-tag">34.95 PB</span>
+          </div>
           <h3 data-i18n="fis_stat1_t">34.95 FIS Points Career Best Comeback</h3>
           <p data-i18n="fis_stat1_d">
             Following a season-ending training crash at Mont Adstock and pivoting to coaching U16s, I entered a 2-race late-season comeback with zero formal gate training and scored a career-best 34.95 FIS points.
           </p>
-        </div>
+        </article>
       </div>
 
-      <!-- Collapsible DLS Standings Drawer (Keeps Mobile Clean) -->
-      <details class="drawer">
-        <summary data-i18n="drawer_dls">VIEW U12–U16 DLS CIRCUIT PROGRESSION (2014–2020)</summary>
-        <div class="drawer-content table-scroll">
-          <table>
+      <!-- Collapsible Raw DLS Standings Table -->
+      <details class="minimal-drawer reveal" id="dlsTableDrawer">
+        <summary>
+          <span data-i18n="drawer_dls">COMPLETE U12–U16 DLS CIRCUIT STANDINGS (2014–2020)</span>
+          <span class="drawer-indicator">INDEX TABLE ↓</span>
+        </summary>
+        <div class="table-wrap">
+          <table class="telemetry-table">
             <thead>
               <tr>
                 <th data-i18n="th_season">Season</th>
                 <th data-i18n="th_cat">Category</th>
                 <th data-i18n="th_rank">DLS Rank</th>
                 <th data-i18n="th_cohort">2004 Cohort</th>
-                <th data-i18n="th_pts">Points</th>
+                <th data-i18n="th_pts">DLS Points</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>2014–15</td>
                 <td>U12 (Yr 1)</td>
-                <td><span class="badge">#29</span></td>
+                <td><span class="rank-pill">#29</span></td>
                 <td>#4 (2004)</td>
-                <td>728</td>
+                <td>
+                  <div class="pts-bar-cell">
+                    <span>728</span>
+                    <span class="pts-mini-bar"><span class="pts-mini-fill" style="width: 34%"></span></span>
+                  </div>
+                </td>
               </tr>
               <tr>
                 <td>2015–16</td>
                 <td>U12 (Yr 2)</td>
-                <td><span class="badge top5">#4</span></td>
+                <td><span class="rank-pill top5">#4</span></td>
                 <td>#3 (2004)</td>
-                <td>2,030</td>
+                <td>
+                  <div class="pts-bar-cell">
+                    <span>2,030</span>
+                    <span class="pts-mini-bar"><span class="pts-mini-fill" style="width: 96%"></span></span>
+                  </div>
+                </td>
               </tr>
               <tr>
                 <td>2016–17</td>
                 <td>U14 (Yr 1)</td>
-                <td><span class="badge">#13</span></td>
+                <td><span class="rank-pill">#13</span></td>
                 <td>#3 (2004)</td>
-                <td>858</td>
+                <td>
+                  <div class="pts-bar-cell">
+                    <span>858</span>
+                    <span class="pts-mini-bar"><span class="pts-mini-fill" style="width: 40%"></span></span>
+                  </div>
+                </td>
               </tr>
               <tr>
                 <td>2017–18</td>
                 <td>U14 (Yr 2)</td>
-                <td><span class="badge podium">🥉 #3</span></td>
+                <td><span class="rank-pill podium">🥉 #3</span></td>
                 <td>#3 (2004)</td>
-                <td>2,120</td>
+                <td>
+                  <div class="pts-bar-cell">
+                    <span>2,120</span>
+                    <span class="pts-mini-bar"><span class="pts-mini-fill" style="width: 100%"></span></span>
+                  </div>
+                </td>
               </tr>
               <tr>
                 <td>2018–19</td>
                 <td>U16 (Yr 1)</td>
-                <td><span class="badge">#8</span></td>
+                <td><span class="rank-pill">#8</span></td>
                 <td>#3 (2004)</td>
-                <td>1,130</td>
+                <td>
+                  <div class="pts-bar-cell">
+                    <span>1,130</span>
+                    <span class="pts-mini-bar"><span class="pts-mini-fill" style="width: 53%"></span></span>
+                  </div>
+                </td>
               </tr>
               <tr>
                 <td>2019–20</td>
                 <td>U16 (Yr 2)</td>
-                <td><span class="badge podium">🥈 #2</span></td>
+                <td><span class="rank-pill podium">🥈 #2</span></td>
                 <td>#2 (2004)</td>
-                <td>1,700</td>
+                <td>
+                  <div class="pts-bar-cell">
+                    <span>1,700</span>
+                    <span class="pts-mini-bar"><span class="pts-mini-fill" style="width: 80%"></span></span>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -770,229 +1833,780 @@
       </details>
     </section>
 
-    <!-- 02. Coaching Methodology -->
-    <section id="skills">
-      <span class="section-tag" data-i18n="sec1_tag">02 // METHODOLOGY & SKILLS</span>
-      <h2 class="section-title" data-i18n="sec1_title">Modern Alpine Coaching Architecture</h2>
-      <p class="section-desc" data-i18n="sec1_desc">
-        No rigid dogma—only physics, biomechanics, and what makes an athlete faster down the fall line. Every principle is tested on my own skis first.
-      </p>
+    <!-- ======================================================================
+         02. METHODOLOGY & COACHING ARCHITECTURE
+         ====================================================================== -->
+    <section id="skills" class="editorial-section">
+      <div class="section-header-grid reveal">
+        <div class="section-index" data-i18n="sec1_tag">02 // Methodology &amp; System</div>
+        <div>
+          <h2 class="section-heading" data-i18n="sec1_title">Modern Alpine Coaching Architecture</h2>
+          <p class="section-summary" data-i18n="sec1_desc" style="margin-top: 0.65rem;">
+            No rigid dogma—only physics, biomechanics, and what makes an athlete faster down the fall line. Every principle is tested on my own skis first.
+          </p>
+        </div>
+      </div>
 
-      <div class="cards-grid">
-        <div class="card">
-          <span class="card-tag">SYS.01 // BIOMECHANICS & LINE</span>
-          <h3 data-i18n="sk1_t">Trajectory & Force Physics</h3>
+      <div class="index-list reveal">
+        <article class="index-row">
+          <div class="index-row-meta">
+            <span class="index-num">01</span>
+            <span>// BIOMECHANICS &amp; LINE</span>
+          </div>
+          <h3 data-i18n="sk1_t">Trajectory &amp; Force Physics</h3>
           <p data-i18n="sk1_d">
             Blending motorsport racing-line theory with European technical mechanics: apex timing, shin-to-boot leverage, hip projection, and transition pressure.
           </p>
-        </div>
-        <div class="card">
-          <span class="card-tag">SYS.02 // ACTIVE DEMONSTRATION</span>
-          <h3 data-i18n="sk2_t">Live Sub-35 FIS Point Execution</h3>
+        </article>
+
+        <article class="index-row">
+          <div class="index-row-meta">
+            <span class="index-num">02</span>
+            <span>// ACTIVE EXECUTION</span>
+          </div>
+          <h3 data-i18n="sk2_t">Live Sub-35 FIS Point Demonstration</h3>
           <p data-i18n="sk2_d">
             I still ski active FIS speeds—feeling the exact snow chatter, ruts, and injection conditions as my athletes to demonstrate real-time corrections.
           </p>
-        </div>
-        <div class="card">
-          <span class="card-tag">SYS.03 // INDIVIDUAL CALIBRATION</span>
-          <h3 data-i18n="sk3_t">Anthropometric & Mental Tuning</h3>
+        </article>
+
+        <article class="index-row">
+          <div class="index-row-meta">
+            <span class="index-num">03</span>
+            <span>// INDIVIDUAL CALIBRATION</span>
+          </div>
+          <h3 data-i18n="sk3_t">Anthropometric &amp; Mental Tuning</h3>
           <p data-i18n="sk3_d">
             Calibrating technical cues, tactical risk profiles, and dryland preparation to each racer's leverage ratios, anatomy, and competitive mindset.
           </p>
-        </div>
-        <div class="card">
-          <span class="card-tag">SYS.04 // DIGITAL LAB</span>
+        </article>
+
+        <article class="index-row">
+          <div class="index-row-meta">
+            <span class="index-num">04</span>
+            <span>// DIGITAL LAB</span>
+          </div>
           <h3 data-i18n="sk4_t">High-Frame-Rate Video Breakdown</h3>
           <p data-i18n="sk4_d">
             Translating race telemetry and video analysis into direct, ego-free adjustments on the hill and via @kingjulianhq educational content.
           </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         03. COACHING TRACK RECORD & MONT GARCEAU U18 FIS ROSTER
+         ====================================================================== -->
+    <section id="coaching" class="editorial-section">
+      <div class="section-header-grid reveal">
+        <div class="section-index" data-i18n="sec4_tag">03 // Coaching &amp; Roster</div>
+        <div>
+          <h2 class="section-heading" data-i18n="sec4_title">Club de Ski Mont Garceau</h2>
+        </div>
+      </div>
+
+      <div class="coaching-layout reveal">
+        <article class="surface-card">
+          <div class="card-eyebrow">
+            <span>YEAR 01 MILESTONE // U16 &amp; PROGRAMME PLUS</span>
+            <span class="signal-tag">PROVINCIALS</span>
+          </div>
+          <h3 data-i18n="c_u16_t">2 Weekend-Program Athletes Qualified for Provincials</h3>
+          <p data-i18n="c_u16_d">
+            Guided two weekend-program U16 racers at Mont Garceau all the way to Provincial Championship qualification in my debut coaching season.
+          </p>
+        </article>
+
+        <div class="roster-panel">
+          <div class="card-eyebrow">
+            <span>CURRENT ASSIGNMENT // HEAD COACH — U18 FIS MEN</span>
+            <span class="signal-tag">08 ATHLETES</span>
+          </div>
+          <div class="roster-header">
+            <h3 style="font-family: var(--font-display); font-size: 1.25rem;" data-i18n="c_u18_t">Mont Garceau U18 FIS Squad</h3>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);" data-i18n="c_u18_d">
+            Leading the first-year U18 FIS men's cohort across a full FIS racing and technical development calendar:
+          </p>
+
+          <div class="roster-grid">
+            <div class="roster-athlete">
+              <div class="athlete-idx"><span>01</span><span class="fis-tag">U18 FIS</span></div>
+              <div class="athlete-name">Théo Morisette</div>
+            </div>
+            <div class="roster-athlete">
+              <div class="athlete-idx"><span>02</span><span class="fis-tag">U18 FIS</span></div>
+              <div class="athlete-name">Caleb Bibeau</div>
+            </div>
+            <div class="roster-athlete">
+              <div class="athlete-idx"><span>03</span><span class="fis-tag">U18 FIS</span></div>
+              <div class="athlete-name">Arnaud Marrier</div>
+            </div>
+            <div class="roster-athlete">
+              <div class="athlete-idx"><span>04</span><span class="fis-tag">U18 FIS</span></div>
+              <div class="athlete-name">Derek Nelson</div>
+            </div>
+            <div class="roster-athlete">
+              <div class="athlete-idx"><span>05</span><span class="fis-tag">U18 FIS</span></div>
+              <div class="athlete-name">Méric Pelletier</div>
+            </div>
+            <div class="roster-athlete">
+              <div class="athlete-idx"><span>06</span><span class="fis-tag">U18 FIS</span></div>
+              <div class="athlete-name">Maxime Autran</div>
+            </div>
+            <div class="roster-athlete">
+              <div class="athlete-idx"><span>07</span><span class="fis-tag">U18 FIS</span></div>
+              <div class="athlete-name">Antoine Richard</div>
+            </div>
+            <div class="roster-athlete">
+              <div class="athlete-idx"><span>08</span><span class="fis-tag">U18 FIS</span></div>
+              <div class="athlete-name">Philippe Bernard</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 03. Mont Garceau Coaching & U18 FIS Roster -->
-    <section id="coaching">
-      <span class="section-tag" data-i18n="sec4_tag">03 // COACHING TRACK RECORD & ROSTER</span>
-      <h2 class="section-title" data-i18n="sec4_title">Club de Ski Mont Garceau</h2>
-
-      <div class="card highlight-cyan" style="margin-bottom: 0.85rem;">
-        <span class="card-tag">YEAR 01 MILESTONE // U16 & PROGRAMME PLUS</span>
-        <h3 data-i18n="c_u16_t">2 Weekend-Program Athletes Qualified for Provincials</h3>
-        <p data-i18n="c_u16_d">
-          Guided two weekend-program U16 racers at Mont Garceau all the way to Provincial Championship qualification in my debut coaching season.
-        </p>
+    <!-- ======================================================================
+         04. TECHNICAL LINEAGE & MENTORS
+         ====================================================================== -->
+    <section id="lineage" class="editorial-section">
+      <div class="section-header-grid reveal">
+        <div class="section-index" data-i18n="sec3_tag">04 // Technical Lineage</div>
+        <div>
+          <h2 class="section-heading" data-i18n="sec3_title">Shaped by World-Class Mentors</h2>
+          <p class="section-summary" data-i18n="sec3_desc" style="margin-top: 0.65rem;">
+            From Mont-Tremblant and S1 Racing to European biomechanics specialists and Équipe du Québec—every system contributed a tool to my coaching philosophy.
+          </p>
+        </div>
       </div>
 
-      <div class="card">
-        <span class="card-tag">CURRENT ASSIGNMENT // HEAD COACH — U18 FIS MEN</span>
-        <h3 data-i18n="c_u18_t">Mont Garceau U18 FIS Squad (8 Athletes)</h3>
-        <p data-i18n="c_u18_d">
-          Leading the first-year U18 FIS men's cohort across a full FIS racing and technical development calendar:
-        </p>
-        <div class="squad-grid">
-          <div class="athlete-chip">Théo Morisette <span class="tag">FIS</span></div>
-          <div class="athlete-chip">Caleb Bibeau <span class="tag">FIS</span></div>
-          <div class="athlete-chip">Arnaud Marrier <span class="tag">FIS</span></div>
-          <div class="athlete-chip">Derek Nelson <span class="tag">FIS</span></div>
-          <div class="athlete-chip">Méric Pelletier <span class="tag">FIS</span></div>
-          <div class="athlete-chip">Maxime Autran <span class="tag">FIS</span></div>
-          <div class="athlete-chip">Antoine Richard <span class="tag">FIS</span></div>
-          <div class="athlete-chip">Philippe Bernard <span class="tag">FIS</span></div>
-        </div>
+      <div class="lineage-track reveal">
+        <article class="lineage-item">
+          <div class="lineage-stage"><strong>01</strong> // U12 YR 2 · TREMBLANT</div>
+          <h3 class="lineage-mentor" data-i18n="lin1_t">Nils Pailler &amp; Norbert Poitras</h3>
+          <p class="lineage-desc" data-i18n="lin1_d">
+            Instilled the pure joy, instinct, and athleticism of alpine ski racing.
+          </p>
+        </article>
+
+        <article class="lineage-item">
+          <div class="lineage-stage"><strong>02</strong> // U14 TO FIS YR 1 · TREMBLANT</div>
+          <h3 class="lineage-mentor" data-i18n="lin2_t">My Father — Experimental Simplicity</h3>
+          <p class="lineage-desc" data-i18n="lin2_d">
+            Bold experimentation paired with ruthlessly simple, direct feedback on the single variable that matters.
+          </p>
+        </article>
+
+        <article class="lineage-item">
+          <div class="lineage-stage"><strong>03</strong> // U18 FIS BREAKOUT · S1 RACING</div>
+          <h3 class="lineage-mentor" data-i18n="lin3_t">Jordan Trudel &amp; Claudel May Plouffe</h3>
+          <p class="lineage-desc" data-i18n="lin3_d">
+            Captured the U18 FIS Quebec Super Series Championship under a high-accountability private team model.
+          </p>
+        </article>
+
+        <article class="lineage-item">
+          <div class="lineage-stage"><strong>04</strong> // FIS YR 3 · S1 &amp; SPECIALISTS</div>
+          <h3 class="lineage-mentor" data-i18n="lin4_t">Noemi Dalla Costa, Antony Hérisset, Christophe Beauvais &amp; Sascha Sorio</h3>
+          <p class="lineage-desc" data-i18n="lin4_d">
+            Combined Italian work ethic and Quebec race craft with motorsport racing lines (Beauvais) and European biomechanics (Sorio).
+          </p>
+        </article>
+
+        <article class="lineage-item">
+          <div class="lineage-stage"><strong>05</strong> // ÉQUIPE DU QUÉBEC · PROVINCIAL</div>
+          <h3 class="lineage-mentor" data-i18n="lin5_t">Jonatan Blanchard &amp; Samuel Lacroix</h3>
+          <p class="lineage-desc" data-i18n="lin5_d">
+            Elite provincial standards and rigorous data-driven analysis prior to my transition into coaching.
+          </p>
+        </article>
       </div>
     </section>
 
-    <!-- 04. Mentorship Lineage (Collapsible for Fast Mobile Scanning) -->
-    <section id="lineage">
-      <span class="section-tag" data-i18n="sec3_tag">04 // TECHNICAL LINEAGE</span>
-      <h2 class="section-title" data-i18n="sec3_title">Shaped by World-Class Mentors</h2>
-      <p class="section-desc" data-i18n="sec3_desc">
-        From Mont-Tremblant and S1 Racing to European biomechanics specialists and Équipe du Québec—every system contributed a tool to my coaching philosophy.
-      </p>
-
-      <details class="drawer" open>
-        <summary data-i18n="drawer_lineage">COACHING & MENTORSHIP TIMELINE (5 STAGES)</summary>
-        <div class="drawer-content timeline">
-          <div class="timeline-item">
-            <span class="card-tag">01 // U12 YEAR 2 — MONT TREMBLANT</span>
-            <h3 data-i18n="lin1_t">Nils Pailler & Norbert Poitras</h3>
-            <p data-i18n="lin1_d">Instilled the pure joy, instinct, and athleticism of alpine ski racing.</p>
-          </div>
-          <div class="timeline-item">
-            <span class="card-tag">02 // U14 TO FIS YEAR 1 — MONT TREMBLANT</span>
-            <h3 data-i18n="lin2_t">My Father — Experimental Simplicity</h3>
-            <p data-i18n="lin2_d">Bold experimentation paired with ruthlessly simple, direct feedback on the single variable that matters.</p>
-          </div>
-          <div class="timeline-item">
-            <span class="card-tag">03 // U18 FIS BREAKOUT — S1 RACING</span>
-            <h3 data-i18n="lin3_t">Jordan Trudel & Claudel May Plouffe</h3>
-            <p data-i18n="lin3_d">Captured the U18 FIS Quebec Super Series Championship under a high-accountability private team model.</p>
-          </div>
-          <div class="timeline-item">
-            <span class="card-tag">04 // FIS YEAR 3 — S1 RACING & SPECIALISTS</span>
-            <h3 data-i18n="lin4_t">Noemi Dalla Costa, Antony Hérisset, Christophe Beauvais & Sascha Sorio</h3>
-            <p data-i18n="lin4_d">Combined Italian work ethic and Quebec race craft with motorsport racing lines (Beauvais) and European biomechanics (Sorio).</p>
-          </div>
-          <div class="timeline-item">
-            <span class="card-tag">05 // ÉQUIPE DU QUÉBEC — PROVINCIAL TEAM</span>
-            <h3 data-i18n="lin5_t">Jonatan Blanchard & Samuel Lacroix</h3>
-            <p data-i18n="lin5_d">Elite provincial standards and rigorous data-driven analysis prior to my transition into coaching.</p>
-          </div>
+    <!-- ======================================================================
+         05. DIGITAL LAB & CONNECT
+         ====================================================================== -->
+    <section id="connect" class="editorial-section">
+      <div class="section-header-grid reveal">
+        <div class="section-index" data-i18n="sec5_tag">05 // Digital Lab &amp; Contact</div>
+        <div>
+          <h2 class="section-heading" data-i18n="sec5_title">Follow the Lab &amp; Connect</h2>
+          <p class="section-summary" data-i18n="sec5_desc" style="margin-top: 0.65rem;">
+            Short-form biomechanical breakdowns, trajectory physics, and direct contact for coaching inquiries.
+          </p>
         </div>
-      </details>
-    </section>
+      </div>
 
-    <!-- 05. Digital Lab & Connect -->
-    <section id="connect">
-      <span class="section-tag" data-i18n="sec5_tag">05 // DIGITAL LAB & CONTACT</span>
-      <h2 class="section-title" data-i18n="sec5_title">Follow the Lab & Connect</h2>
-      <p class="section-desc" data-i18n="sec5_desc">
-        Short-form biomechanical breakdowns, trajectory physics, and direct contact for coaching inquiries.
-      </p>
-
-      <div class="social-grid">
-        <a href="https://www.instagram.com/kingjulianhq/" target="_blank" rel="noopener" class="social-card">
-          <div>
-            <div class="social-platform">INSTAGRAM // SKI EDUCATION LAB</div>
-            <div class="social-handle">@kingjulianhq</div>
-            <div class="social-desc" data-i18n="soc1_d">Biomechanics, trajectory physics & race breakdowns.</div>
+      <div class="connect-list reveal">
+        <a href="https://www.instagram.com/kingjulianhq/" target="_blank" rel="noopener" class="connect-row" id="linkIgLab">
+          <div class="connect-left">
+            <span class="connect-platform">01 // INSTAGRAM · SKI EDUCATION LAB</span>
+            <span class="connect-handle">@kingjulianhq</span>
+            <span class="connect-desc" data-i18n="soc1_d">Biomechanics, trajectory physics &amp; race breakdowns.</span>
           </div>
-          <span class="social-arrow">↗</span>
+          <span class="connect-arrow-box">↗</span>
         </a>
 
-        <a href="https://www.tiktok.com/@kingjulianhq" target="_blank" rel="noopener" class="social-card">
-          <div>
-            <div class="social-platform">TIKTOK // SHORT-FORM TELEMETRY</div>
-            <div class="social-handle">@kingjulianhq</div>
-            <div class="social-desc" data-i18n="soc2_d">On-snow drills, line analysis & rapid coaching clips.</div>
+        <a href="https://www.tiktok.com/@kingjulianhq" target="_blank" rel="noopener" class="connect-row" id="linkTiktokLab">
+          <div class="connect-left">
+            <span class="connect-platform">02 // TIKTOK · SHORT-FORM TELEMETRY</span>
+            <span class="connect-handle">@kingjulianhq</span>
+            <span class="connect-desc" data-i18n="soc2_d">On-snow drills, line analysis &amp; rapid coaching clips.</span>
           </div>
-          <span class="social-arrow">↗</span>
+          <span class="connect-arrow-box">↗</span>
         </a>
 
-        <a href="https://www.instagram.com/julian.hyun.brunet/" target="_blank" rel="noopener" class="social-card">
-          <div>
-            <div class="social-platform">INSTAGRAM // PERSONAL & COACHING DM</div>
-            <div class="social-handle">@julian.hyun.brunet</div>
-            <div class="social-desc" data-i18n="soc3_d">Personal journey & direct messaging for inquiries.</div>
+        <a href="https://www.instagram.com/julian.hyun.brunet/" target="_blank" rel="noopener" class="connect-row" id="linkIgPersonal">
+          <div class="connect-left">
+            <span class="connect-platform">03 // INSTAGRAM · PERSONAL &amp; COACHING DM</span>
+            <span class="connect-handle">@julian.hyun.brunet</span>
+            <span class="connect-desc" data-i18n="soc3_d">Personal journey &amp; direct messaging for inquiries.</span>
           </div>
-          <span class="social-arrow">↗</span>
+          <span class="connect-arrow-box">↗</span>
         </a>
 
-        <a href="https://www.facebook.com/julian.hyun.brunet/" target="_blank" rel="noopener" class="social-card">
-          <div>
-            <div class="social-platform">FACEBOOK // COMMUNITY NETWORK</div>
-            <div class="social-handle">Julian Hyun Brunet</div>
-            <div class="social-desc" data-i18n="soc4_d">Connect for parents, club directors & Quebec racing.</div>
+        <a href="https://www.facebook.com/julian.hyun.brunet/" target="_blank" rel="noopener" class="connect-row" id="linkFacebook">
+          <div class="connect-left">
+            <span class="connect-platform">04 // FACEBOOK · COMMUNITY NETWORK</span>
+            <span class="connect-handle">Julian Hyun Brunet</span>
+            <span class="connect-desc" data-i18n="soc4_d">Connect for parents, club directors &amp; Quebec racing.</span>
           </div>
-          <span class="social-arrow">↗</span>
+          <span class="connect-arrow-box">↗</span>
+        </a>
+
+        <a href="https://www.fis-ski.com/DB/general/athlete-biography.html?sectorcode=AL&competitorid=256564&type=result" target="_blank" rel="noopener" class="connect-row" id="linkFisBio">
+          <div class="connect-left">
+            <span class="connect-platform">05 // OFFICIAL DATABASE · FÉDÉRATION INTERNATIONALE DE SKI</span>
+            <span class="connect-handle">FIS #256564</span>
+            <span class="connect-desc" data-i18n="soc5_d">Verified race results, FIS point history &amp; competitor biography.</span>
+          </div>
+          <span class="connect-arrow-box">↗</span>
         </a>
       </div>
     </section>
   </main>
 
-  <footer>
-    <div class="container">
-      JULIAN BRUNET • JBRUNET.COM • FIS #256564
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>JULIAN BRUNET • JBRUNET.COM • FIS #256564</div>
+      <a href="#top" class="footer-top-link" id="backToTopLink" data-i18n="footer_top">TOP ↑</a>
     </div>
   </footer>
 
-  <!-- Bilingual EN / FR Engine with URL (?lang=fr) & Memory Support -->
+  <!-- ========================================================================
+       INTERACTIVE PROGRESSION ENGINE, BILINGUAL I18N & MOTION CONTROLLER
+       ======================================================================== -->
   <script>
     let currentLang = 'en';
+    let currentGraphMode = 'career'; // 'career' | 'dls'
+    let activeStageIdx = 6; // Defaults to U18 FIS Champ (#1) on initial load
 
+    // Verified Career & DLS Progression Datasets (Bilingual EN / FR)
+    const graphDatasets = {
+      career: {
+        yLabels: {
+          en: ['ELITE', 'PODIUM', 'TOP 15', '#30'],
+          fr: ['ÉLITE', 'PODIUM', 'TOP 15', '#30']
+        },
+        nodes: [
+          {
+            short: '14–15',
+            pill: 'U12 Y1',
+            valLabel: '#29',
+            y: 212,
+            milestone: false,
+            tag: { en: 'STAGE 01 // 2014–15 · U12 YEAR 1', fr: 'ÉTAPE 01 // 2014–15 · U12 1RE ANNÉE' },
+            metric: { en: '#29 DLS Overall', fr: '#29 Général DLS' },
+            sub: { en: '728 Pts • #4 (2004 Cohort)', fr: '728 Pts • #4 (Cohorte 2004)' },
+            desc: {
+              en: 'Entry season on the Laurentian Ski Division (DLS) circuit at Mont-Tremblant, establishing baseline technical fundamentals.',
+              fr: 'Première saison sur le circuit de la Division Laurentienne de Ski (DLS) à Mont-Tremblant et mise en place des bases techniques.'
+            }
+          },
+          {
+            short: '15–16',
+            pill: 'U12 Y2',
+            valLabel: '#4',
+            y: 108,
+            milestone: false,
+            tag: { en: 'STAGE 02 // 2015–16 · U12 YEAR 2', fr: 'ÉTAPE 02 // 2015–16 · U12 2E ANNÉE' },
+            metric: { en: '#4 DLS Overall', fr: '#4 Général DLS' },
+            sub: { en: '2,030 Pts • #3 (2004 Cohort)', fr: '2 030 Pts • #3 (Cohorte 2004)' },
+            desc: {
+              en: 'Surged 25 spots in a single season under Mont-Tremblant coaches Nils Pailler & Norbert Poitras.',
+              fr: 'Bond de 25 places au classement général en une seule saison avec les entraîneurs Nils Pailler et Norbert Poitras à Tremblant.'
+            }
+          },
+          {
+            short: '16–17',
+            pill: 'U14 Y1',
+            valLabel: '#13',
+            y: 158,
+            milestone: false,
+            tag: { en: 'STAGE 03 // 2016–17 · U14 YEAR 1', fr: 'ÉTAPE 03 // 2016–17 · U14 1RE ANNÉE' },
+            metric: { en: '#13 DLS Overall', fr: '#13 Général DLS' },
+            sub: { en: '858 Pts • #3 (2004 Cohort)', fr: '858 Pts • #3 (Cohorte 2004)' },
+            desc: {
+              en: 'Held Top-3 standing in the 2004 birth cohort while adapting to longer radii and higher speeds in first-year U14.',
+              fr: 'Maintien du Top 3 de la cohorte 2004 lors de la transition vers les rayons plus longs en première année U14.'
+            }
+          },
+          {
+            short: '17–18',
+            pill: 'U14 Y2',
+            valLabel: '🥉 #3',
+            y: 92,
+            milestone: true,
+            tag: { en: 'STAGE 04 // 2017–18 · U14 YEAR 2', fr: 'ÉTAPE 04 // 2017–18 · U14 2E ANNÉE' },
+            metric: { en: '🥉 #3 DLS Overall', fr: '🥉 #3 Général DLS' },
+            sub: { en: '2,120 Pts • Career High DLS Points', fr: '2 120 Pts • Sommet de points DLS' },
+            desc: {
+              en: 'Overall U14 DLS circuit podium (#3) with 2,120 points through experimental simplicity and direct technical cues.',
+              fr: 'Podium général U14 DLS (#3) avec 2 120 points grâce à une approche expérimentale directe et ciblée.'
+            }
+          },
+          {
+            short: '18–19',
+            pill: 'U16 Y1',
+            valLabel: '#8',
+            y: 132,
+            milestone: false,
+            tag: { en: 'STAGE 05 // 2018–19 · U16 YEAR 1', fr: 'ÉTAPE 05 // 2018–19 · U16 1RE ANNÉE' },
+            metric: { en: '#8 DLS Overall', fr: '#8 Général DLS' },
+            sub: { en: '1,130 Pts • #3 (2004 Cohort)', fr: '1 130 Pts • #3 (Cohorte 2004)' },
+            desc: {
+              en: 'Top-8 overall finish as a first-year U16 while maintaining #3 ranking among all 2004-born athletes.',
+              fr: 'Top 8 au classement général dès la 1re année U16 tout en conservant le 3e rang de la cohorte 2004.'
+            }
+          },
+          {
+            short: '19–20',
+            pill: 'U16 Y2',
+            valLabel: '🥈 #2',
+            y: 78,
+            milestone: true,
+            tag: { en: 'STAGE 06 // 2019–20 · U16 YEAR 2', fr: 'ÉTAPE 06 // 2019–20 · U16 2E ANNÉE' },
+            metric: { en: '🥈 #2 DLS Vice-Champ', fr: '🥈 #2 Vice-Champion DLS' },
+            sub: { en: '1,700 Pts • #2 (2004 Cohort)', fr: '1 700 Pts • #2 (Cohorte 2004)' },
+            desc: {
+              en: 'Finished #2 overall on the U16 DLS circuit and #2 in the 2004 cohort entering the FIS ranks.',
+              fr: 'Vice-champion général du circuit U16 DLS (#2) et #2 de la cohorte 2004 avant le passage au niveau FIS.'
+            }
+          },
+          {
+            short: 'U18 FIS',
+            pill: 'U18 CHAMP',
+            valLabel: '🏆 #1',
+            y: 52,
+            milestone: true,
+            tag: { en: 'STAGE 07 // U18 FIS · S1 RACING', fr: 'ÉTAPE 07 // U18 FIS · S1 RACING' },
+            metric: { en: '🏆 #1 U18 Super Series', fr: '🏆 #1 Super Série U18' },
+            sub: { en: 'Ski Québec Alpin Provincial Title', fr: 'Champion Provincial Ski Québec Alpin' },
+            desc: {
+              en: 'Captured the overall U18 FIS Quebec Super Series Championship (Super Série Sports Experts) with S1 Racing.',
+              fr: 'Conquête du titre de Champion U18 de la Super Série FIS Québec (Super Série Sports Experts) avec S1 Racing.'
+            }
+          },
+          {
+            short: 'QC TEAM',
+            pill: 'TOP 500',
+            valLabel: 'TOP 500',
+            y: 44,
+            milestone: false,
+            tag: { en: 'STAGE 08 // ÉQUIPE DU QUÉBEC · FIS', fr: 'ÉTAPE 08 // ÉQUIPE DU QUÉBEC · FIS' },
+            metric: { en: 'Top 500 World FIS', fr: 'Top 500 Mondial FIS' },
+            sub: { en: 'Quebec Provincial Team Selection', fr: 'Sélection Équipe du Québec' },
+            desc: {
+              en: 'Earned selection to Équipe du Québec and climbed into the Top 500 of the world FIS alpine rankings.',
+              fr: 'Sélection au sein de l’Équipe du Québec et ascension dans le Top 500 du classement mondial FIS.'
+            }
+          },
+          {
+            short: 'FIS PB',
+            pill: '34.95 PB',
+            valLabel: '34.95 PB',
+            y: 38,
+            milestone: true,
+            tag: { en: 'STAGE 09 // CONCEPTUAL COMEBACK · FIS PB', fr: 'ÉTAPE 09 // RETOUR CONCEPTUEL · RECORD FIS' },
+            metric: { en: '34.95 FIS Points PB', fr: 'Record 34.95 Points FIS' },
+            sub: { en: '2-Race Comeback • 0 Gate Training', fr: 'Retour de 2 courses • 0 Entraînement' },
+            desc: {
+              en: 'After pivoting to coaching U16s following an injury at Mont Adstock, returned for 2 late-season FIS races with zero gate training and scored a career-best 34.95 FIS points.',
+              fr: 'Après ma blessure à Adstock et ma transition vers le coaching U16, retour de 2 courses sans entraînement dans les portes pour signer mon record à 34.95 points FIS.'
+            }
+          }
+        ]
+      },
+      dls: {
+        yLabels: {
+          en: ['#1 RANK', '#5 RANK', '#15 RANK', '#30 RANK'],
+          fr: ['RANG #1', 'RANG #5', 'RANG #15', 'RANG #30']
+        },
+        nodes: [
+          {
+            short: '2014–15',
+            pill: '14–15 (U12)',
+            valLabel: '#29 (728p)',
+            y: 212,
+            cohortY: 96,
+            milestone: false,
+            tag: { en: 'DLS 01 // 2014–15 · U12 YEAR 1', fr: 'DLS 01 // 2014–15 · U12 1RE ANNÉE' },
+            metric: { en: 'Rank #29 • 728 Pts', fr: 'Rang #29 • 728 Pts' },
+            sub: { en: '2004 Cohort Rank: #4', fr: 'Rang Cohorte 2004 : #4' },
+            desc: {
+              en: 'First season on the DLS circuit: #29 overall across both birth years and already #4 among 2004-born racers.',
+              fr: 'Première saison sur le circuit DLS : #29 au général et déjà #4 parmi les coureurs nés en 2004.'
+            }
+          },
+          {
+            short: '2015–16',
+            pill: '15–16 (U12)',
+            valLabel: '#4 (2,030p)',
+            y: 86,
+            cohortY: 82,
+            milestone: true,
+            tag: { en: 'DLS 02 // 2015–16 · U12 YEAR 2', fr: 'DLS 02 // 2015–16 · U12 2E ANNÉE' },
+            metric: { en: 'Rank #4 • 2,030 Pts', fr: 'Rang #4 • 2 030 Pts' },
+            sub: { en: '2004 Cohort Rank: #3', fr: 'Rang Cohorte 2004 : #3' },
+            desc: {
+              en: 'Nearly tripled season points (728 → 2,030) to climb from #29 to #4 overall and #3 in the 2004 cohort.',
+              fr: 'Points presque triplés (728 → 2 030) pour passer du 29e au 4e rang général et #3 de la cohorte 2004.'
+            }
+          },
+          {
+            short: '2016–17',
+            pill: '16–17 (U14)',
+            valLabel: '#13 (858p)',
+            y: 142,
+            cohortY: 82,
+            milestone: false,
+            tag: { en: 'DLS 03 // 2016–17 · U14 YEAR 1', fr: 'DLS 03 // 2016–17 · U14 1RE ANNÉE' },
+            metric: { en: 'Rank #13 • 858 Pts', fr: 'Rang #13 • 858 Pts' },
+            sub: { en: '2004 Cohort Rank: #3', fr: 'Rang Cohorte 2004 : #3' },
+            desc: {
+              en: 'First-year U14 campaign: #13 overall against older second-year athletes while holding #3 in the 2004 cohort.',
+              fr: 'Première année U14 : #13 au général face aux 2e années tout en conservant le 3e rang de la cohorte 2004.'
+            }
+          },
+          {
+            short: '2017–18',
+            pill: '17–18 (U14)',
+            valLabel: '🥉 #3 (2,120p)',
+            y: 72,
+            cohortY: 82,
+            milestone: true,
+            tag: { en: 'DLS 04 // 2017–18 · U14 YEAR 2', fr: 'DLS 04 // 2017–18 · U14 2E ANNÉE' },
+            metric: { en: '🥉 Rank #3 • 2,120 Pts', fr: '🥉 Rang #3 • 2 120 Pts' },
+            sub: { en: '2004 Cohort Rank: #3', fr: 'Rang Cohorte 2004 : #3' },
+            desc: {
+              en: 'Overall U14 DLS bronze medalist with a career-high 2,120 circuit points.',
+              fr: 'Médaillé de bronze au classement général U14 DLS avec un sommet personnel de 2 120 points.'
+            }
+          },
+          {
+            short: '2018–19',
+            pill: '18–19 (U16)',
+            valLabel: '#8 (1,130p)',
+            y: 112,
+            cohortY: 82,
+            milestone: false,
+            tag: { en: 'DLS 05 // 2018–19 · U16 YEAR 1', fr: 'DLS 05 // 2018–19 · U16 1RE ANNÉE' },
+            metric: { en: 'Rank #8 • 1,130 Pts', fr: 'Rang #8 • 1 130 Pts' },
+            sub: { en: '2004 Cohort Rank: #3', fr: 'Rang Cohorte 2004 : #3' },
+            desc: {
+              en: 'Strongest first-year transition yet (#29 in U12 Y1 → #13 in U14 Y1 → #8 in U16 Y1).',
+              fr: 'Meilleure transition de première année (#29 en U12 A1 → #13 en U14 A1 → #8 en U16 A1).'
+            }
+          },
+          {
+            short: '2019–20',
+            pill: '19–20 (U16)',
+            valLabel: '🥈 #2 (1,700p)',
+            y: 52,
+            cohortY: 52,
+            milestone: true,
+            tag: { en: 'DLS 06 // 2019–20 · U16 YEAR 2', fr: 'DLS 06 // 2019–20 · U16 2E ANNÉE' },
+            metric: { en: '🥈 Rank #2 • 1,700 Pts', fr: '🥈 Rang #2 • 1 700 Pts' },
+            sub: { en: '2004 Cohort Rank: #2', fr: 'Rang Cohorte 2004 : #2' },
+            desc: {
+              en: 'Capped 6-year DLS progression as U16 Overall Vice-Champion (#2) and #2 in the 2004 cohort.',
+              fr: 'Conclusion des 6 saisons DLS avec le titre de Vice-Champion général U16 (#2) et #2 de la cohorte 2004.'
+            }
+          }
+        ]
+      }
+    };
+
+    // Smooth Catmull-Rom / Cubic Bezier SVG path generator
+    function buildSmoothPath(points) {
+      if (!points.length) return '';
+      if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+      let d = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i === 0 ? 0 : i - 1];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    function renderProgressionGraph() {
+      const dataset = graphDatasets[currentGraphMode];
+      const nodes = dataset.nodes;
+      const startX = 68;
+      const endX = 712;
+      const stepX = (endX - startX) / (nodes.length - 1);
+
+      // Update Y-axis labels
+      const yLbls = dataset.yLabels[currentLang];
+      document.getElementById('yAxisTop').textContent = yLbls[0];
+      document.getElementById('yAxisUpper').textContent = yLbls[1];
+      document.getElementById('yAxisMid').textContent = yLbls[2];
+      document.getElementById('yAxisLow').textContent = yLbls[3];
+
+      const coords = nodes.map((n, idx) => ({
+        x: startX + idx * stepX,
+        y: n.y,
+        cohortY: n.cohortY || n.y
+      }));
+
+      const curveD = buildSmoothPath(coords);
+      const areaD = `${curveD} L ${coords[coords.length - 1].x.toFixed(1)} 224 L ${coords[0].x.toFixed(1)} 224 Z`;
+
+      const svgCurvePath = document.getElementById('svgCurvePath');
+      const svgAreaPath = document.getElementById('svgAreaPath');
+      const svgCohortPath = document.getElementById('svgCohortPath');
+
+      svgCurvePath.setAttribute('d', curveD);
+      svgAreaPath.setAttribute('d', areaD);
+
+      if (currentGraphMode === 'dls') {
+        const cohortCoords = coords.map(c => ({ x: c.x, y: c.cohortY }));
+        svgCohortPath.setAttribute('d', buildSmoothPath(cohortCoords));
+        svgCohortPath.classList.add('visible');
+      } else {
+        svgCohortPath.classList.remove('visible');
+      }
+
+      // Render SVG Interactive Nodes
+      const nodesGroup = document.getElementById('svgNodesGroup');
+      nodesGroup.innerHTML = '';
+
+      // Render Stage Pill Strip
+      const pillStrip = document.getElementById('stagePillStrip');
+      pillStrip.innerHTML = '';
+
+      if (activeStageIdx >= nodes.length) {
+        activeStageIdx = nodes.length - 1;
+      }
+
+      nodes.forEach((node, idx) => {
+        const cx = coords[idx].x;
+        const cy = coords[idx].y;
+        const isActive = idx === activeStageIdx;
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', `graph-node ${node.milestone ? 'milestone' : ''} ${isActive ? 'is-active' : ''}`);
+        g.setAttribute('tabindex', '0');
+        g.setAttribute('role', 'button');
+        g.setAttribute('aria-label', `${node.short}: ${node.valLabel}`);
+
+        // Value label above point
+        const valText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        valText.setAttribute('x', cx);
+        valText.setAttribute('y', cy - 14);
+        valText.setAttribute('text-anchor', 'middle');
+        valText.setAttribute('class', 'node-val-label');
+        valText.textContent = node.valLabel;
+
+        // X-axis label below baseline
+        const xText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        xText.setAttribute('x', cx);
+        xText.setAttribute('y', 248);
+        xText.setAttribute('text-anchor', 'middle');
+        xText.setAttribute('class', 'node-x-label');
+        xText.textContent = node.short;
+
+        // Outer pulse ring
+        const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        ring.setAttribute('cx', cx);
+        ring.setAttribute('cy', cy);
+        ring.setAttribute('r', isActive ? '11' : '7');
+        ring.setAttribute('class', 'node-ring');
+
+        // Core dot
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', cx);
+        dot.setAttribute('cy', cy);
+        dot.setAttribute('r', isActive ? '5.5' : '4.2');
+        dot.setAttribute('class', 'node-dot');
+
+        // Invisible larger touch target (44px equivalent in viewBox)
+        const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        hit.setAttribute('cx', cx);
+        hit.setAttribute('cy', cy);
+        hit.setAttribute('r', '26');
+        hit.setAttribute('class', 'node-hit');
+
+        g.appendChild(valText);
+        g.appendChild(xText);
+        g.appendChild(ring);
+        g.appendChild(dot);
+        g.appendChild(hit);
+
+        g.addEventListener('click', () => selectStage(idx));
+        g.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectStage(idx);
+          }
+        });
+
+        nodesGroup.appendChild(g);
+
+        // Create corresponding thumb pill button
+        const pill = document.createElement('button');
+        pill.className = `stage-pill ${isActive ? 'active' : ''}`;
+        pill.textContent = node.pill;
+        pill.addEventListener('click', () => selectStage(idx));
+        pillStrip.appendChild(pill);
+      });
+
+      updateInspector(coords);
+    }
+
+    function updateInspector(coordsArg) {
+      const dataset = graphDatasets[currentGraphMode];
+      const nodes = dataset.nodes;
+      const startX = 68;
+      const endX = 712;
+      const stepX = (endX - startX) / (nodes.length - 1);
+      const activeNode = nodes[activeStageIdx];
+      const cx = coordsArg ? coordsArg[activeStageIdx].x : (startX + activeStageIdx * stepX);
+      const cy = activeNode.y;
+
+      // Move vertical guide line
+      const guide = document.getElementById('svgActiveGuide');
+      guide.setAttribute('x1', cx);
+      guide.setAttribute('x2', cx);
+      guide.setAttribute('y1', cy + 6);
+
+      // Update inspector text
+      const tagEl = document.getElementById('inspectorTag');
+      tagEl.textContent = activeNode.tag[currentLang];
+      tagEl.className = `inspector-stage-tag ${activeNode.milestone ? 'amber' : ''}`;
+
+      document.getElementById('inspectorMetric').textContent = activeNode.metric[currentLang];
+      document.getElementById('inspectorCohort').textContent = activeNode.sub[currentLang];
+      document.getElementById('inspectorDesc').textContent = activeNode.desc[currentLang];
+    }
+
+    function selectStage(idx) {
+      activeStageIdx = idx;
+      renderProgressionGraph();
+    }
+
+    function stepStage(delta) {
+      const len = graphDatasets[currentGraphMode].nodes.length;
+      activeStageIdx = (activeStageIdx + delta + len) % len;
+      renderProgressionGraph();
+    }
+
+    function setGraphMode(mode) {
+      currentGraphMode = mode;
+      document.getElementById('modeCareerBtn').classList.toggle('active', mode === 'career');
+      document.getElementById('modeDlsBtn').classList.toggle('active', mode === 'dls');
+
+      const titleEl = document.getElementById('graphMainTitle');
+      const titleKey = mode === 'career' ? 'graph_title_career' : 'graph_title_dls';
+      titleEl.setAttribute('data-i18n', titleKey);
+      titleEl.innerHTML = translations[currentLang][titleKey];
+
+      // Select peak stage for that view
+      activeStageIdx = mode === 'career' ? 6 : 5;
+
+      // Retrigger subtle line draw animation
+      const shell = document.getElementById('progressionShell');
+      shell.classList.remove('is-drawn');
+      renderProgressionGraph();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          shell.classList.add('is-drawn');
+        });
+      });
+    }
+
+    // Bilingual Translations Dictionary (EN / FR)
     const translations = {
       en: {
-        nav_results: "01. Results",
+        nav_results: "01. Progression",
         nav_skills: "02. Methodology",
         nav_coaching: "03. U18 Team",
-        nav_lineage: "04. Mentors",
+        nav_lineage: "04. Lineage",
         nav_connect: "05. Connect",
-        hero_badge: "HEAD U18 FIS COACH • MONT GARCEAU • FIS #256564",
+        meta_role_lbl: "Current Assignment",
+        meta_role_val: "Head U18 FIS Coach",
+        meta_club_lbl: "Base / Club",
+        meta_fis_lbl: "FIS License",
+        meta_time_lbl: "Local Telemetry",
         hero_title: "Engineering Speed on <em>Injected Snow.</em>",
         hero_sub: "Former Top-500 FIS racer, Équipe du Québec alumnus, and U18 FIS Quebec Super Series Champion. Combining active sub-35 FIS point demonstration with trajectory physics and modern biomechanics.",
+        cta_fis_results: "FIS Profile",
+        cta_view_graph: "View Telemetry ↓",
         kpi_champ_val: "U18 CHAMP",
         kpi_champ_lbl: "FIS Quebec Super Series",
         kpi_1: "FIS Points (2-Race Comeback)",
         kpi_2: "Peak World FIS Ranking",
         kpi_4: "Head Coach • Mont Garceau",
-        cta_fis_results: "FIS PROFILE ↗",
-        cta_connect: "@KINGJULIANHQ HUB",
-        sec2_tag: "01 // VERIFIED ATHLETE TELEMETRY",
-        sec2_title: "Provincial Title & 34.95-Point Comeback",
-        sec2_desc: "Built season by season from #29 in first-year U12 to #2 in U16 DLS, U18 FIS Quebec Super Series Champion with S1 Racing, and selection to the Quebec Provincial Team.",
+        sec2_tag: "01 // Telemetry & Progression",
+        sec2_title: "From #29 in U12 to Provincial Champion & 34.95 FIS PB",
+        sec2_desc: "Built season by season from #29 in first-year U12 to #2 in U16 DLS, U18 FIS Quebec Super Series Champion with S1 Racing, selection to Équipe du Québec, and a 34.95 FIS point comeback.",
+        graph_eyebrow: "VERIFIED PERFORMANCE CURVE // TAP ANY STAGE",
+        graph_title_career: "Full Career Trajectory (U12 DLS → FIS Peak & 34.95 PB)",
+        graph_title_dls: "DLS Circuit Standings & 2004 Cohort Rank (2014–2020)",
+        graph_mode_career: "Career Arc (U12–FIS)",
+        graph_mode_dls: "DLS Rank & Points",
         fis_stat0_tag: "SKI QUÉBEC ALPIN // SUPER SÉRIE",
-        fis_stat0_t: "🏆 U18 FIS Quebec Super Series Champion",
+        fis_stat0_t: "U18 FIS Quebec Super Series Champion",
         fis_stat0_d: "Captured the overall U18 Men's provincial circuit title (Super Série Sports Experts) before earning selection to Équipe du Québec and reaching the Top 500 in the world FIS rankings.",
         fis_stat1_tag: "CONCEPTUAL MASTERY // ZERO GATE TRAINING",
         fis_stat1_t: "34.95 FIS Points Career Best Comeback",
         fis_stat1_d: "Following a season-ending training crash at Mont Adstock and pivoting to coaching U16s, I entered a 2-race late-season comeback with zero formal gate training and scored a career-best 34.95 FIS points.",
-        drawer_dls: "VIEW U12–U16 DLS CIRCUIT PROGRESSION (2014–2020)",
+        drawer_dls: "COMPLETE U12–U16 DLS CIRCUIT STANDINGS (2014–2020)",
         th_season: "Season",
         th_cat: "Category",
         th_rank: "DLS Rank",
         th_cohort: "2004 Cohort",
-        th_pts: "Points",
-        sec1_tag: "02 // METHODOLOGY & SKILLS",
+        th_pts: "DLS Points",
+        sec1_tag: "02 // Methodology & System",
         sec1_title: "Modern Alpine Coaching Architecture",
         sec1_desc: "No rigid dogma—only physics, biomechanics, and what makes an athlete faster down the fall line. Every principle is tested on my own skis first.",
         sk1_t: "Trajectory & Force Physics",
         sk1_d: "Blending motorsport racing-line theory with European technical mechanics: apex timing, shin-to-boot leverage, hip projection, and transition pressure.",
-        sk2_t: "Live Sub-35 FIS Point Execution",
+        sk2_t: "Live Sub-35 FIS Point Demonstration",
         sk2_d: "I still ski active FIS speeds—feeling the exact snow chatter, ruts, and injection conditions as my athletes to demonstrate real-time corrections.",
         sk3_t: "Anthropometric & Mental Tuning",
         sk3_d: "Calibrating technical cues, tactical risk profiles, and dryland preparation to each racer's leverage ratios, anatomy, and competitive mindset.",
         sk4_t: "High-Frame-Rate Video Breakdown",
         sk4_d: "Translating race telemetry and video analysis into direct, ego-free adjustments on the hill and via @kingjulianhq educational content.",
-        sec4_tag: "03 // COACHING TRACK RECORD & ROSTER",
+        sec4_tag: "03 // Coaching & Roster",
         sec4_title: "Club de Ski Mont Garceau",
         c_u16_t: "2 Weekend-Program Athletes Qualified for Provincials",
         c_u16_d: "Guided two weekend-program U16 racers at Mont Garceau all the way to Provincial Championship qualification in my debut coaching season.",
-        c_u18_t: "Mont Garceau U18 FIS Squad (8 Athletes)",
+        c_u18_t: "Mont Garceau U18 FIS Squad",
         c_u18_d: "Leading the first-year U18 FIS men's cohort across a full FIS racing and technical development calendar:",
-        sec3_tag: "04 // TECHNICAL LINEAGE",
+        sec3_tag: "04 // Technical Lineage",
         sec3_title: "Shaped by World-Class Mentors",
         sec3_desc: "From Mont-Tremblant and S1 Racing to European biomechanics specialists and Équipe du Québec—every system contributed a tool to my coaching philosophy.",
-        drawer_lineage: "COACHING & MENTORSHIP TIMELINE (5 STAGES)",
         lin1_t: "Nils Pailler & Norbert Poitras",
         lin1_d: "Instilled the pure joy, instinct, and athleticism of alpine ski racing.",
         lin2_t: "My Father — Experimental Simplicity",
@@ -1003,46 +2617,57 @@
         lin4_d: "Combined Italian work ethic and Quebec race craft with motorsport racing lines (Beauvais) and European biomechanics (Sorio).",
         lin5_t: "Jonatan Blanchard & Samuel Lacroix",
         lin5_d: "Elite provincial standards and rigorous data-driven analysis prior to my transition into coaching.",
-        sec5_tag: "05 // DIGITAL LAB & CONTACT",
+        sec5_tag: "05 // Digital Lab & Contact",
         sec5_title: "Follow the Lab & Connect",
         sec5_desc: "Short-form biomechanical breakdowns, trajectory physics, and direct contact for coaching inquiries.",
         soc1_d: "Biomechanics, trajectory physics & race breakdowns.",
         soc2_d: "On-snow drills, line analysis & rapid coaching clips.",
         soc3_d: "Personal journey & direct messaging for inquiries.",
-        soc4_d: "Connect for parents, club directors & Quebec racing."
+        soc4_d: "Connect for parents, club directors & Quebec racing.",
+        soc5_d: "Verified race results, FIS point history & competitor biography.",
+        footer_top: "TOP ↑"
       },
       fr: {
-        nav_results: "01. Résultats",
+        nav_results: "01. Progression",
         nav_skills: "02. Méthode",
         nav_coaching: "03. Équipe U18",
-        nav_lineage: "04. Mentors",
+        nav_lineage: "04. Lignée",
         nav_connect: "05. Contact",
-        hero_badge: "ENTRAÎNEUR-CHEF U18 FIS • MONT GARCEAU • FIS #256564",
+        meta_role_lbl: "Poste Actuel",
+        meta_role_val: "Entraîneur-Chef U18 FIS",
+        meta_club_lbl: "Club / Base",
+        meta_fis_lbl: "Licence FIS",
+        meta_time_lbl: "Télémétrie Locale",
         hero_title: "L'Ingénierie de la Vitesse sur <em>Neige Injectée.</em>",
         hero_sub: "Ancien coureur du Top 500 mondial FIS, ancien de l'Équipe du Québec et Champion U18 de la Super Série FIS Québec. Démonstration active sous les 35 points FIS, physique des trajectoires et biomécanique moderne.",
+        cta_fis_results: "Profil FIS",
+        cta_view_graph: "Voir Courbe ↓",
         kpi_champ_val: "CHAMPION U18",
         kpi_champ_lbl: "Super Série FIS Québec",
         kpi_1: "Points FIS (Retour en 2 courses)",
         kpi_2: "Sommet Classement Mondial FIS",
         kpi_4: "Entraîneur-Chef • Mont Garceau",
-        cta_fis_results: "PROFIL FIS ↗",
-        cta_connect: "LABO @KINGJULIANHQ",
-        sec2_tag: "01 // TÉLÉMÉTRIE ET RÉSULTATS VÉRIFIÉS",
-        sec2_title: "Titre Provincial & Retour à 34.95 Points FIS",
-        sec2_desc: "Une progression bâtie saison après saison : du 29e rang U12 au 2e rang U16 DLS, Champion U18 de la Super Série FIS Québec avec S1 Racing, jusqu'à l'Équipe du Québec.",
+        sec2_tag: "01 // Télémétrie & Progression",
+        sec2_title: "Du #29 en U12 au Titre Provincial & Record à 34.95 Pts FIS",
+        sec2_desc: "Une progression bâtie saison après saison : du 29e rang U12 au 2e rang U16 DLS, Champion U18 de la Super Série FIS Québec avec S1 Racing, sélection au sein de l'Équipe du Québec et retour à 34.95 points FIS.",
+        graph_eyebrow: "COURBE DE PROGRESSION VÉRIFIÉE // TOUCHER UNE ÉTAPE",
+        graph_title_career: "Trajectoire Complète (U12 DLS → Sommet FIS & 34.95 PB)",
+        graph_title_dls: "Classement Circuit DLS & Cohorte 2004 (2014–2020)",
+        graph_mode_career: "Carrière (U12–FIS)",
+        graph_mode_dls: "Rang & Points DLS",
         fis_stat0_tag: "SKI QUÉBEC ALPIN // SUPER SÉRIE",
-        fis_stat0_t: "🏆 Champion U18 Super Série FIS Québec",
+        fis_stat0_t: "Champion U18 Super Série FIS Québec",
         fis_stat0_d: "Champion général U18 masculin du circuit provincial (Super Série Sports Experts), suivi d'une sélection au sein de l'Équipe du Québec et d'une place dans le Top 500 mondial FIS.",
         fis_stat1_tag: "MAÎTRISE CONCEPTUELLE // SANS ENTRAÎNEMENT",
         fis_stat1_t: "Record Personnel à 34.95 Points FIS",
         fis_stat1_d: "Après une blessure à Mont Adstock et ma transition vers le coaching U16, j'ai effectué un retour de 2 courses en fin de saison sans entraînement dans les portes et signé mon record en carrière à 34.95 points FIS.",
-        drawer_dls: "VOIR LA PROGRESSION CIRCUIT DLS U12–U16 (2014–2020)",
+        drawer_dls: "CLASSEMENT COMPLET CIRCUIT DLS U12–U16 (2014–2020)",
         th_season: "Saison",
         th_cat: "Catégorie",
         th_rank: "Rang DLS",
         th_cohort: "Rang 2004",
-        th_pts: "Points",
-        sec1_tag: "02 // MÉTHODOLOGIE & COMPÉTENCES",
+        th_pts: "Points DLS",
+        sec1_tag: "02 // Méthodologie & Système",
         sec1_title: "Architecture Moderne du Coaching Alpin",
         sec1_desc: "Aucun dogme rigide — seulement la physique, la biomécanique et ce qui rend un athlète plus rapide dans la ligne de pente. Chaque principe est testé sur mes propres skis.",
         sk1_t: "Physique des Trajectoires & Forces",
@@ -1053,16 +2678,15 @@
         sk3_d: "Adaptation des repères techniques, de la tactique et de la préparation physique au gabarit, aux leviers et au profil mental de chaque coureur.",
         sk4_t: "Analyse Vidéo & Labo Numérique",
         sk4_d: "Traduction de l'analyse vidéo haute fréquence en repères simples, directs et sans ego sur la piste et via @kingjulianhq.",
-        sec4_tag: "03 // PARCOURS D'ENTRAÎNEUR & EFFECTIF",
+        sec4_tag: "03 // Parcours & Effectif",
         sec4_title: "Club de Ski Mont Garceau",
         c_u16_t: "2 Athlètes du Programme Régulier Qualifiés aux Provinciaux",
         c_u16_d: "Dès ma première saison comme entraîneur au Mont Garceau, j'ai mené deux athlètes U16 du programme régulier jusqu'aux Championnats Provinciaux.",
-        c_u18_t: "Équipe U18 FIS Mont Garceau (8 Athlètes)",
+        c_u18_t: "Équipe U18 FIS Mont Garceau",
         c_u18_d: "À la tête de la cohorte U18 FIS masculine (1re année) sur le calendrier complet de développement et de compétition FIS :",
-        sec3_tag: "04 // LIGNÉE TECHNIQUE",
+        sec3_tag: "04 // Lignée Technique",
         sec3_title: "Forgé par des Mentors d'Élite",
         sec3_desc: "De Mont-Tremblant et S1 Racing aux spécialistes européens jusqu'à l'Équipe du Québec — chaque système a enrichi mon approche.",
-        drawer_lineage: "CHRONOLOGIE DES MENTORS (5 ÉTAPES)",
         lin1_t: "Nils Pailler & Norbert Poitras",
         lin1_d: "Ont transmis le plaisir pur, l'instinct et le goût du dépassement en ski alpin.",
         lin2_t: "Mon Père — Simplicité Expérimentale",
@@ -1073,13 +2697,15 @@
         lin4_d: "Éthique de travail italienne et expérience québécoise combinées à la science des trajectoires (Beauvais) et au style alpin européen (Sorio).",
         lin5_t: "Jonatan Blanchard & Samuel Lacroix",
         lin5_d: "Standards d'élite de l'Équipe du Québec et rigueur axée sur les données avant ma transition vers le coaching.",
-        sec5_tag: "05 // LABO NUMÉRIQUE & CONTACT",
+        sec5_tag: "05 // Labo Numérique & Contact",
         sec5_title: "Suivre le Labo & Me Contacter",
         sec5_desc: "Analyses biomécaniques, physique des trajectoires et contact direct pour demandes de coaching.",
         soc1_d: "Biomécanique, physique des trajectoires et analyses.",
         soc2_d: "Éducatifs sur neige, analyse de ligne et capsules rapides.",
         soc3_d: "Parcours personnel et messagerie directe.",
-        soc4_d: "Contact pour parents, directeurs de clubs et réseau alpin."
+        soc4_d: "Contact pour parents, directeurs de clubs et réseau alpin.",
+        soc5_d: "Résultats officiels, historique des points FIS et biographie.",
+        footer_top: "HAUT ↑"
       }
     };
 
@@ -1096,18 +2722,106 @@
           el.innerHTML = translations[currentLang][key];
         }
       });
+
+      renderProgressionGraph();
     }
 
     function toggleLanguage() {
       applyLanguage(currentLang === 'en' ? 'fr' : 'en');
     }
 
-    (function initLang() {
+    // Live Montreal / Mont Garceau Telemetry Clock (Tom de Koning inspired)
+    function updateLocalClock() {
+      const clockEl = document.getElementById('localClock');
+      if (!clockEl) return;
+      try {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-CA', {
+          timeZone: 'America/Toronto',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+        clockEl.textContent = `MTL ${timeStr} EST`;
+      } catch (e) {
+        clockEl.textContent = 'MTL // EST';
+      }
+    }
+
+    // Smooth Counter Animation
+    function animateCounters() {
+      document.querySelectorAll('[data-count]').forEach(el => {
+        if (el.dataset.animated) return;
+        el.dataset.animated = 'true';
+        const target = parseFloat(el.getAttribute('data-count'));
+        const decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+        const duration = 1100;
+        const start = performance.now();
+
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = target * eased;
+          el.textContent = current.toFixed(decimals);
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            el.textContent = target.toFixed(decimals);
+          }
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    // Initialize Page, Observers & Language
+    (function init() {
       const params = new URLSearchParams(window.location.search);
       let saved = null;
       try { saved = localStorage.getItem('jb_lang'); } catch (e) {}
       if (params.get('lang') === 'fr' || (!params.get('lang') && saved === 'fr')) {
         applyLanguage('fr');
+      } else {
+        renderProgressionGraph();
+      }
+
+      updateLocalClock();
+      setInterval(updateLocalClock, 30000);
+
+      // Reveal & Graph Draw IntersectionObserver
+      if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              if (entry.target.id === 'progressionShell') {
+                entry.target.classList.add('is-drawn');
+              }
+              if (entry.target.classList.contains('kpi-matrix')) {
+                animateCounters();
+              }
+            }
+          });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Active Section Nav Highlighting
+        const navLinks = document.querySelectorAll('#desktopNav a, #mobileNav a');
+        const sectionObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const id = '#' + entry.target.id;
+              navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === id);
+              });
+            }
+          });
+        }, { rootMargin: '-25% 0px -60% 0px' });
+
+        document.querySelectorAll('section[id]').forEach(sec => sectionObserver.observe(sec));
+      } else {
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'));
+        document.getElementById('progressionShell').classList.add('is-drawn');
       }
     })();
   </script>
