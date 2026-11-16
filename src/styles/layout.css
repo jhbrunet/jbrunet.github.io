@@ -1,0 +1,74 @@
+/* ==========================================================================
+   LAYOUT — PERSISTENT TIMING RAIL + 12-COLUMN PITCH SHELL
+   ========================================================================== */
+
+.course-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100dvh;
+}
+
+/* Mobile collapses the timing rail into a slim sticky top bar */
+.timing-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  height: var(--topbar-height);
+  background-color: var(--color-bg);
+  border-bottom: var(--border-thin);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.timing-rail {
+  display: none;
+}
+
+.course-main {
+  min-width: 0;
+  position: relative;
+}
+
+/* Deliberate visible 10-column working grid inside the pitch (Cols 3-12 of 12-col shell) */
+.pitch-hero {
+  position: relative;
+  min-height: calc(100dvh - var(--topbar-height));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: auto auto auto 1fr;
+  column-gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) 0;
+  border-bottom: var(--border-thin);
+  overflow: clip;
+}
+
+@media (min-width: 960px) {
+  .course-shell {
+    grid-template-columns: var(--rail-width) minmax(0, 1fr);
+  }
+
+  .timing-topbar {
+    display: none;
+  }
+
+  .timing-rail {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    background-color: var(--color-bg);
+    border-right: var(--border-thin);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 50;
+  }
+
+  .pitch-hero {
+    min-height: 100dvh;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: var(--space-4);
+    padding: var(--space-4) var(--space-5) 0;
+  }
+}

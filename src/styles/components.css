@@ -1,0 +1,537 @@
+/* ==========================================================================
+   COMPONENTS — TIMING RAIL, START GATE BIB, OVERLAPPING PITCH HERO & PLACEHOLDER
+   ========================================================================== */
+
+/* ---------- Persistent Rail Components (Desktop Cols 1-2) ---------- */
+.rail-bib-block {
+  border-bottom: var(--border-thin);
+  padding: var(--space-4) var(--space-3);
+  background-color: var(--color-surface);
+}
+
+.rail-bib-code {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-ink);
+  line-height: 1.45;
+}
+
+.rail-bib-role {
+  margin-top: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-accent);
+  letter-spacing: 0.04em;
+}
+
+.rail-clock-box {
+  border-bottom: var(--border-thin);
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rail-clock-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+  letter-spacing: 0.08em;
+}
+
+.rail-clock-digits {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.rail-gate-status {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+}
+
+.rail-nav {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) 0;
+  flex: 1;
+}
+
+.rail-nav-link {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+  border-left: 2px solid transparent;
+  transition: color var(--dur-fast) var(--ease-physical),
+              background-color var(--dur-fast) var(--ease-physical),
+              border-color var(--dur-fast) var(--ease-physical);
+}
+
+.rail-nav-link:hover {
+  color: var(--color-ink);
+  background-color: var(--color-surface);
+}
+
+.rail-nav-link.is-active {
+  color: var(--color-ink);
+  border-left-color: var(--color-accent);
+  background-color: var(--color-surface);
+}
+
+.rail-nav-gate-num {
+  color: var(--color-ink-faint);
+}
+
+.rail-nav-link.is-active .rail-nav-gate-num {
+  color: var(--color-accent);
+}
+
+.rail-footer-bar {
+  border-top: var(--border-thin);
+  padding: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+}
+
+.lang-toggle-btn {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink);
+  border: var(--border-thin);
+  padding: 0 var(--space-2);
+  transition: border-color var(--dur-fast) var(--ease-physical),
+              color var(--dur-fast) var(--ease-physical);
+}
+
+.lang-toggle-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ---------- Mobile Slim Top Bar & Sheet (< 960px) ---------- */
+.topbar-bib {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: stretch;
+}
+
+.topbar-clock {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  border-left: var(--border-thin);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.topbar-menu-btn {
+  min-width: 44px;
+  padding: 0 var(--space-3);
+  border-left: var(--border-thin);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink);
+  background-color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-gate-drawer {
+  position: fixed;
+  top: var(--topbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-bg);
+  border-top: var(--border-strong);
+  z-index: 59;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-3);
+}
+
+.mobile-gate-list {
+  display: flex;
+  flex-direction: column;
+  border-top: var(--border-thin);
+}
+
+.mobile-gate-item {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: var(--border-thin);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink);
+}
+
+/* ---------- Hero: Option C ("The Pitch Drop") Architecture ---------- */
+/* Faint organic grid crosshair lines matching S/C Labs & Tom de Koning */
+.pitch-grid-trace {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.reg-mark {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  color: var(--color-ink-faint);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 11px;
+  text-align: center;
+  user-select: none;
+}
+
+.reg-mark-bl { bottom: var(--space-3); left: var(--space-3); }
+.reg-mark-br { bottom: var(--space-3); right: var(--space-3); }
+
+/* Horizontal bisecting timing hairline from Reference 1 (Tom de Koning) */
+.pitch-horizon-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 46%;
+  height: 1px;
+  background-color: var(--color-line);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Top Metadata Row */
+.pitch-meta-top {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-1) var(--space-3);
+  z-index: 4;
+  padding-bottom: var(--space-3);
+}
+
+.meta-slash-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.meta-slash-divider {
+  color: var(--color-accent);
+  font-weight: 400;
+}
+
+.meta-location {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+}
+
+/* Portrait Image Placeholder Frame (Deliberately offset, 4:5 intended aspect ratio) */
+.pitch-portrait-frame {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  position: relative;
+  aspect-ratio: 4 / 5;
+  height: 245px;
+  width: auto;
+  justify-self: end;
+  background-color: var(--color-surface);
+  border: var(--border-strong);
+  overflow: hidden;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+/* Matte architectural image placeholder (4:5 aspect ratio, zero gradients/glows) */
+.portrait-frame-grid {
+  position: absolute;
+  inset: 0;
+  border-bottom: var(--border-thin);
+  pointer-events: none;
+}
+
+.portrait-crosshair {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.portrait-crosshair::before,
+.portrait-crosshair::after {
+  content: '';
+  position: absolute;
+  background-color: var(--color-accent-secondary);
+}
+
+.portrait-crosshair::before {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.portrait-crosshair::after {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.portrait-frame-label {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+.portrait-frame-spec {
+  position: relative;
+  z-index: 2;
+  margin-top: var(--space-2);
+  margin-bottom: auto;
+  border-top: var(--border-thin);
+  border-bottom: var(--border-thin);
+  padding: var(--space-1) 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+/* Oversized H1 Display Statement (Breaks the grid and overlaps the portrait edge like Ref 1 & Ref 3) */
+.pitch-title-block {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  position: relative;
+  z-index: 5;
+  margin-top: calc(var(--space-5) * -1);
+  pointer-events: none;
+}
+
+.pitch-h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-hero-mobile);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  color: var(--color-ink);
+  text-transform: uppercase;
+}
+
+.pitch-h1-italic {
+  display: block;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-ink);
+}
+
+.pitch-best-gs {
+  margin-top: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  border-top: var(--border-strong);
+  border-bottom: var(--border-thin);
+  padding: var(--space-2) 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  letter-spacing: 0.08em;
+  color: var(--color-ink);
+  pointer-events: auto;
+}
+
+.pitch-best-gs-value {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* Bottom Row: Factual Voice Copy + Crisp 1px Vertical Fall Line */
+.pitch-bottom-band {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3);
+  align-items: end;
+  padding-top: var(--space-3);
+  z-index: 5;
+}
+
+.pitch-statement {
+  max-width: 46ch;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: 1.46;
+  color: var(--color-ink-muted);
+  padding-bottom: var(--space-5);
+}
+
+/* The Vertical Fall Line Drop Anchor (Option C signature visual line down toward Gate 01) */
+.fall-line-anchor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  justify-self: end;
+  align-self: stretch;
+  justify-content: flex-end;
+}
+
+.fall-line-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-accent);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.fall-line-rule {
+  width: 1px;
+  height: var(--space-5);
+  background-color: var(--color-accent);
+}
+
+/* ---------- Desktop Overrides (Min-width 960px — 1440px Target) ---------- */
+@media (min-width: 960px) {
+  .reg-mark-bl { bottom: var(--space-4); left: var(--space-4); }
+  .reg-mark-br { bottom: var(--space-4); right: var(--space-4); }
+
+  .pitch-horizon-rule {
+    top: 47%;
+  }
+
+  .pitch-meta-top {
+    grid-column: 1 / 11;
+    grid-row: 1;
+    padding-bottom: var(--space-4);
+  }
+
+  .meta-slash-group {
+    gap: var(--space-3);
+  }
+
+  /* Irregular asymmetric placement: Portrait anchored cols 6-9, overlapping lower H1 */
+  .pitch-portrait-frame {
+    grid-column: 6 / 10;
+    grid-row: 2 / 4;
+    aspect-ratio: 4 / 5;
+    height: clamp(420px, 57vh, 540px);
+    width: auto;
+    justify-self: start;
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  /* Intentional Grid Break: Hero H1 spans Columns 1-10, cutting across the lower portrait like Ref 1 & Ref 3 */
+  .pitch-title-block {
+    grid-column: 1 / 11;
+    grid-row: 3;
+    align-self: start;
+    margin-top: var(--space-7);
+  }
+
+  .pitch-h1 {
+    font-size: var(--text-hero-desktop);
+    line-height: 0.88;
+  }
+
+  .pitch-h1-italic {
+    padding-left: var(--space-6);
+  }
+
+  .pitch-best-gs {
+    margin-top: var(--space-4);
+    margin-left: var(--space-6);
+  }
+
+  .pitch-bottom-band {
+    grid-column: 1 / 11;
+    grid-row: 4;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    column-gap: var(--space-4);
+    align-items: end;
+    padding-top: var(--space-5);
+  }
+
+  .pitch-statement-wrap {
+    grid-column: 1 / 6;
+  }
+
+  .pitch-statement {
+    padding-bottom: var(--space-6);
+  }
+
+  .fall-line-anchor {
+    grid-column: 9 / 11;
+    align-items: center;
+    justify-self: end;
+  }
+
+  .fall-line-rule {
+    height: var(--space-7);
+  }
+}

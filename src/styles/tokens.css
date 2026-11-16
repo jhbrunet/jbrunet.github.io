@@ -1,0 +1,54 @@
+/* ==========================================================================
+   DESIGN TOKENS — SOURCE OF TRUTH (Section 4, portfolio-rules.md)
+   Never hardcode font, color, spacing, type scale, or radius values elsewhere.
+   ========================================================================== */
+
+:root {
+  /* Palette (5 base colors + derived hairlines/muted ink via color-mix) */
+  --color-bg: #0a0a0a;
+  --color-surface: #161615;
+  --color-ink: #f5f4f0;
+  --color-accent: #e07119;
+  --color-accent-secondary: #c29136;
+
+  --color-ink-muted: color-mix(in srgb, var(--color-ink) 76%, var(--color-bg));
+  --color-ink-faint: color-mix(in srgb, var(--color-ink) 58%, var(--color-bg));
+  --color-line: color-mix(in srgb, var(--color-ink) 14%, var(--color-bg));
+  --color-line-strong: color-mix(in srgb, var(--color-ink) 32%, var(--color-bg));
+  --color-accent-dim: color-mix(in srgb, var(--color-accent) 18%, var(--color-bg));
+
+  /* Typography */
+  --font-display: 'Libron', Georgia, 'Times New Roman', serif;
+  --font-body: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* Spacing Scale (4px base: 4, 8, 16, 24, 40, 72, 120) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 72px;
+  --space-7: 120px;
+
+  /* Type Scale */
+  --text-small: 13px;
+  --text-body: 17px;
+  --text-h2: 48px;
+  --text-hero-desktop: clamp(72px, 11.2vw, 184px);
+  --text-hero-mobile: clamp(54px, 15.5vw, 76px);
+
+  /* Borders & Shape (Square, zero radius) */
+  --radius: 0px;
+  --border-thin: 1px solid var(--color-line);
+  --border-strong: 1px solid var(--color-line-strong);
+  --border-accent: 1px solid var(--color-accent);
+
+  /* Structural Dimensions */
+  --rail-width: 224px;
+  --topbar-height: 48px;
+
+  /* Easing & Timing */
+  --ease-physical: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 180ms;
+}
