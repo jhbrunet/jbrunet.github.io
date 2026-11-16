@@ -72,3 +72,71 @@
     padding: var(--space-4) var(--space-5) 0;
   }
 }
+
+/* ---------- Step 2 Layout: Option 2 (Pinned Split-Board + Stepped Gates) ---------- */
+.course-section {
+  position: relative;
+  padding: var(--space-4) var(--space-3) var(--space-6);
+  border-bottom: var(--border-thin);
+  scroll-margin-top: var(--topbar-height);
+}
+
+.mobile-course-bar {
+  position: sticky;
+  top: var(--topbar-height);
+  z-index: 45;
+  margin-inline: calc(var(--space-3) * -1);
+  background-color: var(--color-bg);
+  border-top: var(--border-thin);
+  border-bottom: var(--border-strong);
+}
+
+.course-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.split-board-col {
+  min-width: 0;
+}
+
+.gates-track {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+@media (min-width: 960px) {
+  .course-section {
+    padding: var(--space-6) var(--space-5) var(--space-7);
+    scroll-margin-top: var(--space-4);
+  }
+
+  .mobile-course-bar {
+    display: none;
+  }
+
+  .course-layout {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    column-gap: var(--space-4);
+    row-gap: 0;
+  }
+
+  .split-board-col {
+    grid-column: 1 / 5;
+    position: sticky;
+    top: var(--space-4);
+    z-index: 10;
+  }
+
+  .gates-track {
+    grid-column: 5 / 11;
+    padding-left: var(--space-4);
+    border-left: var(--border-thin);
+    gap: var(--space-7);
+  }
+}
+

@@ -2,6 +2,7 @@
 
 import {
   BIB_IDENTITY,
+  COURSE_GATE_STATUSES,
   COURSE_NAV_ITEMS,
   HERO_COPY,
 } from '@/data/careerData';
@@ -19,12 +20,44 @@ export function TimingRail() {
 
   const copy = HERO_COPY[locale];
   const clockFormatted = formatRunClock(elapsedSeconds);
+  const currentGateStatus =
+    COURSE_GATE_STATUSES.find((g) => g.gate === activeGate) ??
+    COURSE_GATE_STATUSES[0];
+  const mobileTopLabel =
+    activeGate === '00'
+      ? BIB_IDENTITY.mobileSlimBib
+      : `FIS ${BIB_IDENTITY.fisCode} · G${activeGate}`;
+
+  const isNavItemActive = (itemGate: string) => {
+    if (itemGate === activeGate) return true;
+    if (itemGate === '01–08' && Number(activeGate) >= 1 && Number(activeGate) <= 8) {
+      return true;
+    }
+    return false;
+  };
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+    closeMobile = false
+  ) => {
+    if (closeMobile) {
+      setMobileNavOpen(false);
+    }
+    if (href.startsWith('#')) {
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('run:scroll-to', { detail: href }));
+      }
+    }
+  };
 
   return (
     <>
       {/* Mobile: Collapsed Slim Top Bar (< 960px) */}
       <header className="timing-topbar" aria-label="Timing bar and navigation">
-        <div className="topbar-bib">{BIB_IDENTITY.mobileSlimBib}</div>
+        <div className="topbar-bib">{mobileTopLabel}</div>
 
         <div className="topbar-right">
           <div className="topbar-clock" aria-label={copy.runTimeLabel}>
@@ -66,8 +99,8 @@ export function TimingRail() {
                 <a
                   key={item.gate}
                   href={item.href}
-                  className="mobile-gate-item"
-                  onClick={() => setMobileNavOpen(false)}
+                  className={`mobile-gate-item ${isNavItemActive(item.gate) ? 'is-active' : ''}`}
+                  onClick={(e) => handleNavClick(e, item.href, true)}
                 >
                   <span>{item.label[locale]}</span>
                   <span className="rail-nav-gate-num">{item.gate}</span>
@@ -108,17 +141,20 @@ export function TimingRail() {
             <span className="rail-clock-digits" aria-live="off">
               {clockFormatted}
             </span>
-            <span className="rail-gate-status">{copy.gateStatusLabel}</span>
+            <span className="rail-gate-status">
+              {currentGateStatus.label[locale]}
+            </span>
           </div>
 
           {/* Persistent Gate Navigation */}
           <nav className="rail-nav" aria-label="Course gate navigation">
             {COURSE_NAV_ITEMS.map((item) => {
-              const isActive = item.gate === activeGate;
+              const isActive = isNavItemActive(item.gate);
               return (
                 <a
                   key={item.gate}
                   href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href, false)}
                   className={`rail-nav-link ${isActive ? 'is-active' : ''}`}
                 >
                   <span>{item.label[locale]}</span>
@@ -144,3 +180,4 @@ export function TimingRail() {
     </>
   );
 }
+

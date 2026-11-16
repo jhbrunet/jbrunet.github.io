@@ -5,11 +5,13 @@ export type Locale = 'en' | 'fr';
 interface RunState {
   locale: Locale;
   elapsedSeconds: number;
+  courseProgress: number;
   activeGate: string;
   mobileNavOpen: boolean;
   setLocale: (locale: Locale) => void;
   toggleLocale: () => void;
   setElapsedSeconds: (seconds: number) => void;
+  setCourseProgress: (progress: number) => void;
   setActiveGate: (gate: string) => void;
   setMobileNavOpen: (open: boolean) => void;
 }
@@ -17,12 +19,15 @@ interface RunState {
 export const useRunStore = create<RunState>((set) => ({
   locale: 'en',
   elapsedSeconds: 0,
+  courseProgress: 0,
   activeGate: '00',
   mobileNavOpen: false,
   setLocale: (locale) => set({ locale }),
   toggleLocale: () =>
     set((state) => ({ locale: state.locale === 'en' ? 'fr' : 'en' })),
   setElapsedSeconds: (elapsedSeconds) => set({ elapsedSeconds }),
+  setCourseProgress: (courseProgress) =>
+    set({ courseProgress: Math.min(1, Math.max(0, courseProgress)) }),
   setActiveGate: (activeGate) => set({ activeGate }),
   setMobileNavOpen: (mobileNavOpen) => set({ mobileNavOpen }),
 }));

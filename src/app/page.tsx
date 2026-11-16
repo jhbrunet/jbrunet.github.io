@@ -1,4 +1,5 @@
 import { StartGateHero } from '@/components/StartGateHero';
+import { TheCourse } from '@/components/TheCourse';
 import { TimingRail } from '@/components/TimingRail';
 
 export default function HomePage() {
@@ -7,7 +8,9 @@ export default function HomePage() {
       <TimingRail />
       <main className="course-main">
         <StartGateHero />
+        <TheCourse />
       </main>
     </div>
   );
 }
+

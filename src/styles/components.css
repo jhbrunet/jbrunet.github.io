@@ -535,3 +535,997 @@
     height: var(--space-7);
   }
 }
+
+/* ==========================================================================
+   STEP 2: THE COURSE — PINNED SPLIT-BOARD + STEPPED GATES (01–08)
+   ========================================================================== */
+
+.mobile-gate-item.is-active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ---------- Mobile Collapsible Sticky Split Strip (< 960px) ---------- */
+.mobile-course-bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  min-height: 44px;
+}
+
+.mobile-course-bar-telemetry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+
+.mobile-course-tag {
+  color: var(--color-accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.mobile-course-split {
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.split-mobile-toggle {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border-left: var(--border-thin);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color var(--dur-fast) var(--ease-physical);
+}
+
+.split-mobile-toggle:hover {
+  color: var(--color-accent);
+}
+
+.mobile-progress-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+}
+
+.mobile-progress-line .progress-track {
+  fill: var(--color-line);
+}
+
+.mobile-progress-line .progress-fill {
+  fill: var(--color-accent);
+}
+
+.mobile-sticky-drawer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 46;
+  border-top: var(--border-thin);
+  border-bottom: var(--border-strong);
+  padding: var(--space-3);
+  background-color: var(--color-surface);
+}
+
+/* ---------- Split-Board (Desktop Sticky Cols 1-4 / Mobile Lead Block) ---------- */
+.split-board {
+  border: var(--border-strong);
+  background-color: var(--color-bg);
+}
+
+.split-board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: var(--space-3);
+  border-bottom: var(--border-thin);
+  background-color: var(--color-surface);
+}
+
+.course-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-accent);
+  letter-spacing: 0.06em;
+}
+
+.split-board-title {
+  margin-top: var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--color-ink);
+  letter-spacing: -0.015em;
+}
+
+.split-legend-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-thin);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend-swatch-gs {
+  width: 12px;
+  height: 2px;
+  background-color: var(--color-accent);
+}
+
+.legend-swatch-sl {
+  width: 12px;
+  height: 2px;
+  background-color: var(--color-accent-secondary);
+}
+
+/* ---------- D3 Self-Drawing Split Curve SVG ---------- */
+.split-curve-wrap {
+  padding: var(--space-3) var(--space-3) var(--space-2);
+}
+
+.split-curve-wrap.is-compact {
+  padding: 0;
+}
+
+.split-curve-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.curve-grid-line {
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+
+.curve-axis-label {
+  fill: var(--color-ink-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.curve-axis-label.is-active {
+  fill: var(--color-ink);
+  font-weight: 600;
+}
+
+.curve-path-ghost {
+  fill: none;
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+
+.curve-path-sl {
+  fill: none;
+  stroke: var(--color-accent-secondary);
+  stroke-width: 1.5;
+}
+
+.curve-path-gs {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.25;
+}
+
+.curve-path-pb {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+
+.curve-node-sl {
+  fill: var(--color-bg);
+  stroke: var(--color-accent-secondary);
+  stroke-width: 1.5;
+  opacity: 0.45;
+  transition: opacity var(--dur-fast) var(--ease-physical);
+}
+
+.curve-node-sl.is-reached {
+  opacity: 1;
+}
+
+.curve-node-gs {
+  fill: var(--color-bg);
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  opacity: 0.45;
+  transition: opacity var(--dur-fast) var(--ease-physical),
+              fill var(--dur-fast) var(--ease-physical);
+}
+
+.curve-node-gs.is-reached {
+  opacity: 1;
+}
+
+.curve-node-gs.is-selected {
+  fill: var(--color-accent);
+}
+
+.curve-node-gs.is-pb-node.is-reached {
+  fill: var(--color-accent);
+}
+
+.curve-hit-zone {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.curve-hit-zone:focus-visible {
+  stroke: var(--color-ink);
+  stroke-width: 1;
+}
+
+.curve-apex-tag {
+  fill: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.25;
+  transition: opacity var(--dur-fast) var(--ease-physical);
+}
+
+.curve-apex-tag.is-visible {
+  opacity: 1;
+}
+
+.split-active-readout {
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  border-top: var(--border-thin);
+  background-color: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.readout-row-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+
+.readout-period {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.readout-note {
+  color: var(--color-ink-faint);
+}
+
+.readout-row-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+
+.readout-gs {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.readout-sl {
+  color: var(--color-accent-secondary);
+}
+
+.split-axis-footer {
+  padding: var(--space-2) var(--space-3);
+  border-top: var(--border-thin);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+}
+
+/* ---------- Discipline Summary Mini-Table ---------- */
+.discipline-ledger {
+  border-top: var(--border-strong);
+  padding: var(--space-3);
+}
+
+.discipline-ledger-title {
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.course-mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+
+.course-mini-table th,
+.course-mini-table td {
+  padding: var(--space-2) var(--space-1);
+  text-align: right;
+  border-bottom: var(--border-thin);
+}
+
+.course-mini-table th:first-child,
+.course-mini-table td:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+
+.course-mini-table th:last-child,
+.course-mini-table td:last-child {
+  padding-right: 0;
+}
+
+.course-mini-table th {
+  color: var(--color-ink-faint);
+  font-weight: 400;
+}
+
+.course-mini-table td {
+  color: var(--color-ink-muted);
+}
+
+.course-mini-table .cell-code {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.course-mini-table .cell-best {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* ---------- Stepped Asymmetric Gate Shared Headers & Prose ---------- */
+.gate-block {
+  position: relative;
+  border-top: var(--border-strong);
+  padding-top: var(--space-4);
+  scroll-margin-top: calc(var(--topbar-height) + var(--space-6));
+  transition: border-color var(--dur-fast) var(--ease-physical);
+}
+
+.gate-block.is-active-gate {
+  border-top-color: var(--color-accent);
+}
+
+.gate-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+
+.gate-badge {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-thin);
+  color: var(--color-ink);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: border-color var(--dur-fast) var(--ease-physical),
+              color var(--dur-fast) var(--ease-physical);
+}
+
+.gate-block.is-active-gate .gate-badge,
+.gate-badge.is-accent {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.gate-meta-tag {
+  color: var(--color-ink-faint);
+}
+
+.gate-years {
+  margin-left: auto;
+  color: var(--color-ink-muted);
+}
+
+.gate-title {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.gate-copy {
+  margin-top: var(--space-3);
+  max-width: 58ch;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.54;
+  color: var(--color-ink-muted);
+}
+
+.gate-subhead {
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-accent-secondary);
+  letter-spacing: 0.05em;
+}
+
+.gate-kv-list {
+  margin-top: var(--space-4);
+  border-top: var(--border-thin);
+}
+
+.gate-kv-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-thin);
+}
+
+.gate-kv-row dt {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+}
+
+.gate-kv-row dd {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink);
+  line-height: 1.45;
+}
+
+/* ---------- Architectural Image Placeholder System ---------- */
+.gate-media-placeholder {
+  position: relative;
+  width: 100%;
+  background-color: var(--color-surface);
+  border: var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-3);
+  overflow: hidden;
+}
+
+.gate-media-placeholder.ratio-3-2 {
+  aspect-ratio: 3 / 2;
+}
+
+.gate-media-placeholder.ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.gate-media-placeholder.ratio-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
+.placeholder-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.placeholder-crosshair::before,
+.placeholder-crosshair::after {
+  content: '';
+  position: absolute;
+  background-color: var(--color-accent-secondary);
+}
+
+.placeholder-crosshair::before {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.placeholder-crosshair::after {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.placeholder-top,
+.placeholder-bottom {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+
+.placeholder-top {
+  color: var(--color-ink-muted);
+}
+
+.placeholder-bottom {
+  border-top: var(--border-thin);
+  padding-top: var(--space-2);
+  color: var(--color-ink-faint);
+}
+
+/* ---------- Gate 01: DLS Progression Ledger ---------- */
+.dls-table {
+  margin-top: var(--space-4);
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  border-top: var(--border-strong);
+}
+
+.dls-table th,
+.dls-table td {
+  padding: var(--space-2) var(--space-1);
+  border-bottom: var(--border-thin);
+  text-align: left;
+  vertical-align: top;
+}
+
+.dls-table th {
+  color: var(--color-ink-faint);
+  font-weight: 400;
+}
+
+.dls-table th:first-child,
+.dls-table td:first-child {
+  padding-left: 0;
+}
+
+.dls-table th:nth-child(2),
+.dls-table th:nth-child(3),
+.dls-table th:nth-child(4),
+.dls-table td:nth-child(2),
+.dls-table td:nth-child(3),
+.dls-table td:nth-child(4) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dls-season-yr {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.dls-season-sub {
+  margin-top: var(--space-1);
+  color: var(--color-ink-faint);
+}
+
+.dls-mobile-note {
+  margin-top: var(--space-1);
+  color: var(--color-ink-muted);
+}
+
+.dls-rank {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.dls-col-notes-th,
+.dls-meta {
+  display: none;
+}
+
+/* ---------- Gate 02: Sparse Typographic COVID Pause ---------- */
+.gate-02-sparse {
+  padding-block: var(--space-5);
+}
+
+.gate-02-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.gate-02-numeral-box {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  border-bottom: var(--border-thin);
+  padding-bottom: var(--space-3);
+}
+
+.gate-02-big-zero {
+  font-family: var(--font-display);
+  font-size: var(--text-apex);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 0.85;
+  color: var(--color-ink);
+}
+
+.gate-02-big-unit {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Gate 03: Champion + 3:2 Frame ---------- */
+.gate-03-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* ---------- Gate 04: Asymmetric Podiums vs Europe Log ---------- */
+.gate-04-dual {
+  margin-top: var(--space-4);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+.podium-log-list {
+  list-style: none;
+  border-top: var(--border-thin);
+}
+
+.podium-log-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-thin);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+
+.podium-date {
+  color: var(--color-accent-secondary);
+}
+
+.podium-res {
+  color: var(--color-ink);
+}
+
+.gate-04-europe .gate-kv-list {
+  margin-top: 0;
+}
+
+/* ---------- Gate 05: Recessed Surface Block + 16:9 Action Frame ---------- */
+.gate-05-steep {
+  background-color: var(--color-surface);
+  border: var(--border-strong);
+  padding: var(--space-4) var(--space-3);
+}
+
+.gate-05-steep .gate-media-placeholder {
+  margin-top: var(--space-4);
+  background-color: var(--color-bg);
+}
+
+/* ---------- Gate 06: Nine-Month Gap Pause ---------- */
+.gate-06-gap {
+  padding-block: var(--space-4);
+}
+
+.gate-06-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+.gate-06-metric {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--color-accent-secondary);
+  line-height: 0.95;
+}
+
+/* ---------- Gate 07: Focal Comeback Anchor (34.95 PB) ---------- */
+.gate-07-comeback {
+  border-top: 2px solid var(--color-accent);
+  border-bottom: var(--border-strong);
+  padding-top: var(--space-5);
+  padding-bottom: var(--space-5);
+}
+
+.gate-07-apex-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.gate-07-pb-col {
+  border-bottom: var(--border-thin);
+  padding-bottom: var(--space-3);
+}
+
+.gate-07-pb-display {
+  font-family: var(--font-display);
+  font-size: var(--text-apex);
+  font-weight: 700;
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+  color: var(--color-accent);
+}
+
+.gate-07-pb-sub {
+  margin-top: var(--space-2);
+  max-width: 24ch;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  line-height: 1.45;
+  color: var(--color-ink-faint);
+}
+
+.comeback-table {
+  margin-top: var(--space-4);
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  border-top: var(--border-strong);
+}
+
+.comeback-table th,
+.comeback-table td {
+  padding: var(--space-2) var(--space-1);
+  border-bottom: var(--border-thin);
+  text-align: left;
+  vertical-align: top;
+}
+
+.comeback-table th {
+  color: var(--color-ink-faint);
+  font-weight: 400;
+}
+
+.comeback-table th:first-child,
+.comeback-table td:first-child {
+  padding-left: 0;
+  white-space: nowrap;
+}
+
+.comeback-table th:last-child,
+.comeback-table td:last-child {
+  padding-right: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.comeback-table td:nth-child(4),
+.comeback-table th:nth-child(4) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.comeback-col-event {
+  display: none;
+}
+
+.comeback-mobile-event {
+  margin-top: var(--space-1);
+  color: var(--color-ink-faint);
+}
+
+.comeback-table tr.is-best-row td {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  border-bottom-color: var(--color-accent);
+}
+
+.comeback-table .cell-best {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.gate-07-totals {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: var(--border-thin);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  line-height: 1.55;
+  color: var(--color-ink-faint);
+}
+
+/* ---------- Gate 08: U18 Head Coach Finish Corral + Handoff ---------- */
+.gate-08-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.gate-08-cohort {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-accent-secondary);
+}
+
+.gate-08-handoff {
+  margin-top: var(--space-5);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+.course-handoff-link {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color var(--dur-fast) var(--ease-physical),
+              color var(--dur-fast) var(--ease-physical),
+              background-color var(--dur-fast) var(--ease-physical);
+}
+
+.course-handoff-link.is-primary {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.course-handoff-link:hover {
+  background-color: var(--color-surface);
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+}
+
+/* ---------- Step 2 Responsive Desktop Re-Composition (>= 640px & >= 960px) ---------- */
+@media (min-width: 640px) {
+  .dls-mobile-note {
+    display: none;
+  }
+
+  .dls-season-sub {
+    white-space: nowrap;
+  }
+
+  .dls-col-notes-th,
+  .dls-meta {
+    display: table-cell;
+    padding-left: var(--space-3);
+    color: var(--color-ink-muted);
+  }
+
+  .comeback-col-event {
+    display: table-cell;
+  }
+
+  .comeback-mobile-event {
+    display: none;
+  }
+
+  .gate-kv-row {
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .gate-08-handoff {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .gate-block {
+    scroll-margin-top: var(--space-4);
+  }
+
+  .gate-title {
+    font-size: var(--text-h2);
+  }
+
+  /* Intentional asymmetric stepped indents and widths across Gates 01-08 */
+  .gate-02-sparse {
+    margin-left: 24%;
+    padding-block: var(--space-6);
+  }
+
+  .gate-02-body {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .gate-02-numeral-box {
+    flex-direction: column;
+    border-bottom: none;
+    border-right: var(--border-thin);
+    padding-bottom: 0;
+    padding-right: var(--space-4);
+  }
+
+  .gate-03-split {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .gate-04-breakout {
+    width: 94%;
+  }
+
+  .gate-04-dual {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: var(--space-5);
+  }
+
+  .gate-04-europe {
+    border-left: var(--border-thin);
+    padding-left: var(--space-4);
+  }
+
+  .gate-05-steep {
+    padding: var(--space-5);
+  }
+
+  .gate-06-gap {
+    width: 74%;
+    padding-block: var(--space-5);
+  }
+
+  .gate-06-inner {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .gate-07-apex-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .gate-07-pb-col {
+    border-bottom: none;
+    border-right: var(--border-thin);
+    padding-bottom: 0;
+    padding-right: var(--space-5);
+  }
+
+  .gate-08-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+    gap: var(--space-5);
+  }
+}
+
