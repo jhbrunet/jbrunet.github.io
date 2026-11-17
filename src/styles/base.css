@@ -61,6 +61,12 @@ body {
   overflow-x: clip;
 }
 
+html.is-drawer-locked,
+body.is-drawer-locked {
+  overflow: hidden;
+  touch-action: none;
+}
+
 a {
   color: inherit;
   text-decoration: none;

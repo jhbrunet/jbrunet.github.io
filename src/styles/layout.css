@@ -4,7 +4,7 @@
 
 .course-shell {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   min-height: 100dvh;
 }
 
@@ -33,12 +33,12 @@
 /* Deliberate visible 10-column working grid inside the pitch (Cols 3-12 of 12-col shell) */
 .pitch-hero {
   position: relative;
-  min-height: calc(100dvh - var(--topbar-height));
+  min-height: auto;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: auto auto auto 1fr;
+  grid-template-rows: auto auto auto auto;
   column-gap: var(--space-3);
-  padding: var(--space-3) var(--space-3) 0;
+  padding: var(--space-3) var(--space-3) var(--space-4);
   border-bottom: var(--border-thin);
   overflow: clip;
 }
@@ -99,6 +99,7 @@
 }
 
 .split-board-col {
+  display: none;
   min-width: 0;
 }
 
@@ -106,7 +107,17 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: 0;
+}
+
+@media (max-width: 479px) {
+  .course-section {
+    padding-inline: var(--space-2);
+  }
+
+  .mobile-course-bar {
+    margin-inline: calc(var(--space-2) * -1);
+  }
 }
 
 @media (min-width: 960px) {
@@ -126,6 +137,7 @@
   }
 
   .split-board-col {
+    display: block;
     grid-column: 1 / 5;
     position: sticky;
     top: var(--space-4);
@@ -136,7 +148,7 @@
     grid-column: 5 / 11;
     padding-left: var(--space-4);
     border-left: var(--border-thin);
-    gap: var(--space-7);
+    gap: 0;
   }
 }
 

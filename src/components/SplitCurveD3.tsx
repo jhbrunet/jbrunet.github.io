@@ -2,7 +2,11 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { line, scaleLinear } from 'd3';
-import { FIS_CURVE_POINTS, type FisCurvePoint } from '@/data/careerData';
+import {
+  FIS_CURVE_POINTS,
+  getMatchedFisCurvePoint,
+  type FisCurvePoint,
+} from '@/data/careerData';
 import type { Locale } from '@/data/runStore';
 
 interface SplitCurveD3Props {
@@ -15,7 +19,7 @@ interface SplitCurveD3Props {
 
 const SVG_WIDTH = 440;
 const SVG_HEIGHT = 228;
-const MARGIN = { top: 20, right: 28, bottom: 32, left: 46 };
+const MARGIN = { top: 20, right: 38, bottom: 32, left: 46 };
 const Y_TICKS = [120, 90, 60, 35];
 
 export function SplitCurveD3({
@@ -86,12 +90,15 @@ export function SplitCurveD3({
 
   // Synchronize D3 list curve drawing strictly to descent scroll (Gates 01-07)
   // Reduced-motion mode immediately displays the entire trace statically.
+  const isComebackGateReached = activeGate === '07' || activeGate === '08';
   const effectiveListDraw = reducedMotion
     ? 1
     : Math.min(1, Math.max(0.06, (progress - 0.08) / 0.62));
   const effectivePbDraw = reducedMotion
     ? 1
-    : Math.min(1, Math.max(0, (progress - 0.72) / 0.16));
+    : isComebackGateReached
+    ? Math.min(1, Math.max(0.78, (progress - 0.68) / 0.14))
+    : 0;
 
   const gsDashOffset = gsLen > 0 ? gsLen * (1 - effectiveListDraw) : 0;
   const slDashOffset = slLen > 0 ? slLen * (1 - effectiveListDraw) : 0;
@@ -103,25 +110,11 @@ export function SplitCurveD3({
     (pbEndX - pbStartX + 12) * effectivePbDraw
   );
 
-  // Pick highlighted datum from manual hover/focus or current gate progression
-  const scrollMatchedPoint: FisCurvePoint = useMemo(() => {
-    if (activeGate === '07' || activeGate === '08' || progress >= 0.78) {
-      return FIS_CURVE_POINTS[5];
-    }
-    if (activeGate === '05' || activeGate === '06' || progress >= 0.56) {
-      return FIS_CURVE_POINTS[4];
-    }
-    if (activeGate === '04' && progress >= 0.45) {
-      return FIS_CURVE_POINTS[3];
-    }
-    if (activeGate === '04') {
-      return FIS_CURVE_POINTS[2];
-    }
-    if (activeGate === '03' && progress >= 0.30) {
-      return FIS_CURVE_POINTS[1];
-    }
-    return FIS_CURVE_POINTS[0];
-  }, [activeGate, progress]);
+  // Pick highlighted datum from manual inspection or current gate progression
+  const scrollMatchedPoint: FisCurvePoint = useMemo(
+    () => getMatchedFisCurvePoint(activeGate, progress),
+    [activeGate, progress]
+  );
 
   const activeDatum =
     FIS_CURVE_POINTS.find((p) => p.id === selectedId) ?? scrollMatchedPoint;
@@ -205,10 +198,12 @@ export function SplitCurveD3({
         {/* X Axis Tick Labels & Square Nodes */}
         {coords.map((item, idx) => {
           const isSelected = activeDatum.id === item.point.id;
-          const nodeThreshold = item.point.isRacePbExtension
-            ? 0.78
-            : 0.05 + idx * 0.14;
-          const isReached = reducedMotion || progress >= nodeThreshold;
+          const isPressed = selectedId === item.point.id;
+          const isReached = item.point.isRacePbExtension
+            ? reducedMotion || isComebackGateReached
+            : reducedMotion ||
+              progress >= 0.05 + idx * 0.14 ||
+              Number(activeGate) >= Number(item.point.gate);
 
           return (
             <g key={item.point.id}>
@@ -231,7 +226,7 @@ export function SplitCurveD3({
                 />
               )}
 
-              {/* Square Marker + Larger Accessible Hit Target */}
+              {/* Square Marker + >=44px Accessible Hit Target */}
               <rect
                 x={isSelected ? item.cx - 4.5 : item.cx - 3.5}
                 y={isSelected ? item.gsY - 4.5 : item.gsY - 3.5}
@@ -245,12 +240,13 @@ export function SplitCurveD3({
               />
 
               <rect
-                x={item.cx - 16}
+                x={item.cx - 35}
                 y={MARGIN.top}
-                width={32}
+                width={70}
                 height={innerH}
                 tabIndex={0}
                 role="button"
+                aria-pressed={isPressed}
                 aria-label={`${item.point.periodLabel[locale]}: GS ${item.point.gsPoints} (${item.point.gsRank})`}
                 className="curve-hit-zone"
                 onMouseEnter={() => setSelectedId(item.point.id)}
@@ -262,6 +258,14 @@ export function SplitCurveD3({
                     prev === item.point.id ? null : item.point.id
                   )
                 }
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedId(item.point.id);
+                  } else if (e.key === 'Escape' && selectedId === item.point.id) {
+                    setSelectedId(null);
+                  }
+                }}
               />
             </g>
           );
@@ -279,7 +283,7 @@ export function SplitCurveD3({
       </svg>
 
       {/* Live / Inspected Split Readout Strip Directly Below Chart */}
-      <div className="split-active-readout" aria-live="polite">
+      <div id="curve-readout" className="split-active-readout" aria-live="polite">
         <div className="readout-row-top">
           <span className="readout-period">{activeDatum.periodLabel[locale]}</span>
           <span className="readout-note">{activeDatum.note[locale]}</span>

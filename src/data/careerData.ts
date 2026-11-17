@@ -25,13 +25,13 @@ export const COURSE_NAV_ITEMS: NavGateItem[] = [
   {
     gate: '00',
     label: { en: 'START GATE', fr: 'DÉPART' },
-    href: '#start-gate',
+    href: '/#start-gate',
     active: true,
   },
   {
     gate: '01–08',
     label: { en: 'THE COURSE', fr: 'LE TRACÉ' },
-    href: '#course-gates',
+    href: '/#course-gates',
   },
   {
     gate: 'TIMING',
@@ -193,6 +193,25 @@ export const FIS_CURVE_POINTS: FisCurvePoint[] = [
   },
 ];
 
+export function getMatchedFisCurvePoint(
+  activeGate: string,
+  progress: number
+): FisCurvePoint {
+  if (activeGate === '07' || activeGate === '08') {
+    return FIS_CURVE_POINTS[5];
+  }
+  if (activeGate === '05' || activeGate === '06') {
+    return FIS_CURVE_POINTS[4];
+  }
+  if (activeGate === '04') {
+    return progress >= 0.44 ? FIS_CURVE_POINTS[3] : FIS_CURVE_POINTS[2];
+  }
+  if (activeGate === '03') {
+    return progress >= 0.24 ? FIS_CURVE_POINTS[1] : FIS_CURVE_POINTS[0];
+  }
+  return FIS_CURVE_POINTS[0];
+}
+
 export interface DisciplineSplitRow {
   code: 'GS' | 'SL' | 'SG';
   name: Record<Locale, string>;
@@ -223,7 +242,7 @@ export const DISCIPLINE_SPLITS: DisciplineSplitRow[] = [
     top10: '11',
     avgPts: '68.2',
     bestPts: '42.66',
-    bestNote: { en: '7th Passo Furcia · Dec 2023', fr: '7e Passo Furcia · Déc 2023' },
+    bestNote: { en: '7th Passo Furcia · Nov–Dec 2023', fr: '7e Passo Furcia · Nov–Déc 2023' },
   },
   {
     code: 'SG',
@@ -368,10 +387,10 @@ export const COURSE_COPY = {
     axisNote: 'LOWER PTS = HIGHER RANK',
     reducedMotionNote: 'STATIC TELEMETRY MODE (REDUCED MOTION)',
     activeSplitLabel: 'ACTIVE SPLIT',
-    mobileExpandChart: 'CURVE +',
-    mobileCollapseChart: 'CURVE −',
-    disciplineHeading: 'FIS CAREER SPLITS (147 STARTS)',
-    disciplineCols: ['DISC', 'STR / FIN', 'TOP 10', 'AVG', 'BEST PTS'],
+    mobileExpandChart: 'DATA +',
+    mobileCollapseChart: 'DATA −',
+    disciplineHeading: 'FIS CAREER SPLITS (147 ENTRIES)',
+    disciplineCols: ['DISC', 'ENT / FIN', 'TOP 10', 'AVG', 'BEST PTS'],
     gates: {
       g01: {
         num: '01',
@@ -399,7 +418,7 @@ export const COURSE_COPY = {
         rows: [
           { k: '1ST FIS WIN', v: 'Georgian Peaks GS · Jan 31, 2022 (61.16 pts)' },
           { k: 'SEASON LOG', v: '33 entries · 22 finishes · 2 top-5s · 7 top-10s' },
-          { k: 'LIST DROP', v: '127.09 (#3,082) → 58.88 (#1,291) GS | 56.60 season best' },
+          { k: 'LIST DROP', v: '127.09 (#3,082) → 58.88 (#1,291) GS | 56.60 race best' },
           { k: 'TREMBLANT / NAT', v: 'Tremblant GS 5th (Apr 9) · Nationals Panorama SL 24th / GS 29th' },
         ],
         placeholderTitle: 'IMAGE PLACEHOLDER',
@@ -434,9 +453,9 @@ export const COURSE_COPY = {
         years: '2024–2025',
         tag: 'ÉQUIPE DU QUÉBEC / #459 & ADSTOCK',
         title: 'Top 500 World, Nor-Am Pitch & Crash',
-        copy: 'Raced with Équipe du Québec and entered the world top 500 in GS across Lists 5 to 13, peaking at #459 (36.84). Nor-Am starts were the steep pitch: two scored Super-G finishes at Panorama alongside DNFs, DNQs, and DNSs. On Feb 11, I skied 37.00 for 4th at Whiteface. Shortly after, a training crash at Mont Adstock halted progression right as form peaked.',
+        copy: 'Raced with Équipe du Québec and entered the 2024–25 world top 500 in GS across Lists 5 to 13, peaking at #459 (36.84). Nor-Am starts were the steep pitch: two scored Super-G finishes at Panorama alongside DNFs, DNQs, and DNSs. On Feb 11, I skied 37.00 for 4th at Whiteface. Shortly after, a training crash at Mont Adstock halted progression right as form peaked.',
         blocks: [
-          { k: 'WORLD RANK & AVG', v: '#459 GS (List 6) · #647 SL · 33 starts · 6 top-5s · 11 top-10s · 56.0 avg' },
+          { k: 'WORLD RANK & AVG', v: '#459 GS (List 6) · #647 SL · 33 entries · 6 top-5s · 11 top-10s · 56.0 avg' },
           { k: 'PODIUMS & TOP 5', v: '3rd Garceau GS (Jan 17 · 40.67) · 3rd Mont Édouard GS (Apr 13 · 41.13) · 4th Whiteface GS (37.00)' },
           { k: 'NOR-AM REALITY', v: '36th (85.50 PB) & 53rd (99.73) Panorama SG · Sugarloaf Mar 18–19: DNQ1 / DNS' },
           { k: 'POST-CRASH SPRING', v: '35th Nationals Tremblant (Mar 25) · 5th Stoneham (Apr 5 · 37.80) · Mont Édouard podium' },
@@ -488,10 +507,10 @@ export const COURSE_COPY = {
     axisNote: 'MOINS DE PTS = MEILLEUR RANG',
     reducedMotionNote: 'MODE STATIQUE (MOUVEMENT RÉDUIT)',
     activeSplitLabel: 'PASSAGE ACTIF',
-    mobileExpandChart: 'COURBE +',
-    mobileCollapseChart: 'COURBE −',
-    disciplineHeading: 'BILAN PAR DISCIPLINE (147 DÉPARTS)',
-    disciplineCols: ['DISC', 'DÉP / FIN', 'TOP 10', 'MOY', 'MEILLEUR'],
+    mobileExpandChart: 'DONNÉES +',
+    mobileCollapseChart: 'DONNÉES −',
+    disciplineHeading: 'BILAN PAR DISCIPLINE (147 INSCRIPTIONS)',
+    disciplineCols: ['DISC', 'INS / FIN', 'TOP 10', 'MOY', 'MEILLEUR'],
     gates: {
       g01: {
         num: '01',
@@ -518,8 +537,8 @@ export const COURSE_COPY = {
         copy: 'Ouverture à 127.09 pts GS et titre général #1 U18 de la Super Série Sports Experts présentée par Audi. Première victoire FIS en GS à Georgian Peaks le 31 janvier 2022.',
         rows: [
           { k: '1RE VICTOIRE FIS', v: 'Georgian Peaks GS · 31 jan 2022 (61.16 pts)' },
-          { k: 'BILAN SAISON', v: '33 départs · 22 arrivées · 2 top-5 · 7 top-10' },
-          { k: 'CHUTE DE PTS', v: '127.09 (#3 082) → 58.88 (#1 291) GS | Meilleur 56.60' },
+          { k: 'BILAN SAISON', v: '33 inscriptions · 22 arrivées · 2 top-5 · 7 top-10' },
+          { k: 'CHUTE DE PTS', v: '127.09 (#3 082) → 58.88 (#1 291) GS | 56.60 en course' },
           { k: 'TREMBLANT / NAT', v: 'Tremblant GS 5e (9 avr) · Nationaux Panorama SL 24e / GS 29e' },
         ],
         placeholderTitle: 'EMPLACEMENT PHOTO',
@@ -545,8 +564,8 @@ export const COURSE_COPY = {
         rightRows: [
           { k: 'ITALIE 2023', v: '7e SL Passo Furcia (42.66 record SL) · 9e Jr Champs Kronplatz' },
           { k: 'EUROPE 2022', v: 'Pass Thurn (AUT) & Livigno (ITA) · Nov–Déc 2022' },
-          { k: 'SAISON 2022–23', v: '42 départs · 26 fin · 4e Georgian Peaks · Camp Fortune NA 32e' },
-          { k: 'SAISON 2023–24', v: '33 départs · 24 fin · 7 top-5 · 12 top-10 · Moy. 53.5' },
+          { k: 'SAISON 2022–23', v: '42 inscriptions · 26 fin · 4e Georgian Peaks · Camp Fortune NA 32e' },
+          { k: 'SAISON 2023–24', v: '33 inscriptions · 24 fin · 7 top-5 · 12 top-10 · Moy. 53.5' },
         ],
       },
       g05: {
@@ -556,7 +575,7 @@ export const COURSE_COPY = {
         title: 'Top 500 mondial, mur Nor-Am et chute',
         copy: 'Sélection avec l’Équipe du Québec et entrée dans le top 500 mondial en GS sur les listes 5 à 13, jusqu’au #459 (36.84). Le circuit Nor-Am marque le mur technique : deux classements en Super-G à Panorama au milieu de DNF, DNQ et DNS. Le 11 février, 4e à Whiteface GS (37.00). Peu après, une chute à l’entraînement au Mont Adstock coupe la progression au sommet de ma forme.',
         blocks: [
-          { k: 'RANG MONDIAL & MOY', v: '#459 GS (Liste 6) · #647 SL · 33 départs · 6 top-5 · 11 top-10 · 56.0 moy.' },
+          { k: 'RANG MONDIAL & MOY', v: '#459 GS (Liste 6) · #647 SL · 33 inscriptions · 6 top-5 · 11 top-10 · 56.0 moy.' },
           { k: 'PODIUMS & TOP 5', v: '3e Garceau GS (17 jan · 40.67) · 3e Mont Édouard GS (13 avr · 41.13) · 4e Whiteface (37.00)' },
           { k: 'RÉALITÉ NOR-AM', v: '36e (85.50 PB) & 53e (99.73) Panorama SG · Sugarloaf 18–19 mar : DNQ1 / DNS' },
           { k: 'FIN DE SAISON', v: '35e Nationaux Tremblant (25 mar) · 5e Stoneham (5 avr · 37.80) · Podium Mont Édouard' },
@@ -582,7 +601,7 @@ export const COURSE_COPY = {
         pbSubLine: '12E MSA · 11 AVR · -1.17 VS RECORD',
         copy: 'Six départs sans entraînement structuré en portes. DNF2 en deuxième manche au retour au Mont Garceau, puis 46.35 le lendemain. Onze semaines plus tard au Mont Sainte-Anne le 11 avril 2026 : 12e place, 34.95 points FIS, un gain de 1.17 sur mon ancien record.',
         cols: ['DATE', 'STATION', 'ÉPREUVE', 'RÉS', 'PTS'],
-        totalsLine: 'TOTAUX CARRIÈRE FIS (NOV 2021 – AVR 2026) : 147 DÉPARTS · 96 ARRIVÉES (65 %) · 1 VICTOIRE / 6 PODIUMS · 16 TOP 5 · 33 TOP 10 · 40 DNF / 7 DNS / 3 DNQ / 1 DSQ',
+        totalsLine: 'TOTAUX CARRIÈRE FIS (NOV 2021 – AVR 2026) : 147 INSCRIPTIONS · 96 ARRIVÉES (65 %) · 1 VICTOIRE / 6 PODIUMS · 16 TOP 5 · 33 TOP 10 · 40 DNF / 7 DNS / 3 DNQ / 1 DSQ',
       },
       g08: {
         num: '08',
@@ -598,6 +617,355 @@ export const COURSE_COPY = {
         ctaHub: 'CHRONOMÉTRAGE · /hub →',
         ctaPartners: 'ARRIVÉE · /partners →',
       },
+    },
+  },
+} as const;
+
+/* ---------- Contextual Split Telemetry Bay Datasets (Gates 00–08) ---------- */
+
+export interface RankLadderPoint {
+  id: string;
+  seasonShort: string;
+  bracket: Record<Locale, string>;
+  circuit: Record<Locale, string>;
+  overallRank: number | null;
+  cohortRank: string | null;
+  pointsText: Record<Locale, string>;
+  isYr2Crest: boolean;
+  isCovidGap?: boolean;
+}
+
+export const DLS_TO_U18_LADDER: RankLadderPoint[] = [
+  {
+    id: '14-15',
+    seasonShort: '14–15',
+    bracket: { en: 'U12 Yr 1', fr: 'U12 An 1' },
+    circuit: { en: 'DLS', fr: 'DLS' },
+    overallRank: 29,
+    cohortRank: '#4',
+    pointsText: { en: '728 pts', fr: '728 pts' },
+    isYr2Crest: false,
+  },
+  {
+    id: '15-16',
+    seasonShort: '15–16',
+    bracket: { en: 'U12 Yr 2', fr: 'U12 An 2' },
+    circuit: { en: 'DLS', fr: 'DLS' },
+    overallRank: 4,
+    cohortRank: '#3',
+    pointsText: { en: '2,030 pts', fr: '2 030 pts' },
+    isYr2Crest: true,
+  },
+  {
+    id: '16-17',
+    seasonShort: '16–17',
+    bracket: { en: 'U14 Yr 1', fr: 'U14 An 1' },
+    circuit: { en: 'DLS', fr: 'DLS' },
+    overallRank: 13,
+    cohortRank: '#3',
+    pointsText: { en: '858 pts', fr: '858 pts' },
+    isYr2Crest: false,
+  },
+  {
+    id: '17-18',
+    seasonShort: '17–18',
+    bracket: { en: 'U14 Yr 2', fr: 'U14 An 2' },
+    circuit: { en: 'DLS', fr: 'DLS' },
+    overallRank: 3,
+    cohortRank: '#3',
+    pointsText: { en: '2,120 pts', fr: '2 120 pts' },
+    isYr2Crest: true,
+  },
+  {
+    id: '18-19',
+    seasonShort: '18–19',
+    bracket: { en: 'U16 Yr 1', fr: 'U16 An 1' },
+    circuit: { en: 'DLS', fr: 'DLS' },
+    overallRank: 8,
+    cohortRank: '#3',
+    pointsText: { en: '1,130 pts', fr: '1 130 pts' },
+    isYr2Crest: false,
+  },
+  {
+    id: '19-20',
+    seasonShort: '19–20',
+    bracket: { en: 'U16 Yr 2', fr: 'U16 An 2' },
+    circuit: { en: 'DLS', fr: 'DLS' },
+    overallRank: 2,
+    cohortRank: '#2',
+    pointsText: { en: '1,700 pts', fr: '1 700 pts' },
+    isYr2Crest: true,
+  },
+  {
+    id: '20-21',
+    seasonShort: '20–21',
+    bracket: { en: 'U18 Yr 1', fr: 'U18 An 1' },
+    circuit: { en: 'FIS COVID', fr: 'FIS COVID' },
+    overallRank: null,
+    cohortRank: null,
+    pointsText: { en: '0 FIS starts', fr: '0 départ FIS' },
+    isYr2Crest: false,
+    isCovidGap: true,
+  },
+  {
+    id: '21-22',
+    seasonShort: '21–22',
+    bracket: { en: 'U18 Yr 2', fr: 'U18 An 2' },
+    circuit: { en: 'SQ U18', fr: 'SQ U18' },
+    overallRank: 1,
+    cohortRank: '#1',
+    pointsText: { en: 'SQ Super Series #1', fr: 'Super Série SQ #1' },
+    isYr2Crest: true,
+  },
+];
+
+export interface ConsistencySeasonPoint {
+  id: string;
+  season: string;
+  avgPts: number;
+  bestPts: number;
+  entries: number;
+  finishes: number;
+  top10: number;
+  top5: number;
+  note: Record<Locale, string>;
+}
+
+export const CONSISTENCY_SEASONS_21_24: ConsistencySeasonPoint[] = [
+  {
+    id: '21-22',
+    season: '21–22',
+    avgPts: 83.5,
+    bestPts: 56.6,
+    entries: 33,
+    finishes: 22,
+    top10: 7,
+    top5: 2,
+    note: { en: '1 win · 56.60 race best', fr: '1 victoire · 56.60 en course' },
+  },
+  {
+    id: '22-23',
+    season: '22–23',
+    avgPts: 64.6,
+    bestPts: 46.22,
+    entries: 42,
+    finishes: 26,
+    top10: 3,
+    top5: 1,
+    note: { en: '4th Georgian Peaks · EU tour', fr: '4e Georgian Peaks · Tournée EUR' },
+  },
+  {
+    id: '23-24',
+    season: '23–24',
+    avgPts: 53.5,
+    bestPts: 36.12,
+    entries: 33,
+    finishes: 24,
+    top10: 12,
+    top5: 7,
+    note: { en: '3 Feb podiums · 42.66 SL PB', fr: '3 podiums fév. · 42.66 record SL' },
+  },
+];
+
+export interface ComebackGsTracePoint {
+  id: string;
+  dateLabel: Record<Locale, string>;
+  venue: string;
+  gsPoints: number | null;
+  statusLabel: Record<Locale, string>;
+  isDnf?: boolean;
+  isPb?: boolean;
+}
+
+export const COMEBACK_PRIOR_GS_PB = 36.12;
+
+export const COMEBACK_GS_TRACE_2026: ComebackGsTracePoint[] = [
+  {
+    id: 'jan-22',
+    dateLabel: { en: 'JAN 22', fr: '22 JAN' },
+    venue: 'Mont Garceau',
+    gsPoints: null,
+    statusLabel: { en: 'DNF2 · Return GS', fr: 'DNF2 · Retour GS' },
+    isDnf: true,
+  },
+  {
+    id: 'jan-23',
+    dateLabel: { en: 'JAN 23', fr: '23 JAN' },
+    venue: 'Mont Garceau',
+    gsPoints: 46.35,
+    statusLabel: { en: '14th · 46.35 GS', fr: '14e · 46.35 GS' },
+  },
+  {
+    id: 'apr-11',
+    dateLabel: { en: 'APR 11', fr: '11 AVR' },
+    venue: 'Mont Sainte-Anne',
+    gsPoints: 34.95,
+    statusLabel: { en: '12th · 34.95 PB (-1.17)', fr: '12e · 34.95 RECORD (-1.17)' },
+    isPb: true,
+  },
+  {
+    id: 'apr-12',
+    dateLabel: { en: 'APR 12', fr: '12 AVR' },
+    venue: 'Mont Sainte-Anne',
+    gsPoints: null,
+    statusLabel: { en: 'DNF2 · Closing GS', fr: 'DNF2 · Dernier GS' },
+    isDnf: true,
+  },
+];
+
+export const TELEMETRY_BAY_COPY = {
+  en: {
+    g00: {
+      title: 'FIS CAREER SPLITS (147 ENTRIES)',
+      cols: ['DISC', 'ENT / FIN', 'TOP 10', 'AVG', 'BEST PTS'],
+      footer: '147 ENTRIES · 96 FIN (65%) · 1 WIN / 6 PODIUMS',
+    },
+    g01: {
+      title: 'DLS → U18 RANK LADDER (2014–22)',
+      legendCrest: 'YR-2 CREST: #4 → #3 → #2 → #1 U18',
+      legendSeason: 'ALL SEASONS',
+      circuitLeft: 'DLS OVERALL',
+      circuitRight: 'SQ U18',
+      covidNote: '20–21: 0 FIS STARTS (COVID)',
+      selectHint: 'SELECT SEASON TO INSPECT RANK',
+      overallWord: 'OVERALL',
+      cohortWord: '2004',
+    },
+    g02: {
+      title: '2020–21 SEASON TELEMETRY',
+      zeroBadge: '0',
+      zeroUnit: 'STARTS · 0 FINISHES',
+      rows: [
+        { k: 'CLUB / COACH', v: 'TREMB · Father (Mont-Tremblant)' },
+        { k: 'CATEGORY', v: 'FIS Year 1 (U18 Yr 1)' },
+        { k: 'STATUS', v: 'Calendar Cancelled (COVID-19)' },
+      ],
+    },
+    g03: {
+      title: '2021–22 U18 CONVERSION',
+      funnelText: '33 ENT → 22 FIN (67%) → 7 T10 → 2 T5 → 1 WIN',
+      funnelSegments: [
+        { label: '22 FIN (67%)', pct: 66.7, tone: 'ink' },
+        { label: '7 T10', pct: 21.2, tone: 'gold' },
+        { label: '2 T5', pct: 6.1, tone: 'accent' },
+        { label: '1 WIN', pct: 3.0, tone: 'accent' },
+      ],
+      rows: [
+        { k: 'GS LIST', v: '127.09 (#3,082) → 58.88 (#1,291)' },
+        { k: 'PACE / WIN', v: '83.5 AVG · 56.60 RACE BEST · Georgian Peaks 61.16' },
+      ],
+    },
+    g04: {
+      title: '3-SEASON CONSISTENCY (2021–24)',
+      legendAvg: 'SEASON AVG (83.5 → 53.5)',
+      legendBest: 'RACE BEST (56.60 → 36.12)',
+      footer: '2023–24 PEAK: 12 TOP-10 · 7 TOP-5 · 42.66 SL PB',
+    },
+    g05: {
+      title: '2024–25 PITCH & ADSTOCK LOG',
+      rows: [
+        { k: 'TOP 500 GS', v: 'Lists 5–13 · #459 Peak (36.84)' },
+        { k: 'NOR-AM PITCH', v: 'Panorama SG 36th (85.50) / 53rd (99.73) · Sugarloaf DNQ1/DNS' },
+        { k: 'ADSTOCK CRASH', v: 'Pre 40.67 → 37.00 vs Post 37.80 → 41.13' },
+      ],
+    },
+    g06: {
+      title: '9-MONTH COACHING GAP TELEMETRY',
+      bigMetric: '284 DAYS',
+      bigUnit: '0 GATE SESSIONS',
+      rows: [
+        { k: 'WINDOW', v: 'Apr 13, 2025 → Jan 22, 2026' },
+        { k: 'ROLE', v: 'U16 & Programme Plus · Garceau' },
+      ],
+    },
+    g07: {
+      title: '11-WEEK COMEBACK GS TRACE (2026)',
+      thresholdLabel: '36.12 PRIOR PB (MAR 2024)',
+      pbBadge: '34.95 PB (-1.17)',
+      slInterlude: 'SL INTERLUDE: APR 9–10 LE RELAIS 74.02 → 66.58',
+    },
+    g08: {
+      title: 'FINISH TIMING SHEET & 2026–27 ROSTER',
+      cols: ['DISC', 'ENT / FIN', 'TOP 10', 'AVG', 'BEST PTS'],
+      totals: '147 ENT / 96 FIN (65%) · 1 WIN / 6 PODIUMS',
+      roster: '2026–27 ROSTER: 8 1ST-YR U18 FIS MEN · MONT GARCEAU',
+    },
+  },
+  fr: {
+    g00: {
+      title: 'BILAN PAR DISCIPLINE (147 INSCRIPTIONS)',
+      cols: ['DISC', 'INS / FIN', 'TOP 10', 'MOY', 'MEILLEUR'],
+      footer: '147 INSCRIPTIONS · 96 ARRIVÉES (65 %) · 1 VICTOIRE / 6 PODIUMS',
+    },
+    g01: {
+      title: 'RANGS DLS → U18 (2014–22)',
+      legendCrest: 'PALIER AN 2 : #4 → #3 → #2 → #1 U18',
+      legendSeason: 'TOUTES SAISONS',
+      circuitLeft: 'DLS GÉNÉRAL',
+      circuitRight: 'SQ U18',
+      covidNote: '20–21 : 0 DÉPART FIS (COVID)',
+      selectHint: 'CHOISIR UNE SAISON',
+      overallWord: 'GÉNÉRAL',
+      cohortWord: '2004',
+    },
+    g02: {
+      title: 'DONNÉES SAISON 2020–21',
+      zeroBadge: '0',
+      zeroUnit: 'DÉPART · 0 ARRIVÉE',
+      rows: [
+        { k: 'CLUB / COACH', v: 'TREMB · Père (Mont-Tremblant)' },
+        { k: 'CATÉGORIE', v: 'FIS An 1 (U18 An 1)' },
+        { k: 'STATUT', v: 'Calendrier annulé (COVID-19)' },
+      ],
+    },
+    g03: {
+      title: 'BILAN CONVERSION 2021–22',
+      funnelText: '33 INS → 22 FIN (67 %) → 7 T10 → 2 T5 → 1 VICT.',
+      funnelSegments: [
+        { label: '22 FIN (67 %)', pct: 66.7, tone: 'ink' },
+        { label: '7 T10', pct: 21.2, tone: 'gold' },
+        { label: '2 T5', pct: 6.1, tone: 'accent' },
+        { label: '1 VICT.', pct: 3.0, tone: 'accent' },
+      ],
+      rows: [
+        { k: 'LISTE GS', v: '127.09 (#3 082) → 58.88 (#1 291)' },
+        { k: 'RYTHME / VICT.', v: '83.5 MOY. · 56.60 EN COURSE · Georgian Peaks 61.16' },
+      ],
+    },
+    g04: {
+      title: 'CONSTANCE 3 SAISONS (2021–24)',
+      legendAvg: 'MOYENNE (83.5 → 53.5)',
+      legendBest: 'RECORD COURSE (56.60 → 36.12)',
+      footer: 'SOMMET 2023–24 : 12 TOP-10 · 7 TOP-5 · 42.66 SL',
+    },
+    g05: {
+      title: '2024–25 MUR NOR-AM & ADSTOCK',
+      rows: [
+        { k: 'TOP 500 GS', v: 'Listes 5–13 · #459 (36.84)' },
+        { k: 'MUR NOR-AM', v: 'Panorama SG 36e (85.50) / 53e (99.73) · Sugarloaf DNQ1/DNS' },
+        { k: 'CHUTE ADSTOCK', v: 'Avant 40.67 → 37.00 vs Après 37.80 → 41.13' },
+      ],
+    },
+    g06: {
+      title: 'ARRÊT HORS PORTES (9 MOIS)',
+      bigMetric: '284 JOURS',
+      bigUnit: '0 SESSION EN PORTES',
+      rows: [
+        { k: 'PÉRIODE', v: '13 avr 2025 → 22 jan 2026' },
+        { k: 'RÔLE', v: 'U16 & Programme Plus · Garceau' },
+      ],
+    },
+    g07: {
+      title: 'RETOUR GS EN 11 SEMAINES (2026)',
+      thresholdLabel: '36.12 ANCIEN RECORD (MAR 2024)',
+      pbBadge: '34.95 RECORD (-1.17)',
+      slInterlude: 'INTERLUDE SL : 9–10 AVR LE RELAIS 74.02 → 66.58',
+    },
+    g08: {
+      title: 'BILAN FINAL & GROUPE 2026–27',
+      cols: ['DISC', 'INS / FIN', 'TOP 10', 'MOY', 'MEILLEUR'],
+      totals: '147 INS / 96 FIN (65 %) · 1 VICT. / 6 PODIUMS',
+      roster: 'GROUPE 2026–27 : 8 U18 FIS 1RE ANNÉE · MONT GARCEAU',
     },
   },
 } as const;

@@ -8,50 +8,145 @@ import Link from 'next/link';
 import {
   COMEBACK_LOG_2026,
   COURSE_COPY,
+  COURSE_GATE_STATUSES,
   COURSE_TOTAL_RUN_SECONDS,
-  DISCIPLINE_SPLITS,
   DLS_SEASONS,
-  FIS_CURVE_POINTS,
+  getMatchedFisCurvePoint,
 } from '@/data/careerData';
-import { useRunStore } from '@/data/runStore';
+import { getMediaSlot, type MediaSlotId } from '@/data/mediaManifest';
+import { useRunStore, type Locale } from '@/data/runStore';
+import { CourseGateConnector } from './CourseGateConnector';
 import { SplitCurveD3 } from './SplitCurveD3';
+import { TelemetryContextBay } from './TelemetryContextBay';
 
 gsap.registerPlugin(ScrollTrigger);
+
+function renderWithNorAmNowrap(text: string) {
+  const parts = text.split(/(Nor-Am)/g);
+  return parts.map((part, idx) =>
+    part === 'Nor-Am' ? (
+      <span key={`${part}-${idx}`} className="nowrap">
+        {part}
+      </span>
+    ) : (
+      <span key={`${part}-${idx}`}>{part}</span>
+    )
+  );
+}
+
+interface GateMediaFigureProps {
+  slotId: MediaSlotId;
+  ratioClass: 'ratio-3-2' | 'ratio-16-9' | 'ratio-1-1';
+  locale: Locale;
+  reducedMotion: boolean;
+  placeholderTitle: string;
+  placeholderRatio: string;
+  placeholderSpec: string;
+  placeholderHint: string;
+}
+
+function GateMediaFigure({
+  slotId,
+  ratioClass,
+  locale,
+  reducedMotion,
+  placeholderTitle,
+  placeholderRatio,
+  placeholderSpec,
+  placeholderHint,
+}: GateMediaFigureProps) {
+  const slot = getMediaSlot(slotId);
+
+  if (slot.available && (slot.webpSrc || slot.src)) {
+    return (
+      <figure
+        className={`gate-media-placeholder ${ratioClass} has-media`}
+        aria-label={slot.caption[locale]}
+      >
+        {slot.mediaType === 'video' && slot.src ? (
+          <video
+            autoPlay={!reducedMotion}
+            muted
+            loop
+            playsInline
+            poster={slot.posterSrc ?? undefined}
+            width={slot.width}
+            height={slot.height}
+            aria-label={slot.alt[locale]}
+            className="media-slot-video"
+          >
+            <source src={slot.src} type="video/mp4" />
+          </video>
+        ) : (
+          <picture className="media-slot-picture">
+            {slot.avifSrc && <source srcSet={slot.avifSrc} type="image/avif" />}
+            {slot.webpSrc && <source srcSet={slot.webpSrc} type="image/webp" />}
+            <img
+              src={slot.webpSrc ?? slot.src ?? ''}
+              alt={slot.alt[locale]}
+              width={slot.width}
+              height={slot.height}
+              loading="lazy"
+              decoding="async"
+              className={`media-slot-img pos-${slot.objectPosition}`}
+            />
+          </picture>
+        )}
+        <figcaption className="media-slot-caption">
+          {slot.caption[locale]}
+        </figcaption>
+      </figure>
+    );
+  }
+
+  return (
+    <figure
+      className={`gate-media-placeholder ${ratioClass}`}
+      aria-label={`${placeholderTitle} ${placeholderRatio}`}
+    >
+      <div className="placeholder-crosshair" aria-hidden="true" />
+      <div className="placeholder-top">
+        <span>{placeholderTitle}</span>
+        <span>{placeholderRatio}</span>
+      </div>
+      <figcaption className="placeholder-bottom">
+        <span>{placeholderSpec}</span>
+        <span>{placeholderHint}</span>
+      </figcaption>
+    </figure>
+  );
+}
 
 export function TheCourse() {
   const {
     locale,
     activeGate,
     courseProgress,
+    mobileNavOpen,
     setActiveGate,
     setCourseProgress,
     setElapsedSeconds,
   } = useRunStore();
 
   const courseRef = useRef<HTMLElement | null>(null);
+  const lenisRef = useRef<Lenis | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [mobileStickyOpen, setMobileStickyOpen] = useState(false);
 
   const copy = COURSE_COPY[locale];
 
-  const activeDatum = useMemo(() => {
-    if (activeGate === '07' || activeGate === '08' || courseProgress >= 0.78) {
-      return FIS_CURVE_POINTS[5];
-    }
-    if (activeGate === '05' || activeGate === '06' || courseProgress >= 0.56) {
-      return FIS_CURVE_POINTS[4];
-    }
-    if (activeGate === '04' && courseProgress >= 0.45) {
-      return FIS_CURVE_POINTS[3];
-    }
-    if (activeGate === '04') {
-      return FIS_CURVE_POINTS[2];
-    }
-    if (activeGate === '03' && courseProgress >= 0.30) {
-      return FIS_CURVE_POINTS[1];
-    }
-    return FIS_CURVE_POINTS[0];
-  }, [activeGate, courseProgress]);
+  const activeDatum = useMemo(
+    () => getMatchedFisCurvePoint(activeGate, courseProgress),
+    [activeGate, courseProgress]
+  );
+
+  const activeMobileGateStatus = useMemo(() => {
+    const targetGate = activeGate === '00' ? '01' : activeGate;
+    return (
+      COURSE_GATE_STATUSES.find((g) => g.gate === targetGate) ??
+      COURSE_GATE_STATUSES[1]
+    );
+  }, [activeGate]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -94,10 +189,21 @@ export function TheCourse() {
         const href = (ev as CustomEvent<string>).detail;
         const targetEl = document.querySelector(href);
         if (targetEl) {
+          document.documentElement.classList.remove('is-drawer-locked');
+          document.body.classList.remove('is-drawer-locked');
           targetEl.scrollIntoView({ behavior: 'auto', block: 'start' });
         }
       };
       window.addEventListener('run:scroll-to', handleReducedScrollTo);
+
+      if (window.location.hash && window.location.hash.startsWith('#')) {
+        const initialTarget = document.querySelector(window.location.hash);
+        if (initialTarget) {
+          requestAnimationFrame(() => {
+            initialTarget.scrollIntoView({ behavior: 'auto', block: 'start' });
+          });
+        }
+      }
 
       return () => {
         mediaQuery.removeEventListener('change', onMediaChange);
@@ -112,6 +218,7 @@ export function TheCourse() {
       smoothWheel: true,
       touchMultiplier: 1.4,
     });
+    lenisRef.current = lenis;
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -125,7 +232,12 @@ export function TheCourse() {
       const href = (ev as CustomEvent<string>).detail;
       const targetEl = document.querySelector<HTMLElement>(href);
       if (targetEl) {
-        lenis.scrollTo(targetEl, { offset: -56 });
+        // Clear scroll-lock and resume Lenis synchronously before scrolling
+        document.documentElement.classList.remove('is-drawer-locked');
+        document.body.classList.remove('is-drawer-locked');
+        lenis.start();
+        const offset = window.innerWidth < 960 ? -56 : -16;
+        lenis.scrollTo(targetEl, { offset });
       }
     };
     window.addEventListener('run:scroll-to', handleScrollTo);
@@ -167,14 +279,57 @@ export function TheCourse() {
       });
     }, courseRef);
 
+    if (window.location.hash && window.location.hash.startsWith('#')) {
+      const initialTarget = document.querySelector<HTMLElement>(
+        window.location.hash
+      );
+      if (initialTarget) {
+        const offset = window.innerWidth < 960 ? -56 : -16;
+        requestAnimationFrame(() => {
+          lenis.scrollTo(initialTarget, { offset, immediate: true });
+        });
+      }
+    }
+
     return () => {
       mediaQuery.removeEventListener('change', onMediaChange);
       window.removeEventListener('run:scroll-to', handleScrollTo);
       ctx.revert();
       gsap.ticker.remove(onTick);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, [setActiveGate, setCourseProgress, setElapsedSeconds]);
+
+  useEffect(() => {
+    if (!lenisRef.current) return;
+    if (mobileNavOpen) {
+      lenisRef.current.stop();
+    } else {
+      lenisRef.current.start();
+    }
+  }, [mobileNavOpen]);
+
+  useEffect(() => {
+    if (!mobileStickyOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileStickyOpen(false);
+      }
+    };
+    const desktopMedia = window.matchMedia('(min-width: 960px)');
+    const onViewportChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setMobileStickyOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    desktopMedia.addEventListener('change', onViewportChange);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      desktopMedia.removeEventListener('change', onViewportChange);
+    };
+  }, [mobileStickyOpen]);
 
   const progressPct = Math.round(
     (reducedMotion ? 1 : courseProgress) * 100
@@ -223,54 +378,33 @@ export function TheCourse() {
               {reducedMotion && <span>{copy.reducedMotionNote}</span>}
             </div>
 
-            <div className="discipline-ledger">
-              <div className="discipline-ledger-title">
-                {copy.disciplineHeading}
-              </div>
-              <table className="course-mini-table tabular-nums">
-                <thead>
-                  <tr>
-                    {copy.disciplineCols.map((col) => (
-                      <th key={col} scope="col">
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {DISCIPLINE_SPLITS.map((row) => (
-                    <tr key={row.code}>
-                      <td className="cell-code">{row.code}</td>
-                      <td>
-                        {row.entries}/{row.finishes}
-                      </td>
-                      <td>{row.top10}</td>
-                      <td>{row.avgPts}</td>
-                      <td className="cell-best">{row.bestPts}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {/* Desktop Contextual Telemetry Bay directly under axis footer */}
+            <div className="split-board-bay-desktop">
+              <TelemetryContextBay
+                activeGate={activeGate}
+                locale={locale}
+                reducedMotion={reducedMotion}
+              />
             </div>
           </div>
         </aside>
 
-        {/* Mobile-only Slim Sticky Telemetry Strip during Gates 01-08 (< 960px) */}
+        {/* Mobile-only Slim 44px Sticky Telemetry Strip during Gates 01-08 (< 960px) */}
         <div className="mobile-course-bar" aria-label={copy.boardTitle}>
           <div className="mobile-course-bar-row">
             <div className="mobile-course-bar-telemetry tabular-nums">
               <span className="mobile-course-tag">
-                G{activeGate === '00' ? '01' : activeGate}
+                {activeMobileGateStatus.label[locale]}
               </span>
               <span className="mobile-course-split">
-                {activeDatum.xLabel} · GS {activeDatum.gsPoints.toFixed(2)} (
-                {activeDatum.gsRank})
+                {activeDatum.gsPoints.toFixed(2)} GS
               </span>
             </div>
             <button
               type="button"
               className="split-mobile-toggle"
               aria-expanded={mobileStickyOpen}
+              aria-controls="mobile-telemetry-drawer"
               onClick={() => setMobileStickyOpen((open) => !open)}
             >
               {mobileStickyOpen
@@ -296,11 +430,13 @@ export function TheCourse() {
           </svg>
 
           {mobileStickyOpen && (
-            <div className="mobile-sticky-drawer">
-              <SplitCurveD3
-                locale={locale}
-                progress={courseProgress}
+            <div
+              id="mobile-telemetry-drawer"
+              className="mobile-sticky-drawer"
+            >
+              <TelemetryContextBay
                 activeGate={activeGate}
+                locale={locale}
                 reducedMotion={reducedMotion}
                 compact
               />
@@ -310,6 +446,14 @@ export function TheCourse() {
 
         {/* RIGHT COLUMN (Desktop Cols 5-10 Stepped Asymmetric Gates 01-08) */}
         <div className="gates-track">
+          <CourseGateConnector
+            fromGate="00"
+            toGate="01"
+            activeGate={activeGate}
+            variant="start"
+            reducedMotion={reducedMotion}
+          />
+
           {/* GATE 01 — U12 to U16 DLS CIRCUIT (Dense Sequential Progression Ledger) */}
           <article
             id="gate-01"
@@ -326,6 +470,16 @@ export function TheCourse() {
 
             <h3 className="gate-title">{copy.gates.g01.title}</h3>
             <p className="gate-copy">{copy.gates.g01.copy}</p>
+
+            <div className="gate-mobile-bay">
+              <TelemetryContextBay
+                activeGate={activeGate}
+                forcedGate="01"
+                locale={locale}
+                reducedMotion={reducedMotion}
+                compact
+              />
+            </div>
 
             <table className="dls-table tabular-nums">
               <thead>
@@ -361,6 +515,14 @@ export function TheCourse() {
             </table>
           </article>
 
+          <CourseGateConnector
+            fromGate="01"
+            toGate="02"
+            activeGate={activeGate}
+            variant="bypass"
+            reducedMotion={reducedMotion}
+          />
+
           {/* GATE 02 — 2020-2021 COVID ZERO STARTS (Sparse Indented Typographic Pause) */}
           <article
             id="gate-02"
@@ -389,7 +551,15 @@ export function TheCourse() {
             </div>
           </article>
 
-          {/* GATE 03 — 2021-2022 U18 SUPER SERIES CHAMPION + 3:2 PLACEHOLDER */}
+          <CourseGateConnector
+            fromGate="02"
+            toGate="03"
+            activeGate={activeGate}
+            variant="standard"
+            reducedMotion={reducedMotion}
+          />
+
+          {/* GATE 03 — 2021-2022 U18 SUPER SERIES CHAMPION + 3:2 SLOT */}
           <article
             id="gate-03"
             data-gate-id="03"
@@ -418,22 +588,26 @@ export function TheCourse() {
                 </dl>
               </div>
 
-              <figure
-                className="gate-media-placeholder ratio-3-2"
-                aria-label={`${copy.gates.g03.placeholderTitle} ${copy.gates.g03.placeholderRatio}`}
-              >
-                <div className="placeholder-crosshair" aria-hidden="true" />
-                <div className="placeholder-top">
-                  <span>{copy.gates.g03.placeholderTitle}</span>
-                  <span>{copy.gates.g03.placeholderRatio}</span>
-                </div>
-                <figcaption className="placeholder-bottom">
-                  <span>{copy.gates.g03.placeholderSpec}</span>
-                  <span>{copy.gates.g03.placeholderHint}</span>
-                </figcaption>
-              </figure>
+              <GateMediaFigure
+                slotId="gate03SuperSeries"
+                ratioClass="ratio-3-2"
+                locale={locale}
+                reducedMotion={reducedMotion}
+                placeholderTitle={copy.gates.g03.placeholderTitle}
+                placeholderRatio={copy.gates.g03.placeholderRatio}
+                placeholderSpec={copy.gates.g03.placeholderSpec}
+                placeholderHint={copy.gates.g03.placeholderHint}
+              />
             </div>
           </article>
+
+          <CourseGateConnector
+            fromGate="03"
+            toGate="04"
+            activeGate={activeGate}
+            variant="standard"
+            reducedMotion={reducedMotion}
+          />
 
           {/* GATE 04 — 2022-2024 S1 RACING / EUROPE / 3 PODIUMS (Uneven Dual Column Log) */}
           <article
@@ -451,6 +625,16 @@ export function TheCourse() {
 
             <h3 className="gate-title">{copy.gates.g04.title}</h3>
             <p className="gate-copy">{copy.gates.g04.copy}</p>
+
+            <div className="gate-mobile-bay">
+              <TelemetryContextBay
+                activeGate={activeGate}
+                forcedGate="04"
+                locale={locale}
+                reducedMotion={reducedMotion}
+                compact
+              />
+            </div>
 
             <div className="gate-04-dual">
               <div className="gate-04-podiums">
@@ -479,6 +663,14 @@ export function TheCourse() {
             </div>
           </article>
 
+          <CourseGateConnector
+            fromGate="04"
+            toGate="05"
+            activeGate={activeGate}
+            variant="standard"
+            reducedMotion={reducedMotion}
+          />
+
           {/* GATE 05 — 2024-2025 EQUIPE DU QUEBEC / #459 / NOR-AM & ADSTOCK CRASH + 16:9 */}
           <article
             id="gate-05"
@@ -493,33 +685,41 @@ export function TheCourse() {
               <span className="gate-years">{copy.gates.g05.years}</span>
             </header>
 
-            <h3 className="gate-title">{copy.gates.g05.title}</h3>
-            <p className="gate-copy">{copy.gates.g05.copy}</p>
+            <h3 className="gate-title">
+              {renderWithNorAmNowrap(copy.gates.g05.title)}
+            </h3>
+            <p className="gate-copy">
+              {renderWithNorAmNowrap(copy.gates.g05.copy)}
+            </p>
 
             <dl className="gate-kv-list">
               {copy.gates.g05.blocks.map((b) => (
                 <div key={b.k} className="gate-kv-row">
                   <dt>{b.k}</dt>
-                  <dd>{b.v}</dd>
+                  <dd>{renderWithNorAmNowrap(b.v)}</dd>
                 </div>
               ))}
             </dl>
 
-            <figure
-              className="gate-media-placeholder ratio-16-9"
-              aria-label={`${copy.gates.g05.placeholderTitle} ${copy.gates.g05.placeholderRatio}`}
-            >
-              <div className="placeholder-crosshair" aria-hidden="true" />
-              <div className="placeholder-top">
-                <span>{copy.gates.g05.placeholderTitle}</span>
-                <span>{copy.gates.g05.placeholderRatio}</span>
-              </div>
-              <figcaption className="placeholder-bottom">
-                <span>{copy.gates.g05.placeholderSpec}</span>
-                <span>{copy.gates.g05.placeholderHint}</span>
-              </figcaption>
-            </figure>
+            <GateMediaFigure
+              slotId="gate05EquipeQuebec"
+              ratioClass="ratio-16-9"
+              locale={locale}
+              reducedMotion={reducedMotion}
+              placeholderTitle={copy.gates.g05.placeholderTitle}
+              placeholderRatio={copy.gates.g05.placeholderRatio}
+              placeholderSpec={copy.gates.g05.placeholderSpec}
+              placeholderHint={copy.gates.g05.placeholderHint}
+            />
           </article>
+
+          <CourseGateConnector
+            fromGate="05"
+            toGate="06"
+            activeGate={activeGate}
+            variant="bypass"
+            reducedMotion={reducedMotion}
+          />
 
           {/* GATE 06 — NINE MONTHS OFF GATES (Quiet Interrupted Gap Before Finish) */}
           <article
@@ -543,6 +743,14 @@ export function TheCourse() {
               </div>
             </div>
           </article>
+
+          <CourseGateConnector
+            fromGate="06"
+            toGate="07"
+            activeGate={activeGate}
+            variant="apex"
+            reducedMotion={reducedMotion}
+          />
 
           {/* GATE 07 — 34.95 COMEBACK SPLIT (Biggest Gate on the Page per Rule 12) */}
           <article
@@ -571,6 +779,16 @@ export function TheCourse() {
                 <h3 className="gate-title">{copy.gates.g07.title}</h3>
                 <p className="gate-copy">{copy.gates.g07.copy}</p>
               </div>
+            </div>
+
+            <div className="gate-mobile-bay">
+              <TelemetryContextBay
+                activeGate={activeGate}
+                forcedGate="07"
+                locale={locale}
+                reducedMotion={reducedMotion}
+                compact
+              />
             </div>
 
             <table className="comeback-table tabular-nums">
@@ -615,7 +833,15 @@ export function TheCourse() {
             </div>
           </article>
 
-          {/* GATE 08 — 2026-2027 HEAD COACH U18 FIS MEN + 1:1 PLACEHOLDER + ROUTE HANDOFF */}
+          <CourseGateConnector
+            fromGate="07"
+            toGate="08"
+            activeGate={activeGate}
+            variant="standard"
+            reducedMotion={reducedMotion}
+          />
+
+          {/* GATE 08 — 2026-2027 HEAD COACH U18 FIS MEN + 1:1 SLOT + ROUTE HANDOFF */}
           <article
             id="gate-08"
             data-gate-id="08"
@@ -636,20 +862,16 @@ export function TheCourse() {
                 <p className="gate-copy">{copy.gates.g08.copy}</p>
               </div>
 
-              <figure
-                className="gate-media-placeholder ratio-1-1"
-                aria-label={`${copy.gates.g08.placeholderTitle} ${copy.gates.g08.placeholderRatio}`}
-              >
-                <div className="placeholder-crosshair" aria-hidden="true" />
-                <div className="placeholder-top">
-                  <span>{copy.gates.g08.placeholderTitle}</span>
-                  <span>{copy.gates.g08.placeholderRatio}</span>
-                </div>
-                <figcaption className="placeholder-bottom">
-                  <span>{copy.gates.g08.placeholderSpec}</span>
-                  <span>{copy.gates.g08.placeholderHint}</span>
-                </figcaption>
-              </figure>
+              <GateMediaFigure
+                slotId="gate08MontGarceau"
+                ratioClass="ratio-1-1"
+                locale={locale}
+                reducedMotion={reducedMotion}
+                placeholderTitle={copy.gates.g08.placeholderTitle}
+                placeholderRatio={copy.gates.g08.placeholderRatio}
+                placeholderSpec={copy.gates.g08.placeholderSpec}
+                placeholderHint={copy.gates.g08.placeholderHint}
+              />
             </div>
 
             <div className="gate-08-handoff">
@@ -669,6 +891,14 @@ export function TheCourse() {
               </Link>
             </div>
           </article>
+
+          <CourseGateConnector
+            fromGate="08"
+            toGate="FINISH"
+            activeGate={activeGate}
+            variant="finish"
+            reducedMotion={reducedMotion}
+          />
         </div>
       </div>
     </section>

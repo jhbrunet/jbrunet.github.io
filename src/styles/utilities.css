@@ -17,3 +17,7 @@
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+.nowrap {
+  white-space: nowrap;
+}

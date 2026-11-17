@@ -1,14 +1,21 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   BIB_IDENTITY,
   COURSE_GATE_STATUSES,
   COURSE_NAV_ITEMS,
   HERO_COPY,
+  type NavGateItem,
 } from '@/data/careerData';
 import { formatRunClock, useRunStore } from '@/data/runStore';
 
 export function TimingRail() {
+  const pathname = usePathname() || '/';
+  const menuBtnRef = useRef<HTMLButtonElement | null>(null);
+
   const {
     locale,
     elapsedSeconds,
@@ -24,16 +31,78 @@ export function TimingRail() {
     COURSE_GATE_STATUSES.find((g) => g.gate === activeGate) ??
     COURSE_GATE_STATUSES[0];
   const mobileTopLabel =
-    activeGate === '00'
+    pathname !== '/'
+      ? BIB_IDENTITY.mobileSlimBib
+      : activeGate === '00'
       ? BIB_IDENTITY.mobileSlimBib
       : `FIS ${BIB_IDENTITY.fisCode} · G${activeGate}`;
 
-  const isNavItemActive = (itemGate: string) => {
-    if (itemGate === activeGate) return true;
-    if (itemGate === '01–08' && Number(activeGate) >= 1 && Number(activeGate) <= 8) {
-      return true;
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname, setMobileNavOpen]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('is-drawer-locked', mobileNavOpen);
+    document.body.classList.toggle('is-drawer-locked', mobileNavOpen);
+
+    if (!mobileNavOpen) {
+      document.body.style.overflow = '';
+      return () => {
+        document.documentElement.classList.remove('is-drawer-locked');
+        document.body.classList.remove('is-drawer-locked');
+        document.body.style.overflow = '';
+      };
     }
-    return false;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileNavOpen(false);
+        requestAnimationFrame(() => {
+          menuBtnRef.current?.focus();
+        });
+      }
+    };
+
+    const desktopMedia = window.matchMedia('(min-width: 960px)');
+    const onViewportChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setMobileNavOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    desktopMedia.addEventListener('change', onViewportChange);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      desktopMedia.removeEventListener('change', onViewportChange);
+      document.documentElement.classList.remove('is-drawer-locked');
+      document.body.classList.remove('is-drawer-locked');
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [mobileNavOpen, setMobileNavOpen]);
+
+  const isNavItemActive = (item: NavGateItem) => {
+    if (pathname === '/') {
+      if (item.gate === activeGate) return true;
+      if (
+        item.gate === '01–08' &&
+        Number(activeGate) >= 1 &&
+        Number(activeGate) <= 8
+      ) {
+        return true;
+      }
+      return false;
+    }
+    if (item.href.startsWith('/#')) return false;
+    return pathname === item.href || pathname.startsWith(`${item.href}/`);
   };
 
   const handleNavClick = (
@@ -44,11 +113,15 @@ export function TimingRail() {
     if (closeMobile) {
       setMobileNavOpen(false);
     }
-    if (href.startsWith('#')) {
-      const target = document.querySelector(href);
+    if (href.startsWith('/#') && pathname === '/') {
+      const hash = href.slice(1);
+      const target = document.querySelector(hash);
       if (target) {
         e.preventDefault();
-        window.dispatchEvent(new CustomEvent('run:scroll-to', { detail: href }));
+        window.dispatchEvent(new CustomEvent('run:scroll-to', { detail: hash }));
+        if (window.location.hash !== hash) {
+          window.history.replaceState(null, '', href);
+        }
       }
     }
   };
@@ -64,10 +137,20 @@ export function TimingRail() {
             {clockFormatted}
           </div>
           <button
+            ref={menuBtnRef}
             type="button"
             className="topbar-menu-btn"
             aria-expanded={mobileNavOpen}
             aria-controls="mobile-gate-drawer"
+            aria-label={
+              mobileNavOpen
+                ? locale === 'en'
+                  ? 'Close navigation menu'
+                  : 'Fermer le menu de navigation'
+                : locale === 'en'
+                ? 'Open navigation menu'
+                : 'Ouvrir le menu de navigation'
+            }
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
           >
             {mobileNavOpen ? copy.closeLabel : copy.menuLabel}
@@ -83,6 +166,7 @@ export function TimingRail() {
           role="dialog"
           aria-modal="true"
           aria-label="Course gates navigation"
+          data-lenis-prevent
         >
           <div>
             <div className="rail-bib-block">
@@ -95,17 +179,28 @@ export function TimingRail() {
             </div>
 
             <nav className="mobile-gate-list" aria-label="Primary course gates">
-              {COURSE_NAV_ITEMS.map((item) => (
-                <a
-                  key={item.gate}
-                  href={item.href}
-                  className={`mobile-gate-item ${isNavItemActive(item.gate) ? 'is-active' : ''}`}
-                  onClick={(e) => handleNavClick(e, item.href, true)}
-                >
-                  <span>{item.label[locale]}</span>
-                  <span className="rail-nav-gate-num">{item.gate}</span>
-                </a>
-              ))}
+              {COURSE_NAV_ITEMS.map((item) => {
+                const isActive = isNavItemActive(item);
+                return (
+                  <Link
+                    key={item.gate}
+                    href={item.href}
+                    prefetch={item.href.startsWith('/#') ? undefined : false}
+                    aria-current={
+                      isActive
+                        ? item.href.startsWith('/#')
+                          ? 'location'
+                          : 'page'
+                        : undefined
+                    }
+                    className={`mobile-gate-item ${isActive ? 'is-active' : ''}`}
+                    onClick={(e) => handleNavClick(e, item.href, true)}
+                  >
+                    <span>{item.label[locale]}</span>
+                    <span className="rail-nav-gate-num">{item.gate}</span>
+                  </Link>
+                );
+              })}
             </nav>
           </div>
 
@@ -142,24 +237,32 @@ export function TimingRail() {
               {clockFormatted}
             </span>
             <span className="rail-gate-status">
-              {currentGateStatus.label[locale]}
+              {pathname === '/' ? currentGateStatus.label[locale] : pathname.toUpperCase()}
             </span>
           </div>
 
           {/* Persistent Gate Navigation */}
           <nav className="rail-nav" aria-label="Course gate navigation">
             {COURSE_NAV_ITEMS.map((item) => {
-              const isActive = isNavItemActive(item.gate);
+              const isActive = isNavItemActive(item);
               return (
-                <a
+                <Link
                   key={item.gate}
                   href={item.href}
+                  prefetch={item.href.startsWith('/#') ? undefined : false}
+                  aria-current={
+                    isActive
+                      ? item.href.startsWith('/#')
+                        ? 'location'
+                        : 'page'
+                      : undefined
+                  }
                   onClick={(e) => handleNavClick(e, item.href, false)}
                   className={`rail-nav-link ${isActive ? 'is-active' : ''}`}
                 >
                   <span>{item.label[locale]}</span>
                   <span className="rail-nav-gate-num">{item.gate}</span>
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -180,4 +283,3 @@ export function TimingRail() {
     </>
   );
 }
-
