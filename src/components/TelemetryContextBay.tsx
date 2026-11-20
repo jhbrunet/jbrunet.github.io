@@ -34,16 +34,16 @@ function renderWithNoWrap(text: string) {
 }
 
 const LADDER_W = 400;
-const LADDER_H = 98;
-const LADDER_MARGIN = { top: 14, right: 20, bottom: 20, left: 32 };
+const LADDER_H = 124;
+const LADDER_MARGIN = { top: 32, right: 20, bottom: 20, left: 32 };
 
 const CONS_W = 380;
-const CONS_H = 108;
-const CONS_MARGIN = { top: 16, right: 34, bottom: 22, left: 36 };
+const CONS_H = 124;
+const CONS_MARGIN = { top: 22, right: 26, bottom: 28, left: 36 };
 
 const COMEBACK_W = 380;
-const COMEBACK_H = 108;
-const COMEBACK_MARGIN = { top: 16, right: 30, bottom: 22, left: 40 };
+const COMEBACK_H = 120;
+const COMEBACK_MARGIN = { top: 20, right: 26, bottom: 22, left: 38 };
 
 export function TelemetryContextBay({
   activeGate,
@@ -96,7 +96,7 @@ export function TelemetryContextBay({
       bridgePath: gen(bridgePoints) ?? '',
       crestPath: gen(crestPoints) ?? '',
       splitX,
-      yTicks: [30, 15, 5, 1],
+      yTicks: [30, 15, 1],
     };
   }, []);
 
@@ -108,9 +108,9 @@ export function TelemetryContextBay({
       .domain([0, CONSISTENCY_SEASONS_21_24.length - 1])
       .range([CONS_MARGIN.left + 20, CONS_MARGIN.left + innerW - 20]);
 
-    // Inverted domain: 90 pts at bottom -> 30 pts at top
+    // Inverted domain: 94 pts at bottom -> 30 pts at top
     const yScale = scaleLinear()
-      .domain([90, 30])
+      .domain([94, 30])
       .range([CONS_MARGIN.top + innerH, CONS_MARGIN.top]);
 
     const points = CONSISTENCY_SEASONS_21_24.map((item, idx) => ({
@@ -279,13 +279,13 @@ export function TelemetryContextBay({
             <line
               x1={ladderGeom.splitX}
               x2={ladderGeom.splitX}
-              y1={LADDER_MARGIN.top - 4}
+              y1={2}
               y2={LADDER_H - LADDER_MARGIN.bottom}
               className="bay-boundary-line"
             />
             <text
               x={ladderGeom.splitX - 6}
-              y={LADDER_MARGIN.top + 4}
+              y={11}
               textAnchor="end"
               className="bay-circuit-label"
             >
@@ -293,7 +293,7 @@ export function TelemetryContextBay({
             </text>
             <text
               x={ladderGeom.splitX + 6}
-              y={LADDER_MARGIN.top + 4}
+              y={11}
               textAnchor="start"
               className="bay-circuit-label is-accent"
             >
@@ -309,6 +309,8 @@ export function TelemetryContextBay({
 
             {ladderGeom.points.map(({ item, cx, cy }) => {
               const isSelected = inspectedLadder.id === item.id;
+              const hitW = 56;
+              const hitX = Math.max(0, Math.min(LADDER_W - hitW, cx - hitW / 2));
               return (
                 <g key={item.id}>
                   <text
@@ -343,13 +345,40 @@ export function TelemetryContextBay({
                   {item.isYr2Crest && item.overallRank !== null && (
                     <text
                       x={cx}
-                      y={cy - 6}
+                      y={cy - 7}
                       textAnchor="middle"
                       className="bay-node-tag"
                     >
                       #{item.overallRank}
                     </text>
                   )}
+
+                  <rect
+                    x={hitX}
+                    y={8}
+                    width={hitW}
+                    height={LADDER_H - 16}
+                    tabIndex={0}
+                    role="button"
+                    aria-pressed={isSelected}
+                    aria-label={`${item.seasonShort} ${item.bracket[locale]}: ${
+                      item.overallRank !== null
+                        ? `#${item.overallRank} ${copy.g01.overallWord}`
+                        : item.pointsText[locale]
+                    }`}
+                    className="curve-hit-zone"
+                    onMouseEnter={() => setSelectedLadderId(item.id)}
+                    onFocus={() => setSelectedLadderId(item.id)}
+                    onClick={() => setSelectedLadderId(item.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedLadderId(item.id);
+                      } else if (e.key === 'Escape') {
+                        setSelectedLadderId('21-22');
+                      }
+                    }}
+                  />
                 </g>
               );
             })}
@@ -364,32 +393,6 @@ export function TelemetryContextBay({
                 ? `#${inspectedLadder.overallRank} ${copy.g01.overallWord} · ${copy.g01.cohortWord} ${inspectedLadder.cohortRank} · ${inspectedLadder.pointsText[locale]}`
                 : `${inspectedLadder.circuit[locale]} · ${inspectedLadder.pointsText[locale]}`}
             </span>
-          </div>
-
-          <div
-            className="bay-ladder-controls"
-            role="group"
-            aria-label={copy.g01.selectHint}
-          >
-            {DLS_TO_U18_LADDER.map((item) => {
-              const isSelected = inspectedLadder.id === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-pressed={isSelected}
-                  className={`bay-ladder-btn ${
-                    item.isYr2Crest ? 'is-crest' : ''
-                  } ${isSelected ? 'is-selected' : ''}`}
-                  onClick={() => setSelectedLadderId(item.id)}
-                >
-                  <span className="bay-btn-yr">{item.seasonShort}</span>
-                  <span className="bay-btn-val">
-                    {item.overallRank !== null ? `#${item.overallRank}` : '0'}
-                  </span>
-                </button>
-              );
-            })}
           </div>
         </div>
       )}
@@ -536,7 +539,7 @@ export function TelemetryContextBay({
                   />
                   <text
                     x={cx}
-                    y={avgY - 6}
+                    y={avgY + 13}
                     textAnchor="middle"
                     className="bay-point-val"
                   >
@@ -551,9 +554,9 @@ export function TelemetryContextBay({
                     className={`bay-node is-crest ${isSelected ? 'is-selected' : ''}`}
                   />
                   <text
-                    x={cx + 8}
-                    y={bestY + 4}
-                    textAnchor="start"
+                    x={cx}
+                    y={bestY - 7}
+                    textAnchor="middle"
                     className="bay-node-tag"
                   >
                     {item.bestPts.toFixed(2)}
@@ -588,10 +591,10 @@ export function TelemetryContextBay({
 
           <div className="bay-inspect-readout tabular-nums" aria-live="polite">
             <span className="bay-inspect-primary">
-              {inspectedCons.season} · {inspectedCons.finishes}/{inspectedCons.entries} FIN · {inspectedCons.top10} T10
+              {inspectedCons.season} · {inspectedCons.finishes}/{inspectedCons.entries} {copy.g04.finWord} · {inspectedCons.top10} T10
             </span>
             <span className="bay-inspect-metrics">
-              AVG {inspectedCons.avgPts.toFixed(1)} · BEST {inspectedCons.bestPts.toFixed(2)} · {inspectedCons.note[locale]}
+              {copy.g04.avgWord} {inspectedCons.avgPts.toFixed(1)} · {copy.g04.bestWord} {inspectedCons.bestPts.toFixed(2)} · {inspectedCons.note[locale]}
             </span>
           </div>
           <div className="bay-footer-line">{copy.g04.footer}</div>
@@ -687,7 +690,7 @@ export function TelemetryContextBay({
             />
             <text
               x={COMEBACK_MARGIN.left + 4}
-              y={comebackGeom.thresholdY - 4}
+              y={comebackGeom.thresholdY + 11.5}
               textAnchor="start"
               className="bay-threshold-label"
             >

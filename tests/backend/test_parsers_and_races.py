@@ -450,6 +450,326 @@ class TestRealFixturesAndParsers(unittest.TestCase):
                 shared_cache.clear(clear_disk=True)
                 shared_cache.cache_dir = orig_dir
 
+    def test_hms_live_detection_and_gender_and_run_token_edge_cases(self) -> None:
+        from api.hub.live_timing import _decode_run_token, _normalize_gender
+
+        # 1. hMS vs MS LIVE detection (matches jsRaces.js: 0 <= MS - hMS < 180 AND today/tomorrow)
+        today = dt.date(2026, 11, 20)
+        tomorrow = dt.date(2026, 11, 21)
+        stream = (
+            "MS=1000.0~"
+            "hMS=900.0|hN=U=ACTIVE LIVE|hT=Slalom=Men|hC=CAN=QC|hR=MSA|hST=11/20/2026 9:00 AM|hID=500001|hE|hZ=R|~"
+            "hMS=800.0|hN=U=STALE PAST 180S|hT=Slalom=Men|hC=CAN=QC|hR=MSA|hST=11/20/2026 9:00 AM|hID=500002|hE|hZ=R|~"
+            "hMS=1010.0|hN=U=FUTURE STAMP|hT=Slalom=Women|hC=CAN=QC|hR=MSA|hST=11/20/2026 9:00 AM|hID=500003|hE|hZ=C|~"
+            "hMS=950.0|hN=C2=CLUB RULE|hT=Single Course=Combined of 2 runs (first 2 if more than 2)|hC=USA=UT|hR=Park|hST=11/20/2026 9:00 AM|hID=500004|hE|hZ=X|~"
+        ).encode("utf-8")
+
+        _, races_today = parse_daily_races(stream, date_str=today.isoformat(), today=today)
+        by_id = {r["lt_id"]: r for r in races_today}
+        self.assertEqual(by_id[500001]["zone_status"], "L")
+        self.assertEqual(by_id[500002]["zone_status"], "R")
+        self.assertEqual(by_id[500003]["zone_status"], "C")
+        self.assertEqual(by_id[500004]["zone_status"], "L")
+        # _normalize_gender never leaks Club2020 rule text
+        self.assertEqual(by_id[500004]["gender"], "")
+
+        # Tomorrow is also eligible for LIVE
+        _, races_tomorrow = parse_daily_races(stream, date_str=tomorrow.isoformat(), today=today)
+        self.assertEqual(next(r for r in races_tomorrow if r["lt_id"] == 500001)["zone_status"], "L")
+
+        # Archived past date NEVER gets 'L', even if MS - hMS < 180
+        _, races_past = parse_daily_races(stream, date_str="2026-04-11", today=today)
+        past_by_id = {r["lt_id"]: r for r in races_past}
+        self.assertEqual(past_by_id[500001]["zone_status"], "R")
+        self.assertEqual(past_by_id[500004]["zone_status"], "X")
+
+        # 2. _normalize_gender strict normalization
+        self.assertEqual(_normalize_gender("Men"), "M")
+        self.assertEqual(_normalize_gender("Women"), "W")
+        self.assertEqual(_normalize_gender("Ladies"), "W")
+        self.assertEqual(_normalize_gender("Mixed"), "Mixed")
+        self.assertEqual(_normalize_gender("Combined of 2 runs (first 2 if more than 2)"), "")
+        self.assertEqual(_normalize_gender("Fastest of 3 runs"), "")
+
+        # 3. _decode_run_token never leaks "0" display time on "0=0"
+        self.assertEqual(_decode_run_token("0=0"), ("", "NOT_STARTED", None))
+        self.assertEqual(_decode_run_token("=0"), ("", "NOT_STARTED", None))
+        self.assertEqual(_decode_run_token("56.96=56960"), ("56.96", "OK", 56960))
+
+    def test_weather_shortened_one_run_sl_gs_fallback(self) -> None:
+        # Archived (!online) SL where Run 2 was cancelled: r2=0=0, tt == r1_disp
+        short_sl = (
+            "1=0=795000000.0=N=30|clearC|hNR=0|hN=U=WEATHER 1-RUN SL|hT=Slalom=Men|hC=CAN=QC|hR=MSA|"
+            "hST=11/18/2026 10:00 AM|hE|"
+            "b=1|m=ONE, Alpha|t=CAN|fp=3000|r1=48.00=48000|r2=0=0|tt=48.00|"
+            "b=2|m=TWO, Beta|t=CAN|fp=3500|r1=48.50=48500|r2=0=0|tt=48.50|"
+            "b=3|m=THREE, Gamma|t=CAN|fp=4000|r1=49.00=49000|r2=0=0|tt=49.00|"
+            "b=4|m=FOUR, Delta|t=CAN|fp=4500|r1=49.50=49500|r2=0=0|tt=49.50|"
+            "b=5|m=FIVE, Epsilon|t=CAN|fp=5000|r1=50.00=50000|r2=0=0|tt=50.00|"
+            "b=6|m=SIX, Scratched|t=CAN|fp=5500|r1=DNS=2147483607|r2=0=0|endC|"
+        ).encode("iso-8859-1")
+        parsed = parse_aj_race_bytes(short_sl, lt_id=990030, bulk_idx=self.bulk)
+        self.assertEqual(parsed["num_runs"], 1)
+        self.assertEqual(parsed["penalty"]["status"], "OFFICIAL")
+        self.assertIsNotNone(parsed["penalty"]["applied_penalty"])
+        self.assertEqual(parsed["leader_time_ms"], 48000)
+        bib1 = next(r for r in parsed["racers"] if r["bib"] == 1)
+        self.assertEqual(bib1["status"], "QLF")
+        self.assertEqual(bib1["r2_display"], "")
+        bib6 = next(r for r in parsed["racers"] if r["bib"] == 6)
+        self.assertEqual(bib6["r2_display"], "")
+
+        # Live in-progress (online=Y) Run 1 SL must remain num_runs=2 and 0=0 never leaks "0"
+        live_r1 = short_sl.replace(b"=N=30|", b"=Y=5|").replace(
+            b"r1=DNS=2147483607", b"r1=0=0"
+        )
+        parsed_live = parse_aj_race_bytes(live_r1, lt_id=990031, bulk_idx=self.bulk)
+        self.assertEqual(parsed_live["num_runs"], 2)
+        bib6_live = next(r for r in parsed_live["racers"] if r["bib"] == 6)
+        self.assertEqual(bib6_live["r1_display"], "")
+        self.assertEqual(bib6_live["r2_display"], "")
+
+    def test_event_details_date_and_year_safe_codex_and_birth_year_dd_mm_yyyy(self) -> None:
+        from api.hub.fis_client import parse_event_details_html
+
+        event_html = """
+        <div class="table__body">
+          <div class="table-row">
+            <a href="results.html?sectorcode=AL&raceid=132172"><span class="status__item status__item_selected">D</span><span class="status__item">P</span><span class="status__item">C</span><span class="status__item">C</span></a>
+            <a href="results.html?sectorcode=AL&raceid=132172">20 Nov</a>
+            <div>0460 review</div>
+            <a href="results.html?sectorcode=AL&raceid=132172">Slalom</a>
+            <a href="results.html?sectorcode=AL&raceid=132172">NJR</a>
+            <a href="results.html?sectorcode=AL&raceid=132172">M</a>
+            <a href="results.html?sectorcode=AL&raceid=132172">Replaces: 22.11.2026</a>
+          </div>
+          <div class="table-row">
+            <a href="results.html?sectorcode=AL&raceid=133183"><span class="status__item">D</span><span class="status__item">P</span><span class="status__item">C</span><span class="status__item">C</span></a>
+            <a href="results.html?sectorcode=AL&raceid=133183">19 Nov</a>
+            <a href="results.html?sectorcode=AL&raceid=133183">Giant Slalom</a>
+            <a href="results.html?sectorcode=AL&raceid=133183">NJR</a>
+            <a href="results.html?sectorcode=AL&raceid=133183">W</a>
+            <a class="cancelled" href="results.html?sectorcode=AL&raceid=133183">Cancelled</a>
+            <a href="results.html?sectorcode=AL&raceid=133183">Replaces: 20.11.2026</a>
+          </div>
+        </div>
+        """.encode("utf-8")
+
+        parsed = parse_event_details_html(event_html, season=2027)
+        self.assertEqual(len(parsed), 2)
+        r0, r1 = parsed
+        self.assertEqual(r0["race_id"], 132172)
+        self.assertEqual(r0["race_date"], "2026-11-20")
+        self.assertEqual(r0["codex"], "0460")
+        self.assertEqual(r0["category"], "NJR")
+        self.assertEqual(r0["gender"], "M")
+        self.assertEqual(r0["discipline_code"], "SL")
+        self.assertTrue(r0["has_data"])
+        self.assertFalse(r0["is_cancelled"])
+
+        # Row 2 has NO codex cell and has "Replaces: 20.11.2026" -> codex MUST be None, NOT "2026"!
+        self.assertEqual(r1["race_id"], 133183)
+        self.assertEqual(r1["race_date"], "2026-11-19")
+        self.assertIsNone(r1["codex"])
+        self.assertTrue(r1["is_cancelled"])
+
+        # DD-MM-YYYY birthdate parsing in parse_athlete_biography
+        bio_html = """
+        <html><body>
+          <h1 class="athlete-profile__name">JAKOBSEN Kristoffer</h1>
+          <div class="athlete-profile__team">Storklintens AK Skalp</div>
+          <div class="athlete-profile__country"><span class="country__name-short">SWE</span></div>
+          <ul class="profile-info">
+            <li id="FIS Code"><span>FIS Code</span><span>502015</span></li>
+            <li id="Birthdate"><span>Birthdate</span><span>09-09-1994</span><span>1994</span></li>
+            <li id="Status"><span>Status</span><span>Active</span></li>
+            <li id="Gender"><span>Gender</span><span>Men</span></li>
+          </ul>
+          <div id="fis-points-body"></div>
+        </body></html>
+        """.encode("utf-8")
+        bio = parse_athlete_biography(bio_html, None, competitor_id=160443)
+        self.assertEqual(bio["profile"]["birth_year"], 1994)
+        self.assertTrue(bio["profile"]["active"])
+
+    def test_fis_calendar_status_and_openable_race_resolution(self) -> None:
+        from unittest import mock
+        from api.hub.live_timing import fetch_races_for_date
+
+        # Pick an actual event_id + race_date from bulk_idx to verify zero-network resolution
+        sample_bulk_race = next(
+            r for r in self.bulk.races_by_id.values() if r.get("event_id") and r.get("race_date")
+        )
+        bulk_eid = sample_bulk_race["event_id"]
+        target_date = sample_bulk_race["race_date"]
+
+        fake_cal_events = [
+            {
+                "event_id": bulk_eid,
+                "date_text": target_date,
+                "place": "Bulk Resort",
+                "nation": "ARG",
+                "category": "FIS",
+                "category_code": "FIS",
+                "disciplines": "SL",
+                "genders": ["M"],
+                "has_data": True,
+                "is_cancelled": False,
+            },
+            {
+                "event_id": 777001,
+                "date_text": target_date,
+                "place": "Suomu",
+                "nation": "FIN",
+                "category": "NJR",
+                "category_code": "NJR",
+                "disciplines": "SL",
+                "genders": ["M", "W"],
+                "has_data": True,
+                "is_cancelled": False,
+            },
+            {
+                "event_id": 777002,
+                "date_text": target_date,
+                "place": "Upcoming Venue",
+                "nation": "AUT",
+                "category": "FIS",
+                "category_code": "FIS",
+                "disciplines": "GS",
+                "genders": ["M"],
+                "has_data": False,
+                "is_cancelled": False,
+            },
+            {
+                "event_id": 777003,
+                "date_text": target_date,
+                "place": "Cancelled Venue",
+                "nation": "SUI",
+                "category": "FIS",
+                "category_code": "FIS",
+                "disciplines": "SL",
+                "genders": ["W"],
+                "has_data": False,
+                "is_cancelled": True,
+            },
+        ]
+
+        event_detail_calls: list[int] = []
+
+        def _fake_event_details(event_id: int, **_kw: Any) -> list[dict[str, Any]]:
+            event_detail_calls.append(event_id)
+            return [
+                {
+                    "race_id": 888101,
+                    "codex": "0460",
+                    "discipline": "Slalom",
+                    "discipline_code": "SL",
+                    "gender": "M",
+                    "category": "NJR",
+                    "race_date": target_date,
+                    "date_text": "20 Nov",
+                    "has_data": True,
+                    "is_cancelled": False,
+                    "summary_text": "",
+                },
+                {
+                    "race_id": 888102,
+                    "codex": "0457",
+                    "discipline": "Slalom",
+                    "discipline_code": "SL",
+                    "gender": "M",
+                    "category": "NJR",
+                    "race_date": "1999-01-01",  # Different day -> excluded!
+                    "date_text": "1 Jan",
+                    "has_data": True,
+                    "is_cancelled": False,
+                    "summary_text": "",
+                },
+            ]
+
+        with mock.patch("api.hub.live_timing.fetch_url_bytes", return_value=b"MS=1000.0~"), mock.patch(
+            "api.hub.live_timing.fetch_calendar_for_date", return_value=(fake_cal_events, True)
+        ), mock.patch("api.hub.live_timing.get_bulk_index", return_value=self.bulk), mock.patch(
+            "api.hub.live_timing.fetch_event_details", side_effect=_fake_event_details
+        ):
+            res = fetch_races_for_date(target_date, fis_only=False)
+
+        # Zero network fetch for bulk_eid; only 777001 fetched
+        self.assertEqual(event_detail_calls, [777001])
+
+        races = res["races"]
+        # ZERO FIS_CALENDAR rows may EVER carry zone_status == "L"
+        self.assertFalse(
+            any(r["source_type"] == "FIS_CALENDAR" and r["zone_status"] == "L" for r in races)
+        )
+        # Bulk event resolved openable race row(s)
+        bulk_rows = [r for r in races if r["event_id"] == bulk_eid]
+        self.assertGreaterEqual(len(bulk_rows), 1)
+        self.assertTrue(all(r["fis_race_id"] is not None and r["zone_status"] == "R" for r in bulk_rows))
+
+        # Event-details resolved ONLY matching date (888101, not 888102)
+        suomu_rows = [r for r in races if r["event_id"] == 777001]
+        self.assertEqual(len(suomu_rows), 1)
+        self.assertEqual(suomu_rows[0]["fis_race_id"], 888101)
+        self.assertEqual(suomu_rows[0]["fis_codex"], "0460")
+        self.assertEqual(suomu_rows[0]["discipline_code"], "SL")
+        self.assertEqual(suomu_rows[0]["gender"], "M")
+        self.assertEqual(suomu_rows[0]["zone_status"], "R")
+
+        # Upcoming -> 'S', Cancelled -> 'X' with message 'Cancelled'
+        up_row = next(r for r in races if r["event_id"] == 777002)
+        self.assertEqual(up_row["zone_status"], "S")
+        self.assertEqual(up_row["message"], "")
+
+        can_row = next(r for r in races if r["event_id"] == 777003)
+        self.assertEqual(can_row["zone_status"], "X")
+        self.assertEqual(can_row["message"], "Cancelled")
+
+    def test_cache_eviction_and_bulk_index_concurrent_locking(self) -> None:
+        from concurrent.futures import ThreadPoolExecutor
+        import gc
+        import tempfile
+        from unittest import mock
+        from api.hub.cache import TTLCache, shared_cache
+        from api.hub.fis_client import get_bulk_index
+
+        # 1. Bounded _mem eviction & weakref _key_locks reclamation
+        with tempfile.TemporaryDirectory(prefix="hub_evict_") as tdir:
+            c = TTLCache(cache_dir=tdir, max_mem_entries=20)
+            for i in range(45):
+                c.set_mem(f"k{i}", i, ttl_seconds=60)
+            self.assertLessEqual(len(c._mem), 20)
+
+            for i in range(25):
+                with c.lock_for(f"lk_{i}"):
+                    pass
+            gc.collect()
+            self.assertEqual(len(c._key_locks), 0)
+
+        # 2. Concurrent cold-start get_bulk_index downloads ALFP2027F.zip ONLY ONCE
+        zip_bytes = (FIXTURES / "ALFP2027F.zip").read_bytes()
+        call_count = 0
+
+        def _slow_fetch(*_a: Any, **_kw: Any) -> bytes:
+            nonlocal call_count
+            call_count += 1
+            time.sleep(0.05)
+            return zip_bytes
+
+        with tempfile.TemporaryDirectory(prefix="hub_bulk_lock_") as tdir:
+            orig_dir = shared_cache.cache_dir
+            shared_cache.cache_dir = Path(tdir)
+            shared_cache.clear(clear_disk=True)
+            try:
+                with mock.patch("api.hub.fis_client.fetch_url_bytes", side_effect=_slow_fetch):
+                    with ThreadPoolExecutor(max_workers=4) as ex:
+                        results = list(ex.map(lambda _: get_bulk_index(allow_network=True), range(4)))
+                self.assertEqual(call_count, 1)
+                self.assertTrue(all(r.header["list_id"] == 472 for r in results))
+            finally:
+                shared_cache.clear(clear_disk=True)
+                shared_cache.cache_dir = orig_dir
+
 
 if __name__ == "__main__":
     unittest.main()

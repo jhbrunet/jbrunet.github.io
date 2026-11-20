@@ -122,6 +122,7 @@ export function SplitCurveD3({
   return (
     <div className={`split-curve-wrap ${compact ? 'is-compact' : ''}`}>
       <svg
+        id="split-curve-svg"
         viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
         className="split-curve-svg"
         role="img"
@@ -213,7 +214,7 @@ export function SplitCurveD3({
                 textAnchor="middle"
                 className={`curve-axis-label ${isSelected ? 'is-active' : ''}`}
               >
-                {item.point.xLabel}
+                {item.point.xLabel[locale]}
               </text>
 
               {item.slY !== null && (
@@ -247,7 +248,11 @@ export function SplitCurveD3({
                 tabIndex={0}
                 role="button"
                 aria-pressed={isPressed}
-                aria-label={`${item.point.periodLabel[locale]}: GS ${item.point.gsPoints} (${item.point.gsRank})`}
+                aria-label={`${item.point.periodLabel[locale]}: GS ${item.point.gsPoints} (${
+                  item.point.gsRank === '12th' && locale === 'fr'
+                    ? '12e'
+                    : item.point.gsRank
+                })`}
                 className="curve-hit-zone"
                 onMouseEnter={() => setSelectedId(item.point.id)}
                 onMouseLeave={() => setSelectedId(null)}
@@ -278,7 +283,7 @@ export function SplitCurveD3({
           textAnchor="end"
           className={`curve-apex-tag ${effectivePbDraw > 0.7 ? 'is-visible' : ''}`}
         >
-          34.95 PB
+          {locale === 'en' ? '34.95 PB' : '34.95 REC'}
         </text>
       </svg>
 
@@ -290,7 +295,11 @@ export function SplitCurveD3({
         </div>
         <div className="readout-row-metrics tabular-nums">
           <span className="readout-gs">
-            GS {activeDatum.gsPoints.toFixed(2)} ({activeDatum.gsRank})
+            GS {activeDatum.gsPoints.toFixed(2)} (
+            {activeDatum.gsRank === '12th' && locale === 'fr'
+              ? '12e'
+              : activeDatum.gsRank}
+            )
           </span>
           {activeDatum.slPoints !== null && (
             <span className="readout-sl">

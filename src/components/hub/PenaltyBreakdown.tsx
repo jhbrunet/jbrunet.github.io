@@ -129,6 +129,16 @@ export function PenaltyBreakdown({
     );
   }
 
+  if (penalty.status === 'NON_FIS' || penalty.status === 'HIDDEN') {
+    return (
+      <div className="hub-penalty-detail">
+        <div className="hub-note-bar">
+          {penalty.confidence_note || penalty.status}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="hub-penalty-detail">
       <div className="hub-formula-box">
@@ -137,9 +147,15 @@ export function PenaltyBreakdown({
           ({penalty.sum_a != null ? penalty.sum_a.toFixed(2) : '—'} +{' '}
           {penalty.sum_b != null ? penalty.sum_b.toFixed(2) : '—'} −{' '}
           {penalty.sum_c != null ? penalty.sum_c.toFixed(2) : '—'}) / 10 ={' '}
-          {penalty.z_value != null ? penalty.z_value.toFixed(2) : '—'}
-          {penalty.adder > 0 ? ` + ${penalty.adder.toFixed(2)} = ` : ' → '}
           {penalty.raw_calc != null ? penalty.raw_calc.toFixed(2) : '—'}
+          {penalty.z_value > 0 ? ` + ${penalty.z_value.toFixed(2)} Z` : ''}
+          {penalty.adder > 0
+            ? ` + ${penalty.adder.toFixed(2)}${
+                penalty.provisional_calc != null
+                  ? ` = ${penalty.provisional_calc.toFixed(2)}`
+                  : ''
+              }`
+            : ''}
           {penalty.applied_penalty != null
             ? ` → ${t.appliedLabel} ${penalty.applied_penalty.toFixed(2)}`
             : ''}

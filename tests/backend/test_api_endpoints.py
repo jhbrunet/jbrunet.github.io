@@ -686,6 +686,56 @@ class TestApiEndpointsASGI(unittest.TestCase):
         self.assertEqual(st_empty, 422)
         self.assertFalse(d_empty["ok"])
 
+    def test_12_health_degraded_cache_control_and_negative_list_sim(self) -> None:
+        from api.hub.fis_client import FisBulkIndex
+
+        # 1. GET /api/hub/health reports fis_ski: "degraded" when fallback_embedded is active
+        with mock.patch("api.index.get_bulk_index", return_value=FisBulkIndex(source="fallback_embedded")):
+            st_deg, hdr_deg, d_deg = call_asgi("GET", "/api/hub/health")
+            self.assertEqual(st_deg, 200)
+            self.assertEqual(d_deg["upstream_sources"]["fis_ski"], "degraded")
+            self.assertEqual(d_deg["upstream_sources"]["live_timing"], "ok")
+            self.assertEqual(hdr_deg.get("cache-control"), "no-store")
+
+        # 2. Explicit Cache-Control headers across endpoints
+        with mock.patch("api.hub.live_timing.fetch_url_bytes", side_effect=self._fixture_router), mock.patch(
+            "api.hub.fis_client.fetch_url_bytes", side_effect=self._fixture_router
+        ):
+            st_live, hdr_live, d_live = call_asgi("GET", "/api/hub/races/309223/live")
+            self.assertEqual(st_live, 200)
+            self.assertEqual(hdr_live.get("cache-control"), "no-store")
+            # Auto-detected season 2026 & category FIS when query params omitted
+            self.assertEqual(d_live["race"]["season"], 2026)
+            self.assertEqual(d_live["race"]["category"], "FIS")
+            self.assertEqual(d_live["penalty"]["applied_penalty"], 24.25)
+
+            st_races, hdr_races, _ = call_asgi("GET", "/api/hub/races", "date=2026-04-11")
+            self.assertEqual(st_races, 200)
+            self.assertIn("max-age=", hdr_races.get("cache-control", ""))
+
+            st_fis, hdr_fis, _ = call_asgi("GET", "/api/hub/fis/race/132230")
+            self.assertEqual(st_fis, 200)
+            self.assertIn("max-age=", hdr_fis.get("cache-control", ""))
+
+            st_404, hdr_404, _ = call_asgi("GET", "/api/hub/races/99999999/live")
+            self.assertEqual(st_404, 404)
+            self.assertEqual(hdr_404.get("cache-control"), "no-store")
+
+        # 3. POST /api/hub/calc/list-sim rejects negative scores with HTTP 422 + no-store
+        for bad_payload in (
+            {"discipline": "GS", "season": 2027, "results": [-5.0]},
+            {"discipline": "GS", "season": 2027, "results": [34.95, -0.01]},
+            {"discipline": "GS", "season": 2027, "results": [34.95], "current_list_points": -2.0},
+        ):
+            st_neg, hdr_neg, d_neg = call_asgi(
+                "POST",
+                "/api/hub/calc/list-sim",
+                body=json.dumps(bad_payload).encode("utf-8"),
+            )
+            self.assertEqual(st_neg, 422, f"Expected 422 for {bad_payload}")
+            self.assertFalse(d_neg["ok"])
+            self.assertEqual(hdr_neg.get("cache-control"), "no-store")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -258,7 +258,12 @@ export async function runTier4(ctx) {
 
     // Desktop curve keyboard Tab/Space
     await cdp.setViewport(1440, 900);
-    await cdp.evaluate(`document.querySelector('aside.split-board-col svg [role="button"], aside.split-board svg [role="button"], #split-curve-svg [role="button"], aside svg [role="button"], aside svg [tabindex="0"]')?.focus()`);
+    await cdp.evaluate(`(() => {
+      const target =
+        document.querySelector('#split-curve-svg [role="button"]') ||
+        document.querySelector('aside.split-board-col svg [role="button"], aside.split-board svg [role="button"], aside svg [role="button"], aside svg [tabindex="0"]');
+      if (target) target.focus();
+    })()`);
     const before = await cdp.evaluate(`document.querySelector('#curve-readout, aside.split-board-col #curve-readout, aside.split-board #curve-readout')?.innerText || ''`);
     await cdp.pressKey('Space');
     await cdp.pressKey('Tab');

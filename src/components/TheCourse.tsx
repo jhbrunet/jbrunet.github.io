@@ -39,10 +39,7 @@ interface GateMediaFigureProps {
   ratioClass: 'ratio-3-2' | 'ratio-16-9' | 'ratio-1-1';
   locale: Locale;
   reducedMotion: boolean;
-  placeholderTitle: string;
-  placeholderRatio: string;
-  placeholderSpec: string;
-  placeholderHint: string;
+  placeholderLabel: string;
 }
 
 function GateMediaFigure({
@@ -50,10 +47,7 @@ function GateMediaFigure({
   ratioClass,
   locale,
   reducedMotion,
-  placeholderTitle,
-  placeholderRatio,
-  placeholderSpec,
-  placeholderHint,
+  placeholderLabel,
 }: GateMediaFigureProps) {
   const slot = getMediaSlot(slotId);
 
@@ -102,17 +96,10 @@ function GateMediaFigure({
   return (
     <figure
       className={`gate-media-placeholder ${ratioClass}`}
-      aria-label={`${placeholderTitle} ${placeholderRatio}`}
+      aria-label={placeholderLabel}
     >
       <div className="placeholder-crosshair" aria-hidden="true" />
-      <div className="placeholder-top">
-        <span>{placeholderTitle}</span>
-        <span>{placeholderRatio}</span>
-      </div>
-      <figcaption className="placeholder-bottom">
-        <span>{placeholderSpec}</span>
-        <span>{placeholderHint}</span>
-      </figcaption>
+      <figcaption className="placeholder-tag">{placeholderLabel}</figcaption>
     </figure>
   );
 }
@@ -347,23 +334,19 @@ export function TheCourse() {
         <aside className="split-board-col" aria-label={copy.boardTitle}>
           <div className="split-board">
             <div className="split-board-header">
-              <div>
-                <div className="course-eyebrow">{copy.eyebrow}</div>
-                <h2 id="course-heading" className="split-board-title">
-                  {copy.boardTitle}
-                </h2>
+              <h2 id="course-heading" className="split-board-title">
+                {copy.boardTitle}
+              </h2>
+              <div className="split-legend-inline">
+                <span className="legend-item legend-gs">
+                  <span className="legend-swatch-gs" aria-hidden="true" />
+                  {copy.curveLegendGs}
+                </span>
+                <span className="legend-item legend-sl">
+                  <span className="legend-swatch-sl" aria-hidden="true" />
+                  {copy.curveLegendSl}
+                </span>
               </div>
-            </div>
-
-            <div className="split-legend-bar">
-              <span className="legend-item legend-gs">
-                <span className="legend-swatch-gs" aria-hidden="true" />
-                {copy.curveLegendGs}
-              </span>
-              <span className="legend-item legend-sl">
-                <span className="legend-swatch-sl" aria-hidden="true" />
-                {copy.curveLegendSl}
-              </span>
             </div>
 
             <SplitCurveD3
@@ -373,12 +356,7 @@ export function TheCourse() {
               reducedMotion={reducedMotion}
             />
 
-            <div className="split-axis-footer">
-              <span>{copy.axisNote}</span>
-              {reducedMotion && <span>{copy.reducedMotionNote}</span>}
-            </div>
-
-            {/* Desktop Contextual Telemetry Bay directly under axis footer */}
+            {/* Desktop Contextual Telemetry Bay directly under curve readout */}
             <div className="split-board-bay-desktop">
               <TelemetryContextBay
                 activeGate={activeGate}
@@ -394,7 +372,7 @@ export function TheCourse() {
           <div className="mobile-course-bar-row">
             <div className="mobile-course-bar-telemetry tabular-nums">
               <span className="mobile-course-tag">
-                {activeMobileGateStatus.label[locale]}
+                {activeMobileGateStatus.mobileShort[locale]}
               </span>
               <span className="mobile-course-split">
                 {activeDatum.gsPoints.toFixed(2)} GS
@@ -463,8 +441,9 @@ export function TheCourse() {
             }`}
           >
             <header className="gate-header">
-              <span className="gate-badge">GATE {copy.gates.g01.num}</span>
-              <span className="gate-meta-tag">{copy.gates.g01.tag}</span>
+              <span className="gate-badge">
+                {copy.gatePrefix} {copy.gates.g01.num}
+              </span>
               <span className="gate-years">{copy.gates.g01.years}</span>
             </header>
 
@@ -532,8 +511,9 @@ export function TheCourse() {
             }`}
           >
             <header className="gate-header">
-              <span className="gate-badge">GATE {copy.gates.g02.num}</span>
-              <span className="gate-meta-tag">{copy.gates.g02.tag}</span>
+              <span className="gate-badge">
+                {copy.gatePrefix} {copy.gates.g02.num}
+              </span>
               <span className="gate-years">{copy.gates.g02.years}</span>
             </header>
 
@@ -568,8 +548,9 @@ export function TheCourse() {
             }`}
           >
             <header className="gate-header">
-              <span className="gate-badge">GATE {copy.gates.g03.num}</span>
-              <span className="gate-meta-tag">{copy.gates.g03.tag}</span>
+              <span className="gate-badge">
+                {copy.gatePrefix} {copy.gates.g03.num}
+              </span>
               <span className="gate-years">{copy.gates.g03.years}</span>
             </header>
 
@@ -593,10 +574,7 @@ export function TheCourse() {
                 ratioClass="ratio-3-2"
                 locale={locale}
                 reducedMotion={reducedMotion}
-                placeholderTitle={copy.gates.g03.placeholderTitle}
-                placeholderRatio={copy.gates.g03.placeholderRatio}
-                placeholderSpec={copy.gates.g03.placeholderSpec}
-                placeholderHint={copy.gates.g03.placeholderHint}
+                placeholderLabel={copy.gates.g03.placeholderLabel}
               />
             </div>
           </article>
@@ -618,8 +596,9 @@ export function TheCourse() {
             }`}
           >
             <header className="gate-header">
-              <span className="gate-badge">GATE {copy.gates.g04.num}</span>
-              <span className="gate-meta-tag">{copy.gates.g04.tag}</span>
+              <span className="gate-badge">
+                {copy.gatePrefix} {copy.gates.g04.num}
+              </span>
               <span className="gate-years">{copy.gates.g04.years}</span>
             </header>
 
@@ -680,8 +659,9 @@ export function TheCourse() {
             }`}
           >
             <header className="gate-header">
-              <span className="gate-badge">GATE {copy.gates.g05.num}</span>
-              <span className="gate-meta-tag">{copy.gates.g05.tag}</span>
+              <span className="gate-badge">
+                {copy.gatePrefix} {copy.gates.g05.num}
+              </span>
               <span className="gate-years">{copy.gates.g05.years}</span>
             </header>
 
@@ -706,10 +686,7 @@ export function TheCourse() {
               ratioClass="ratio-16-9"
               locale={locale}
               reducedMotion={reducedMotion}
-              placeholderTitle={copy.gates.g05.placeholderTitle}
-              placeholderRatio={copy.gates.g05.placeholderRatio}
-              placeholderSpec={copy.gates.g05.placeholderSpec}
-              placeholderHint={copy.gates.g05.placeholderHint}
+              placeholderLabel={copy.gates.g05.placeholderLabel}
             />
           </article>
 
@@ -730,8 +707,9 @@ export function TheCourse() {
             }`}
           >
             <header className="gate-header">
-              <span className="gate-badge">GATE {copy.gates.g06.num}</span>
-              <span className="gate-meta-tag">{copy.gates.g06.tag}</span>
+              <span className="gate-badge">
+                {copy.gatePrefix} {copy.gates.g06.num}
+              </span>
               <span className="gate-years">{copy.gates.g06.years}</span>
             </header>
 
@@ -762,9 +740,8 @@ export function TheCourse() {
           >
             <header className="gate-header">
               <span className="gate-badge is-accent">
-                GATE {copy.gates.g07.num}
+                {copy.gatePrefix} {copy.gates.g07.num}
               </span>
-              <span className="gate-meta-tag">{copy.gates.g07.tag}</span>
               <span className="gate-years">{copy.gates.g07.years}</span>
             </header>
 
@@ -808,7 +785,7 @@ export function TheCourse() {
               <tbody>
                 {COMEBACK_LOG_2026.map((race) => (
                   <tr
-                    key={race.date.en + race.venue + race.points}
+                    key={race.date.en + race.venue + race.points.en}
                     className={race.isBest ? 'is-best-row' : ''}
                   >
                     <td>{race.date[locale]}</td>
@@ -819,9 +796,9 @@ export function TheCourse() {
                       </div>
                     </td>
                     <td className="comeback-col-event">{race.event[locale]}</td>
-                    <td>{race.result}</td>
+                    <td>{race.result[locale]}</td>
                     <td className={race.isBest ? 'cell-best' : ''}>
-                      {race.points}
+                      {race.points[locale]}
                     </td>
                   </tr>
                 ))}
@@ -829,7 +806,11 @@ export function TheCourse() {
             </table>
 
             <div className="gate-07-totals tabular-nums">
-              {copy.gates.g07.totalsLine}
+              {copy.gates.g07.totalsCells.map((cell) => (
+                <span key={cell} className="gate-07-total-cell">
+                  {cell}
+                </span>
+              ))}
             </div>
           </article>
 
@@ -850,15 +831,15 @@ export function TheCourse() {
             }`}
           >
             <header className="gate-header">
-              <span className="gate-badge">GATE {copy.gates.g08.num}</span>
-              <span className="gate-meta-tag">{copy.gates.g08.tag}</span>
+              <span className="gate-badge">
+                {copy.gatePrefix} {copy.gates.g08.num}
+              </span>
               <span className="gate-years">{copy.gates.g08.years}</span>
             </header>
 
             <div className="gate-08-grid">
               <div>
                 <h3 className="gate-title">{copy.gates.g08.title}</h3>
-                <div className="gate-08-cohort">{copy.gates.g08.rosterMeta}</div>
                 <p className="gate-copy">{copy.gates.g08.copy}</p>
               </div>
 
@@ -867,10 +848,7 @@ export function TheCourse() {
                 ratioClass="ratio-1-1"
                 locale={locale}
                 reducedMotion={reducedMotion}
-                placeholderTitle={copy.gates.g08.placeholderTitle}
-                placeholderRatio={copy.gates.g08.placeholderRatio}
-                placeholderSpec={copy.gates.g08.placeholderSpec}
-                placeholderHint={copy.gates.g08.placeholderHint}
+                placeholderLabel={copy.gates.g08.placeholderLabel}
               />
             </div>
 

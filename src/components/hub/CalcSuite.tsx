@@ -54,8 +54,8 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
   // List Simulator state (#sim-form)
   const [simDisc, setSimDisc] = useState<string>('GS');
   const [simSeason, setSimSeason] = useState<number>(2027);
-  const [simResultsStr, setSimResultsStr] = useState<string>('34.95, 46.35');
-  const [simCurrentPts, setSimCurrentPts] = useState<string>('58.38');
+  const [simResultsStr, setSimResultsStr] = useState<string>('42.95, 54.35');
+  const [simCurrentPts, setSimCurrentPts] = useState<string>('');
   const [simOut, setSimOut] = useState<ListSimResponse | null>(null);
   const [simErr, setSimErr] = useState<string | null>(null);
   const [simBusy, setSimBusy] = useState<boolean>(false);
@@ -69,6 +69,13 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
   const [penOut, setPenOut] = useState<PenaltyCalcResponse | null>(null);
   const [penErr, setPenErr] = useState<string | null>(null);
   const [penBusy, setPenBusy] = useState<boolean>(false);
+
+  const parseOptionalNumber = (raw: string): number | undefined => {
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    const num = Number(trimmed);
+    return Number.isFinite(num) ? num : undefined;
+  };
 
   useEffect(() => {
     if (!prefillTarget) return;
@@ -103,8 +110,8 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
       body: JSON.stringify({
         discipline: nextDisc,
         leader_time_display: nextLeader.trim(),
-        penalty: Number(nextPenaltyStr) || 0,
-        target_fis_points: Number(nextPtsStr) || 0,
+        penalty: parseOptionalNumber(nextPenaltyStr) ?? 0,
+        target_fis_points: parseOptionalNumber(nextPtsStr) ?? 0,
         run1_display: nextRun1.trim() || undefined,
       }),
     })
@@ -144,8 +151,8 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
         body: JSON.stringify({
           discipline: targetDisc,
           leader_time_display: leaderTime.trim(),
-          penalty: Number(targetPenalty) || 0,
-          target_fis_points: Number(targetPts) || 0,
+          penalty: parseOptionalNumber(targetPenalty) ?? 0,
+          target_fis_points: parseOptionalNumber(targetPts) ?? 0,
           run1_display: run1Time.trim() || undefined,
         }),
       });
@@ -168,7 +175,9 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
     try {
       const parsed = simResultsStr
         .split(/[,\s]+/)
-        .map((s) => Number(s.trim()))
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((s) => Number(s))
         .filter((n) => Number.isFinite(n) && n >= 0);
 
       const res = await fetch('/api/hub/calc/list-sim', {
@@ -178,9 +187,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
           discipline: simDisc,
           season: simSeason,
           results: parsed,
-          current_list_points: simCurrentPts.trim()
-            ? Number(simCurrentPts)
-            : undefined,
+          current_list_points: parseOptionalNumber(simCurrentPts),
         }),
       });
       if (!res.ok) {
@@ -209,10 +216,10 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
           category: penCat,
           season: penSeason,
           competitors: penRows.map((r) => ({
-            bib: r.bib ? Number(r.bib) : undefined,
-            name: r.name || 'RACER',
-            list_points: r.list_points ? Number(r.list_points) : undefined,
-            time_display: r.time_display || undefined,
+            bib: parseOptionalNumber(r.bib),
+            name: r.name.trim() || 'RACER',
+            list_points: parseOptionalNumber(r.list_points),
+            time_display: r.time_display.trim() || undefined,
             status: r.status,
           })),
         }),
@@ -493,209 +500,214 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
         )}
       </article>
 
-      {/* Manual Penalty Calculator */}
-      <article className="hub-card">
-        <h2 className="hub-card-title">{t.penTitle}</h2>
-        <form className="hub-form" onSubmit={handlePenaltySubmit}>
-          <div className="hub-form-grid">
-            <div className="hub-field">
-              <label htmlFor="pen-disc" className="hub-field-label">
-                {t.targetDiscipline}
-              </label>
-              <select
-                id="pen-disc"
-                className="hub-select"
-                value={penDisc}
-                onChange={(e) => setPenDisc(e.target.value)}
-              >
-                <option value="GS">GS</option>
-                <option value="SL">SL</option>
-                <option value="SG">SG</option>
-                <option value="DH">DH</option>
-                <option value="AC">AC</option>
-              </select>
-            </div>
-
-            <div className="hub-field">
-              <label htmlFor="pen-gender" className="hub-field-label">
-                {t.penGender}
-              </label>
-              <select
-                id="pen-gender"
-                className="hub-select"
-                value={penGender}
-                onChange={(e) => setPenGender(e.target.value)}
-              >
-                <option value="M">M</option>
-                <option value="W">W</option>
-              </select>
-            </div>
-
-            <div className="hub-field">
-              <label htmlFor="pen-cat" className="hub-field-label">
-                {t.penCategory}
-              </label>
-              <select
-                id="pen-cat"
-                className="hub-select"
-                value={penCat}
-                onChange={(e) => setPenCat(e.target.value)}
-              >
-                <option value="FIS">FIS</option>
-                <option value="NC">NC</option>
-                <option value="ENL">ENL</option>
-                <option value="NJC">NJC</option>
-                <option value="NAC">NAC</option>
-              </select>
-            </div>
-
-            <div className="hub-field">
-              <label htmlFor="pen-season" className="hub-field-label">
-                {t.simSeason}
-              </label>
-              <select
-                id="pen-season"
-                className="hub-select"
-                value={penSeason}
-                onChange={(e) => setPenSeason(Number(e.target.value))}
-              >
-                <option value={2027}>2027</option>
-                <option value={2026}>2026</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="hub-manual-rows">
-            {penRows.map((row, idx) => (
-              <div key={idx} className="hub-manual-row">
-                <input
-                  type="text"
-                  aria-label={`${t.penBibAria} ${idx + 1}`}
-                  className="hub-input hub-input-sm"
-                  placeholder={t.penBibPlaceholder}
-                  value={row.bib}
-                  onChange={(e) => {
-                    const next = [...penRows];
-                    next[idx] = { ...next[idx], bib: e.target.value };
-                    setPenRows(next);
-                  }}
-                />
-                <input
-                  type="text"
-                  aria-label={`${t.penNameAria} ${idx + 1}`}
-                  className="hub-input"
-                  placeholder={t.penNamePlaceholder}
-                  value={row.name}
-                  onChange={(e) => {
-                    const next = [...penRows];
-                    next[idx] = { ...next[idx], name: e.target.value };
-                    setPenRows(next);
-                  }}
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  aria-label={`${t.penPtsAria} ${idx + 1}`}
-                  className="hub-input hub-input-sm"
-                  placeholder={t.penPtsPlaceholder}
-                  value={row.list_points}
-                  onChange={(e) => {
-                    const next = [...penRows];
-                    next[idx] = { ...next[idx], list_points: e.target.value };
-                    setPenRows(next);
-                  }}
-                />
-                <input
-                  type="text"
-                  aria-label={`${t.penTimeAria} ${idx + 1}`}
-                  className="hub-input hub-input-sm"
-                  placeholder={t.penTimePlaceholder}
-                  value={row.time_display}
-                  onChange={(e) => {
-                    const next = [...penRows];
-                    next[idx] = { ...next[idx], time_display: e.target.value };
-                    setPenRows(next);
-                  }}
-                />
+      {/* Manual Penalty Calculator (collapsed by default via native <details>) */}
+      <details className="hub-card hub-details-card">
+        <summary className="hub-details-summary">
+          <span className="hub-card-title">{t.penTitle}</span>
+          <span className="hub-details-hint">{t.penSummaryHint}</span>
+        </summary>
+        <div className="hub-details-body">
+          <form className="hub-form" onSubmit={handlePenaltySubmit}>
+            <div className="hub-form-grid">
+              <div className="hub-field">
+                <label htmlFor="pen-disc" className="hub-field-label">
+                  {t.targetDiscipline}
+                </label>
+                <select
+                  id="pen-disc"
+                  className="hub-select"
+                  value={penDisc}
+                  onChange={(e) => setPenDisc(e.target.value)}
+                >
+                  <option value="GS">GS</option>
+                  <option value="SL">SL</option>
+                  <option value="SG">SG</option>
+                  <option value="DH">DH</option>
+                  <option value="AC">AC</option>
+                </select>
               </div>
-            ))}
-          </div>
 
-          <div className="hub-empty-actions">
-            <button
-              type="button"
-              className="hub-btn hub-btn-secondary"
-              onClick={() =>
-                setPenRows((r) => [
-                  ...r,
-                  {
-                    bib: String(r.length + 1),
-                    name: `RACER ${r.length + 1}`,
-                    list_points: '40.00',
-                    time_display: '1:45.50',
-                    status: 'QLF',
-                  },
-                ])
-              }
-            >
-              {t.penAddRow}
-            </button>
-            <button
-              type="submit"
-              className="hub-btn hub-btn-accent"
-              disabled={penBusy}
-            >
-              {t.penRunBtn}
-            </button>
-          </div>
-        </form>
+              <div className="hub-field">
+                <label htmlFor="pen-gender" className="hub-field-label">
+                  {t.penGender}
+                </label>
+                <select
+                  id="pen-gender"
+                  className="hub-select"
+                  value={penGender}
+                  onChange={(e) => setPenGender(e.target.value)}
+                >
+                  <option value="M">M</option>
+                  <option value="W">W</option>
+                </select>
+              </div>
 
-        {penErr && (
-          <div className="hub-state-box hub-state-error" role="alert">
-            {penErr}
-          </div>
-        )}
+              <div className="hub-field">
+                <label htmlFor="pen-cat" className="hub-field-label">
+                  {t.penCategory}
+                </label>
+                <select
+                  id="pen-cat"
+                  className="hub-select"
+                  value={penCat}
+                  onChange={(e) => setPenCat(e.target.value)}
+                >
+                  <option value="FIS">FIS</option>
+                  <option value="NC">NC</option>
+                  <option value="ENL">ENL</option>
+                  <option value="NJC">NJC</option>
+                  <option value="NAC">NAC</option>
+                </select>
+              </div>
 
-        {penOut && (
-          <div className="hub-result-strip">
-            <PenaltyBreakdown locale={locale} penalty={penOut.penalty} />
-            {penCompetitors.length > 0 && (
-              <div className="hub-table-wrap">
-                <table className="hub-table">
-                  <thead>
-                    <tr>
-                      <th>{HUB_COPY[locale].race.colRank}</th>
-                      <th>{HUB_COPY[locale].race.colBib}</th>
-                      <th>{HUB_COPY[locale].race.colName}</th>
-                      <th>{HUB_COPY[locale].race.colTotal}</th>
-                      <th>{HUB_COPY[locale].race.colRacePts}</th>
-                      <th>{HUB_COPY[locale].race.colExpPts}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {penCompetitors.map((c, idx) => (
-                      <tr key={`${c.bib ?? idx}-${c.name}`}>
-                        <td className="hub-mono">{c.rank ?? '—'}</td>
-                        <td className="hub-mono">{c.bib ?? '—'}</td>
-                        <td>{c.name}</td>
-                        <td className="hub-mono">{c.total_display || '—'}</td>
-                        <td className="hub-mono">
-                          {c.race_points !== null ? c.race_points.toFixed(2) : '—'}
-                        </td>
-                        <td className="hub-mono">
-                          {c.expected_fis_points !== null
-                            ? c.expected_fis_points.toFixed(2)
-                            : '—'}
-                        </td>
+              <div className="hub-field">
+                <label htmlFor="pen-season" className="hub-field-label">
+                  {t.simSeason}
+                </label>
+                <select
+                  id="pen-season"
+                  className="hub-select"
+                  value={penSeason}
+                  onChange={(e) => setPenSeason(Number(e.target.value))}
+                >
+                  <option value={2027}>2027</option>
+                  <option value={2026}>2026</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="hub-manual-rows">
+              {penRows.map((row, idx) => (
+                <div key={idx} className="hub-manual-row">
+                  <input
+                    type="text"
+                    aria-label={`${t.penBibAria} ${idx + 1}`}
+                    className="hub-input hub-input-sm"
+                    placeholder={t.penBibPlaceholder}
+                    value={row.bib}
+                    onChange={(e) => {
+                      const next = [...penRows];
+                      next[idx] = { ...next[idx], bib: e.target.value };
+                      setPenRows(next);
+                    }}
+                  />
+                  <input
+                    type="text"
+                    aria-label={`${t.penNameAria} ${idx + 1}`}
+                    className="hub-input"
+                    placeholder={t.penNamePlaceholder}
+                    value={row.name}
+                    onChange={(e) => {
+                      const next = [...penRows];
+                      next[idx] = { ...next[idx], name: e.target.value };
+                      setPenRows(next);
+                    }}
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    aria-label={`${t.penPtsAria} ${idx + 1}`}
+                    className="hub-input hub-input-sm"
+                    placeholder={t.penPtsPlaceholder}
+                    value={row.list_points}
+                    onChange={(e) => {
+                      const next = [...penRows];
+                      next[idx] = { ...next[idx], list_points: e.target.value };
+                      setPenRows(next);
+                    }}
+                  />
+                  <input
+                    type="text"
+                    aria-label={`${t.penTimeAria} ${idx + 1}`}
+                    className="hub-input hub-input-sm"
+                    placeholder={t.penTimePlaceholder}
+                    value={row.time_display}
+                    onChange={(e) => {
+                      const next = [...penRows];
+                      next[idx] = { ...next[idx], time_display: e.target.value };
+                      setPenRows(next);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="hub-empty-actions">
+              <button
+                type="button"
+                className="hub-btn hub-btn-secondary"
+                onClick={() =>
+                  setPenRows((r) => [
+                    ...r,
+                    {
+                      bib: String(r.length + 1),
+                      name: `RACER ${r.length + 1}`,
+                      list_points: '40.00',
+                      time_display: '1:45.50',
+                      status: 'QLF',
+                    },
+                  ])
+                }
+              >
+                {t.penAddRow}
+              </button>
+              <button
+                type="submit"
+                className="hub-btn hub-btn-accent"
+                disabled={penBusy}
+              >
+                {t.penRunBtn}
+              </button>
+            </div>
+          </form>
+
+          {penErr && (
+            <div className="hub-state-box hub-state-error" role="alert">
+              {penErr}
+            </div>
+          )}
+
+          {penOut && (
+            <div className="hub-result-strip">
+              <PenaltyBreakdown locale={locale} penalty={penOut.penalty} />
+              {penCompetitors.length > 0 && (
+                <div className="hub-table-wrap">
+                  <table className="hub-table">
+                    <thead>
+                      <tr>
+                        <th>{HUB_COPY[locale].race.colRank}</th>
+                        <th>{HUB_COPY[locale].race.colBib}</th>
+                        <th>{HUB_COPY[locale].race.colName}</th>
+                        <th>{HUB_COPY[locale].race.colTotal}</th>
+                        <th>{HUB_COPY[locale].race.colRacePts}</th>
+                        <th>{HUB_COPY[locale].race.colExpPts}</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-      </article>
+                    </thead>
+                    <tbody>
+                      {penCompetitors.map((c, idx) => (
+                        <tr key={`${c.bib ?? idx}-${c.name}`}>
+                          <td className="hub-mono">{c.rank ?? '—'}</td>
+                          <td className="hub-mono">{c.bib ?? '—'}</td>
+                          <td>{c.name}</td>
+                          <td className="hub-mono">{c.total_display || '—'}</td>
+                          <td className="hub-mono">
+                            {c.race_points !== null ? c.race_points.toFixed(2) : '—'}
+                          </td>
+                          <td className="hub-mono">
+                            {c.expected_fis_points !== null
+                              ? c.expected_fis_points.toFixed(2)
+                              : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </details>
     </section>
   );
 }

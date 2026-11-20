@@ -1,11 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Locale } from '@/data/runStore';
 import { HUB_COPY } from './hubCopy';
 import type { RaceSelection, RacesListResponse, RaceSummary } from './types';
 
 type LiveFilter = 'ALL' | 'LIVE' | 'FIS' | 'NA';
+
+const NA_COUNTRIES = new Set(['CAN', 'CANADA', 'USA', 'UNITED STATES']);
 
 interface LiveBoardProps {
   locale: Locale;
@@ -32,14 +34,19 @@ export function LiveBoard({
   const [data, setData] = useState<RacesListResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const loadRaces = useCallback(async (targetDate: string) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(
         `/api/hub/races?date=${encodeURIComponent(targetDate)}&fis_only=false`,
-        { cache: 'no-store' }
+        { cache: 'no-store', signal: controller.signal }
       );
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
@@ -48,22 +55,34 @@ export function LiveBoard({
       const json = (await res.json()) as RacesListResponse;
       setData(json);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setError(err instanceof Error ? err.message : t.loadError);
     } finally {
-      setLoading(false);
+      if (abortRef.current === controller) {
+        setLoading(false);
+      }
     }
   }, [t.loadError]);
 
   useEffect(() => {
     void loadRaces(date);
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [date, loadRaces]);
 
   const filteredRaces = useMemo(() => {
     if (!data) return [];
     return data.races.filter((r) => {
       if (filter === 'LIVE') return r.zone_status === 'L';
-      if (filter === 'FIS') return Boolean(r.fis_codex || r.fis_race_id);
-      if (filter === 'NA') return r.country === 'CAN' || r.country === 'USA';
+      if (filter === 'FIS') {
+        return Boolean(
+          r.fis_codex || r.fis_race_id || r.source_type === 'FIS_CALENDAR'
+        );
+      }
+      if (filter === 'NA') {
+        return NA_COUNTRIES.has((r.country || '').trim().toUpperCase());
+      }
       return true;
     });
   }, [data, filter]);
@@ -88,11 +107,20 @@ export function LiveBoard({
     }
   };
 
-  const getZoneLabel = (zone: string) => {
+  const getZoneLabel = (race: RaceSummary) => {
+    const zone = (race.zone_status || '').toUpperCase();
+    if (zone === 'X' || race.message?.trim().toLowerCase() === 'cancelled') {
+      return t.statusCancelled;
+    }
     if (zone === 'L') return t.statusLive;
     if (zone === 'R') return t.statusResults;
+    if (zone === 'C') return t.statusStartList;
     return t.statusUpcoming;
   };
+
+  const showDegradedStrip = Boolean(
+    data && (!data.sources.live_timing_ok || !data.sources.fis_calendar_ok)
+  );
 
   return (
     <section className="hub-panel" aria-label={t.boardAria}>
@@ -150,22 +178,14 @@ export function LiveBoard({
           </button>
         ))}
 
-        {data && (
+        {showDegradedStrip && data && (
           <div className="hub-sources-strip">
-            <span
-              className={`hub-source-tag ${
-                data.sources.live_timing_ok ? 'is-ok' : 'is-err'
-              }`}
-            >
-              {data.sources.live_timing_ok ? t.sourceLtOk : t.sourceLtDown}
-            </span>
-            <span
-              className={`hub-source-tag ${
-                data.sources.fis_calendar_ok ? 'is-ok' : 'is-err'
-              }`}
-            >
-              {data.sources.fis_calendar_ok ? t.sourceFisOk : t.sourceFisDown}
-            </span>
+            {!data.sources.live_timing_ok && (
+              <span className="hub-source-tag is-err">{t.sourceLtDown}</span>
+            )}
+            {!data.sources.fis_calendar_ok && (
+              <span className="hub-source-tag is-err">{t.sourceFisDown}</span>
+            )}
           </div>
         )}
       </div>
@@ -174,12 +194,56 @@ export function LiveBoard({
 
       {error && (
         <div className="hub-state-box hub-state-error" role="alert">
-          {t.errorPrefix} {error}
+          <div>
+            {t.errorPrefix} {error}
+          </div>
+          <div className="hub-empty-actions">
+            <button
+              type="button"
+              className="hub-btn hub-btn-secondary"
+              onClick={() => void loadRaces(date)}
+            >
+              {t.retryBtn}
+            </button>
+            <button
+              type="button"
+              className="hub-btn hub-btn-accent"
+              onClick={() => {
+                setDate('2026-04-11');
+                onLoadDemoMsa();
+              }}
+            >
+              {t.demoBtn}
+            </button>
+          </div>
         </div>
       )}
 
       {!loading && !error && filteredRaces.length === 0 && (
-        <div className="hub-state-box">{t.empty}</div>
+        <div className="hub-state-box">
+          <div>{t.empty}</div>
+          <div className="hub-empty-actions">
+            {filter !== 'ALL' && (
+              <button
+                type="button"
+                className="hub-btn hub-btn-secondary"
+                onClick={() => setFilter('ALL')}
+              >
+                {t.resetFiltersBtn}
+              </button>
+            )}
+            <button
+              type="button"
+              className="hub-btn hub-btn-accent"
+              onClick={() => {
+                setDate('2026-04-11');
+                onLoadDemoMsa();
+              }}
+            >
+              {t.demoBtn}
+            </button>
+          </div>
+        </div>
       )}
 
       {!loading && filteredRaces.length > 0 && (
@@ -187,44 +251,70 @@ export function LiveBoard({
           {filteredRaces.map((race, idx) => {
             const key = `${race.lt_id ?? 'fis'}-${race.fis_race_id ?? idx}`;
             const isOpenable = race.lt_id !== null || race.fis_race_id !== null;
-            return (
-              <li key={key} className="hub-race-item">
-                <button
-                  type="button"
-                  className="hub-race-btn"
-                  disabled={!isOpenable}
-                  onClick={() => handleOpenRace(race)}
-                >
-                  <div className="hub-race-top">
-                    <span
-                      className={`hub-zone-badge ${
-                        race.zone_status === 'L' ? 'is-live' : ''
-                      }`}
-                    >
-                      {getZoneLabel(race.zone_status)}
-                    </span>
-                    <span className="hub-race-meta">
-                      {race.discipline_code || race.discipline} · {race.gender}
-                      {race.fis_category ? ` · ${race.fis_category}` : ''}
-                      {race.country ? ` · ${race.country}` : ''}
-                    </span>
-                    <span className="hub-race-time">{race.start_time || '--:--'}</span>
-                  </div>
+            const metaLine = [
+              race.discipline_code || race.discipline,
+              race.gender,
+              race.fis_category,
+              race.country,
+            ]
+              .map((part) => (part || '').trim())
+              .filter(Boolean)
+              .join(' · ');
+            const cleanName = (race.name || '').trim();
+            const cleanResort = (race.resort || '').trim();
+            const isResortInName =
+              Boolean(cleanResort) &&
+              cleanName.toLowerCase().includes(cleanResort.toLowerCase());
+            const resortLine = [
+              isResortInName ? '' : cleanResort,
+              race.fis_codex ? `CODEX ${race.fis_codex}` : '',
+            ]
+              .map((part) => (part || '').trim())
+              .filter(Boolean)
+              .join(' · ');
 
-                  <div className="hub-race-name">{race.name}</div>
+            const content = (
+              <>
+                <div className="hub-race-top">
+                  <span
+                    className={`hub-zone-badge ${
+                      race.zone_status === 'L' ? 'is-live' : ''
+                    }`}
+                  >
+                    {getZoneLabel(race)}
+                  </span>
+                  {metaLine && <span className="hub-race-meta">{metaLine}</span>}
+                  <span className="hub-race-time">{race.start_time || '--:--'}</span>
+                </div>
 
+                <div className="hub-race-name">{race.name}</div>
+
+                {(resortLine || isOpenable) && (
                   <div className="hub-race-bottom">
-                    <span className="hub-race-resort">
-                      {race.resort}
-                      {race.lt_id !== null ? ` · LT ${race.lt_id}` : ''}
-                      {race.fis_codex ? ` · CODEX ${race.fis_codex}` : ''}
-                      {race.fis_race_id ? ` · FIS ${race.fis_race_id}` : ''}
-                    </span>
+                    <span className="hub-race-resort">{resortLine}</span>
                     {isOpenable && (
-                      <span className="hub-race-cta">{t.openRace}</span>
+                      <span className="hub-race-cta" aria-hidden="true">
+                        →
+                      </span>
                     )}
                   </div>
-                </button>
+                )}
+              </>
+            );
+
+            return (
+              <li key={key} className="hub-race-item">
+                {isOpenable ? (
+                  <button
+                    type="button"
+                    className="hub-race-btn"
+                    onClick={() => handleOpenRace(race)}
+                  >
+                    {content}
+                  </button>
+                ) : (
+                  <div className="hub-race-info">{content}</div>
+                )}
               </li>
             );
           })}

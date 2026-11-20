@@ -37,16 +37,12 @@ export function StartGateHero() {
       {/* Top Metadata Strip */}
       <div className="pitch-meta-top">
         <div className="meta-slash-group">
-          <span>{copy.specLeftA}</span>
-          <span className="meta-slash-divider" aria-hidden="true">
-            /
-          </span>
-          <span>{copy.specLeftB}</span>
+          <span>{copy.specLeft}</span>
         </div>
-        <div className="meta-location">{copy.locationTag}</div>
+        <div className="meta-location">{copy.specRight}</div>
       </div>
 
-      {/* 4:5 Portrait Slot (Real AVIF/WebP when supplied, labeled 4:5 plate otherwise) */}
+      {/* 4:5 Portrait Slot (Real AVIF/WebP when supplied, minimal 4:5 plate otherwise) */}
       <figure
         className={`pitch-portrait-frame ${
           heroMedia.available ? 'has-media' : ''
@@ -54,7 +50,7 @@ export function StartGateHero() {
         aria-label={
           heroMedia.available
             ? heroMedia.caption[locale]
-            : `${copy.placeholderTitle} ${copy.placeholderRatio}`
+            : copy.placeholderLabel
         }
       >
         {heroMedia.available && (heroMedia.webpSrc || heroMedia.src) ? (
@@ -83,17 +79,9 @@ export function StartGateHero() {
           </>
         ) : (
           <>
-            <div className="portrait-frame-grid" aria-hidden="true" />
             <div className="portrait-crosshair" aria-hidden="true" />
-
-            <div className="portrait-frame-label">
-              <span>{copy.placeholderTitle}</span>
-              <span>{copy.placeholderRatio}</span>
-            </div>
-
-            <figcaption className="portrait-frame-spec">
-              <span>{copy.placeholderSpec}</span>
-              <span>{copy.placeholderHint}</span>
+            <figcaption className="portrait-frame-tag">
+              {copy.placeholderLabel}
             </figcaption>
           </>
         )}

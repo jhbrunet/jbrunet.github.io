@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Locale } from '@/data/runStore';
 import { HUB_COPY } from './hubCopy';
 import type {
@@ -32,12 +32,20 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
     null
   );
 
+  const searchAbortRef = useRef<AbortController | null>(null);
+  const detailAbortRef = useRef<AbortController | null>(null);
+
   const loadDetail = useCallback(async (competitorId: number) => {
+    detailAbortRef.current?.abort();
+    const controller = new AbortController();
+    detailAbortRef.current = controller;
+
     setDetailLoading(true);
     setDetailErr(null);
     try {
       const res = await fetch(`/api/hub/athletes/${competitorId}`, {
         cache: 'no-store',
+        signal: controller.signal,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -45,9 +53,13 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
       }
       setDetail((await res.json()) as AthleteDetailResponse);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      setDetail(null);
       setDetailErr(err instanceof Error ? err.message : t.profileError);
     } finally {
-      setDetailLoading(false);
+      if (detailAbortRef.current === controller) {
+        setDetailLoading(false);
+      }
     }
   }, [t.profileError]);
 
@@ -55,13 +67,17 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
     async (q: string) => {
       const trimmed = q.trim();
       if (!trimmed) return;
+      searchAbortRef.current?.abort();
+      const controller = new AbortController();
+      searchAbortRef.current = controller;
+
       setSearching(true);
       setSearchErr(null);
       setHasSearched(true);
       try {
         const res = await fetch(
           `/api/hub/athletes/search?q=${encodeURIComponent(trimmed)}&limit=25`,
-          { cache: 'no-store' }
+          { cache: 'no-store', signal: controller.signal }
         );
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
@@ -73,9 +89,12 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
           void loadDetail(json.athletes[0].competitor_id);
         }
       } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         setSearchErr(err instanceof Error ? err.message : t.searchError);
       } finally {
-        setSearching(false);
+        if (searchAbortRef.current === controller) {
+          setSearching(false);
+        }
       }
     },
     [loadDetail, t.searchError]
@@ -87,6 +106,13 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
       void runSearch(initialQuery.trim());
     }
   }, [initialQuery, runSearch]);
+
+  useEffect(() => {
+    return () => {
+      searchAbortRef.current?.abort();
+      detailAbortRef.current?.abort();
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,10 +163,6 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
         </div>
       )}
 
-      {!hasSearched && !detail && (
-        <div className="hub-state-box">{t.emptySearch}</div>
-      )}
-
       {hasSearched && !searching && results.length === 0 && !searchErr && (
         <div className="hub-state-box">{t.noResults}</div>
       )}
@@ -161,8 +183,9 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
                 <div className="hub-race-top">
                   <span className="hub-mono">FIS {ath.fis_code}</span>
                   <span className="hub-mono">
-                    {ath.nation} · {ath.gender}
-                    {ath.birth_year ? ` · ${ath.birth_year}` : ''}
+                    {[ath.nation, ath.gender, ath.birth_year ? String(ath.birth_year) : '']
+                      .filter(Boolean)
+                      .join(' · ')}
                   </span>
                   <span
                     className={`hub-badge ${ath.active ? 'hub-badge-accent' : ''}`}
@@ -204,11 +227,18 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
               </div>
               <h2 className="hub-race-heading">{detail.profile.name}</h2>
               <div className="hub-race-subline">
-                {detail.profile.club || '—'}
-                {detail.profile.team ? ` · ${detail.profile.team}` : ''}
-                {detail.profile.birth_year
-                  ? ` · ${detail.profile.birth_year}`
-                  : ''}
+                {[
+                  detail.profile.club,
+                  detail.profile.team &&
+                  detail.profile.team !== detail.profile.club
+                    ? detail.profile.team
+                    : '',
+                  detail.profile.birth_year
+                    ? String(detail.profile.birth_year)
+                    : '',
+                ]
+                  .filter(Boolean)
+                  .join(' · ') || '—'}
               </div>
             </div>
             <div className="hub-profile-actions">
@@ -325,7 +355,8 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
                       <tr key={`${r.date}-${r.race_id ?? i}`}>
                         <td className="hub-mono">{r.date}</td>
                         <td>
-                          {r.place} ({r.nation})
+                          {r.place}
+                          {r.nation ? ` (${r.nation})` : ''}
                         </td>
                         <td className="hub-mono">{r.category}</td>
                         <td className="hub-mono">{r.discipline}</td>

@@ -35,7 +35,7 @@ export function TimingRail() {
       ? BIB_IDENTITY.mobileSlimBib
       : activeGate === '00'
       ? BIB_IDENTITY.mobileSlimBib
-      : `FIS ${BIB_IDENTITY.fisCode} · G${activeGate}`;
+      : `FIS ${BIB_IDENTITY.fisCode} · ${locale === 'fr' ? 'P' : 'G'}${activeGate}`;
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -133,9 +133,11 @@ export function TimingRail() {
         <div className="topbar-bib">{mobileTopLabel}</div>
 
         <div className="topbar-right">
-          <div className="topbar-clock" aria-label={copy.runTimeLabel}>
-            {clockFormatted}
-          </div>
+          {pathname === '/' && (
+            <div className="topbar-clock" aria-label={copy.runTimeLabel}>
+              {clockFormatted}
+            </div>
+          )}
           <button
             ref={menuBtnRef}
             type="button"
@@ -197,7 +199,9 @@ export function TimingRail() {
                     onClick={(e) => handleNavClick(e, item.href, true)}
                   >
                     <span>{item.label[locale]}</span>
-                    <span className="rail-nav-gate-num">{item.gate}</span>
+                    <span className="rail-nav-gate-num">
+                      {item.gateTag ? item.gateTag[locale] : item.gate}
+                    </span>
                   </Link>
                 );
               })}
@@ -230,16 +234,29 @@ export function TimingRail() {
             </div>
           </div>
 
-          {/* Persistent Timing-Board Clock */}
-          <div className="rail-clock-box">
-            <span className="rail-clock-label">{copy.runTimeLabel}</span>
-            <span className="rail-clock-digits" aria-live="off">
-              {clockFormatted}
-            </span>
-            <span className="rail-gate-status">
-              {pathname === '/' ? currentGateStatus.label[locale] : pathname.toUpperCase()}
-            </span>
-          </div>
+          {/* Persistent Timing-Board Clock on /, static route indicator elsewhere */}
+          {pathname === '/' ? (
+            <div className="rail-clock-box">
+              <span className="rail-clock-label">{copy.runTimeLabel}</span>
+              <span className="rail-clock-digits" aria-live="off">
+                {clockFormatted}
+              </span>
+              <span className="rail-gate-status">
+                {currentGateStatus.label[locale]}
+              </span>
+            </div>
+          ) : (
+            <div className="rail-route-box">
+              <span className="rail-route-kicker">{copy.sectorLabel}</span>
+              <span className="rail-route-name">
+                {pathname.startsWith('/hub')
+                  ? copy.routeHub
+                  : pathname.startsWith('/partners')
+                  ? copy.routePartners
+                  : copy.routeNotFound}
+              </span>
+            </div>
+          )}
 
           {/* Persistent Gate Navigation */}
           <nav className="rail-nav" aria-label="Course gate navigation">
@@ -261,7 +278,9 @@ export function TimingRail() {
                   className={`rail-nav-link ${isActive ? 'is-active' : ''}`}
                 >
                   <span>{item.label[locale]}</span>
-                  <span className="rail-nav-gate-num">{item.gate}</span>
+                  <span className="rail-nav-gate-num">
+                    {item.gateTag ? item.gateTag[locale] : item.gate}
+                  </span>
                 </Link>
               );
             })}

@@ -15,9 +15,9 @@ import type {
 interface RaceTelemetryProps {
   locale: Locale;
   selection: RaceSelection | null;
-  season: number;
+  seasonOverride: number | null;
   onSeasonChange: (season: number) => void;
-  category: string;
+  categoryOverride: string | null;
   onCategoryChange: (cat: string) => void;
   subTab: RaceSubTab;
   onSubTabChange: (tab: RaceSubTab) => void;
@@ -42,14 +42,14 @@ interface RaceTelemetryProps {
 }
 
 const SEASONS = [2027, 2026];
-const CATEGORIES = ['FIS', 'NC', 'ENL', 'UNI', 'NJC', 'NAC', 'EC', 'WC'];
+const CATEGORIES = ['FIS', 'NAC', 'NC', 'NJR', 'NJC', 'ENL', 'CIT', 'UNI', 'EC', 'WC'];
 
 export function RaceTelemetry({
   locale,
   selection,
-  season,
+  seasonOverride,
   onSeasonChange,
-  category,
+  categoryOverride,
   onCategoryChange,
   subTab,
   onSubTabChange,
@@ -66,35 +66,44 @@ export function RaceTelemetry({
   const [polling, setPolling] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [pollError, setPollError] = useState<string | null>(null);
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const stampRef = useRef<number>(liveData?.server_stamp ?? 0);
+  const abortRef = useRef<AbortController | null>(null);
 
   const currentRaceKey = selection
     ? selection.kind === 'live'
-      ? `live-${selection.ltId}-${season}-${category}`
+      ? `live-${selection.ltId}-${seasonOverride ?? 'auto'}-${categoryOverride ?? 'auto'}`
       : `fis-${selection.fisRaceId}`
     : null;
 
   const fetchRace = useCallback(
     async (sel: RaceSelection, reqKey: string, useDelta: boolean) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       if (!useDelta) {
         setLoading(true);
+        setError(null);
       }
-      setError(null);
+      setPollError(null);
       try {
         if (sel.kind === 'live') {
           const m = useDelta ? stampRef.current : 0;
-          const qs = new URLSearchParams({
-            m: String(m),
-            season: String(season),
-            category,
-          });
+          const qs = new URLSearchParams({ m: String(m) });
+          if (seasonOverride !== null) {
+            qs.set('season', String(seasonOverride));
+          }
+          if (categoryOverride !== null) {
+            qs.set('category', categoryOverride);
+          }
           if (sel.sourceType) {
             qs.set('source_type', sel.sourceType);
           }
           const res = await fetch(
             `/api/hub/races/${sel.ltId}/live?${qs.toString()}`,
-            { cache: 'no-store' }
+            { cache: 'no-store', signal: controller.signal }
           );
           if (!res.ok) {
             const errBody = await res.json().catch(() => ({}));
@@ -102,25 +111,38 @@ export function RaceTelemetry({
           }
           const json = (await res.json()) as LiveRaceResponse;
           stampRef.current = json.server_stamp;
+          setError(null);
+          setPollError(null);
           onRaceDataLoaded(reqKey, json, null);
         } else {
           const res = await fetch(`/api/hub/fis/race/${sel.fisRaceId}`, {
             cache: 'no-store',
+            signal: controller.signal,
           });
           if (!res.ok) {
             const errBody = await res.json().catch(() => ({}));
             throw new Error(errBody.detail || `HTTP ${res.status}`);
           }
           const json = (await res.json()) as FisRaceResponse;
+          setError(null);
+          setPollError(null);
           onRaceDataLoaded(reqKey, null, json);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : t.loadError);
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        const msg = err instanceof Error ? err.message : t.loadError;
+        if (useDelta && (liveData || fisData)) {
+          setPollError(msg);
+        } else {
+          setError(msg);
+        }
       } finally {
-        setLoading(false);
+        if (abortRef.current === controller) {
+          setLoading(false);
+        }
       }
     },
-    [season, category, onRaceDataLoaded, t.loadError]
+    [seasonOverride, categoryOverride, onRaceDataLoaded, t.loadError, liveData, fisData]
   );
 
   useEffect(() => {
@@ -133,6 +155,9 @@ export function RaceTelemetry({
     stampRef.current = 0;
     setExpandedKey(null);
     void fetchRace(selection, currentRaceKey, false);
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [selection, currentRaceKey, loadedRaceKey, liveData, fisData, fetchRace]);
 
   useEffect(() => {
@@ -179,6 +204,15 @@ export function RaceTelemetry({
   const penalty: PenaltyBreakdownData | null =
     liveData?.penalty ?? fisData?.penalty_audit ?? null;
 
+  const displayedSeason = seasonOverride ?? liveData?.race.season ?? 2027;
+  const displayedCategory = categoryOverride ?? liveData?.race.category ?? 'FIS';
+  const categoryOptions = CATEGORIES.includes(displayedCategory)
+    ? CATEGORIES
+    : [displayedCategory, ...CATEGORIES];
+  const seasonOptions = SEASONS.includes(displayedSeason)
+    ? SEASONS
+    : [displayedSeason, ...SEASONS];
+
   const raceTitle = liveData
     ? liveData.race.name
     : fisData
@@ -186,9 +220,26 @@ export function RaceTelemetry({
     : selection.label;
 
   const raceMetaLine = liveData
-    ? `${liveData.race.resort} · ${liveData.race.discipline_code || liveData.race.discipline} · ${liveData.race.gender} · ${liveData.race.category}`
+    ? [
+        liveData.race.resort,
+        liveData.race.discipline_code || liveData.race.discipline,
+        liveData.race.gender,
+        liveData.race.category,
+      ]
+        .map((p) => (p || '').trim())
+        .filter(Boolean)
+        .join(' · ')
     : fisData
-    ? `${fisData.nation} · ${fisData.discipline_code} · ${fisData.gender} · ${fisData.category}${fisData.codex ? ` · CODEX ${fisData.codex}` : ''}`
+    ? [
+        fisData.nation,
+        fisData.discipline_code,
+        fisData.gender,
+        fisData.category,
+        fisData.codex ? `CODEX ${fisData.codex}` : '',
+      ]
+        .map((p) => (p || '').trim())
+        .filter(Boolean)
+        .join(' · ')
     : '';
 
   const leaderDisplay =
@@ -206,6 +257,8 @@ export function RaceTelemetry({
   const disciplineForCalc =
     liveData?.race.discipline_code ?? fisData?.discipline_code ?? 'GS';
 
+  const isOfflineArchived = Boolean(liveData && !liveData.online);
+
   return (
     <section className="hub-panel" aria-label={t.telemetryAria}>
       <div className="hub-race-header">
@@ -220,15 +273,19 @@ export function RaceTelemetry({
 
           {selection.kind === 'live' && (
             <div className="hub-poll-controls">
-              <button
-                type="button"
-                className={`hub-btn ${
-                  polling ? 'hub-btn-accent' : 'hub-btn-secondary'
-                }`}
-                onClick={() => setPolling((p) => !p)}
-              >
-                {polling ? t.pollOn : t.pollOff}
-              </button>
+              {isOfflineArchived ? (
+                <span className="hub-badge">{t.finalTag}</span>
+              ) : (
+                <button
+                  type="button"
+                  className={`hub-btn ${
+                    polling ? 'hub-btn-accent' : 'hub-btn-secondary'
+                  }`}
+                  onClick={() => setPolling((p) => !p)}
+                >
+                  {polling ? t.pollOn : t.pollOff}
+                </button>
+              )}
               <button
                 type="button"
                 className="hub-btn hub-btn-secondary"
@@ -255,10 +312,10 @@ export function RaceTelemetry({
               <select
                 id="hub-race-season"
                 className="hub-select"
-                value={season}
+                value={displayedSeason}
                 onChange={(e) => onSeasonChange(Number(e.target.value))}
               >
-                {SEASONS.map((s) => (
+                {seasonOptions.map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>
@@ -273,22 +330,16 @@ export function RaceTelemetry({
               <select
                 id="hub-race-cat"
                 className="hub-select"
-                value={category}
+                value={displayedCategory}
                 onChange={(e) => onCategoryChange(e.target.value)}
               >
-                {CATEGORIES.map((c) => (
+                {categoryOptions.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
               </select>
             </div>
-
-            {liveData && (
-              <span className="hub-badge">
-                {liveData.is_delta ? t.deltaLabel : t.fullLabel}
-              </span>
-            )}
           </div>
         )}
 
@@ -403,7 +454,34 @@ export function RaceTelemetry({
       {loading && <div className="hub-state-box">{t.loading}</div>}
       {error && (
         <div className="hub-state-box hub-state-error" role="alert">
-          {error}
+          <div>{error}</div>
+          <div className="hub-empty-actions">
+            <button
+              type="button"
+              className="hub-btn hub-btn-secondary"
+              onClick={() =>
+                currentRaceKey && void fetchRace(selection, currentRaceKey, false)
+              }
+            >
+              {t.retryBtn}
+            </button>
+          </div>
+        </div>
+      )}
+      {pollError && !error && (
+        <div className="hub-poll-error" role="status">
+          <span>
+            {t.pollErrorPrefix} {pollError}
+          </span>
+          <button
+            type="button"
+            className="hub-btn hub-btn-secondary"
+            onClick={() =>
+              currentRaceKey && void fetchRace(selection, currentRaceKey, true)
+            }
+          >
+            {t.retryBtn}
+          </button>
         </div>
       )}
 
@@ -416,6 +494,9 @@ export function RaceTelemetry({
       )}
 
       {!loading && !error && subTab === 'SHEET' && liveData && (
+        liveData.racers.length === 0 ? (
+          <div className="hub-state-box">{t.emptyField}</div>
+        ) : (
         <div className="hub-sheet-list">
           <div className="hub-sheet-head">
             <span>{t.colRank}</span>
@@ -545,9 +626,13 @@ export function RaceTelemetry({
             );
           })}
         </div>
+        )
       )}
 
       {!loading && !error && subTab === 'SHEET' && fisData && (
+        fisData.results.length === 0 ? (
+          <div className="hub-state-box">{t.emptyField}</div>
+        ) : (
         <div className="hub-sheet-list">
           <div className="hub-sheet-head">
             <span>{t.colRank}</span>
@@ -666,6 +751,7 @@ export function RaceTelemetry({
             );
           })}
         </div>
+        )
       )}
     </section>
   );

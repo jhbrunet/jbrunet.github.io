@@ -67,9 +67,10 @@ def fetch_url_bytes(
     url: str,
     cache_key: str,
     ttl_seconds: int = 300,
-    timeout: int = 15,
+    timeout: int = 8,
     use_cache: bool = True,
     persist_tmp: bool = True,
+    retries: int = 2,
 ) -> bytes:
     """Fetch URL bytes with memory+/tmp TTL cache and transient retry logic."""
     if use_cache and ttl_seconds > 0:
@@ -77,8 +78,9 @@ def fetch_url_bytes(
         if cached is not None:
             return cached
 
+    attempts = max(1, int(retries))
     last_err: Optional[Exception] = None
-    for attempt in range(3):
+    for attempt in range(attempts):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
             with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -91,13 +93,13 @@ def fetch_url_bytes(
                 raise NotFoundError(f"Resource not found (404): {url}") from exc
             last_err = exc
             if exc.code >= 500 or exc.code == 429:
-                if attempt < 2:
+                if attempt < attempts - 1:
                     time.sleep(0.3 * (attempt + 1))
                     continue
             raise UpstreamError(f"HTTP {exc.code} fetching {url}") from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             last_err = exc
-            if attempt < 2:
+            if attempt < attempts - 1:
                 time.sleep(0.3 * (attempt + 1))
                 continue
             break
@@ -476,38 +478,44 @@ def get_bulk_index(allow_network: bool = True) -> FisBulkIndex:
     if isinstance(mem_idx, FisBulkIndex):
         return mem_idx
 
-    cached_zip = shared_cache.get_bytes("alfp2027f_zip")
-    if cached_zip is not None:
-        try:
-            idx = parse_alfp_zip_bytes(cached_zip, source="tmp_cache")
-            shared_cache.set_mem("alfp2027f_index", idx, 3600)
-            return idx
-        except (zipfile.BadZipFile, OSError, KeyError, ValueError):
-            pass
+    with shared_cache.lock_for("alfp2027f_index"):
+        mem_idx = shared_cache.get_mem("alfp2027f_index")
+        if isinstance(mem_idx, FisBulkIndex):
+            return mem_idx
 
-    if allow_network:
-        try:
-            zip_bytes = fetch_url_bytes(
-                ALFP_ZIP_URL,
-                cache_key="alfp2027f_zip",
-                ttl_seconds=3600,
-                timeout=25,
-                use_cache=False,
-                persist_tmp=True,
-            )
-            idx = parse_alfp_zip_bytes(zip_bytes, source="remote_zip")
-            shared_cache.set_bytes("alfp2027f_zip", zip_bytes, 3600, persist_tmp=True)
-            shared_cache.set_mem("alfp2027f_index", idx, 3600)
-            return idx
-        except Exception:
-            pass
+        cached_zip = shared_cache.get_bytes("alfp2027f_zip")
+        if cached_zip is not None:
+            try:
+                idx = parse_alfp_zip_bytes(cached_zip, source="tmp_cache")
+                shared_cache.set_mem("alfp2027f_index", idx, 3600)
+                return idx
+            except (zipfile.BadZipFile, OSError, KeyError, ValueError):
+                pass
 
-    if not allow_network:
-        return FisBulkIndex(source="fallback_embedded")
+        if allow_network:
+            try:
+                zip_bytes = fetch_url_bytes(
+                    ALFP_ZIP_URL,
+                    cache_key="alfp2027f_zip",
+                    ttl_seconds=3600,
+                    timeout=12,
+                    use_cache=False,
+                    persist_tmp=True,
+                    retries=2,
+                )
+                idx = parse_alfp_zip_bytes(zip_bytes, source="remote_zip")
+                shared_cache.set_bytes("alfp2027f_zip", zip_bytes, 3600, persist_tmp=True)
+                shared_cache.set_mem("alfp2027f_index", idx, 3600)
+                return idx
+            except Exception:
+                pass
 
-    fallback = FisBulkIndex(source="fallback_embedded")
-    shared_cache.set_mem("alfp2027f_index", fallback, 15)
-    return fallback
+        if not allow_network:
+            return FisBulkIndex(source="fallback_embedded")
+
+        fallback = FisBulkIndex(source="fallback_embedded")
+        shared_cache.set_mem("alfp2027f_index", fallback, 15)
+        return fallback
 
 
 def parse_calendar_html(raw_bytes: bytes) -> List[Dict[str, Any]]:
@@ -655,9 +663,31 @@ def fetch_calendar_for_date(date_str: str) -> Tuple[List[Dict[str, Any]], bool]:
     return filter_calendar_events_for_date(all_events, d_obj), True
 
 
-def parse_event_details_html(raw_bytes: bytes) -> List[Dict[str, Any]]:
-    """Parse race links & codices from fis-ski.com event-details.html using pure XPath."""
-    doc = lxml_html.fromstring(raw_bytes.decode("utf-8", errors="replace"))
+def parse_event_details_html(
+    raw_bytes: bytes, season: Optional[int] = None
+) -> List[Dict[str, Any]]:
+    """Parse race links, dates, statuses & codices from fis-ski.com event-details.html using pure XPath."""
+    raw_text = raw_bytes.decode("utf-8", errors="replace")
+    doc = lxml_html.fromstring(raw_text)
+
+    effective_season = season
+    if effective_season is None:
+        m_sc = re.search(r"seasoncode=(\d{4})", raw_text)
+        if m_sc:
+            effective_season = int(m_sc.group(1))
+        else:
+            header_txt = _clean(" ".join(doc.xpath('//div[contains(@class, "event-header")]//text()')))
+            m_hd = re.search(r"\b(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})\b", header_txt)
+            if m_hd:
+                mon_h = MONTH_MAP.get(m_hd.group(2).upper())
+                if mon_h:
+                    try:
+                        effective_season = fis_season_for_date(
+                            dt.date(int(m_hd.group(3)), mon_h, int(m_hd.group(1)))
+                        )
+                    except ValueError:
+                        pass
+
     rows = doc.xpath('//div[contains(@class, "table-row") and .//a[contains(@href, "results.html")]]')
     races: List[Dict[str, Any]] = []
     for row in rows:
@@ -669,19 +699,130 @@ def parse_event_details_html(raw_bytes: bytes) -> List[Dict[str, Any]]:
             continue
         race_id = int(m_rid.group(1))
         full_txt = _clean(" ".join(row.itertext()))
-        m_codex = re.search(r"\b(\d{4})\b", full_txt)
-        codex = m_codex.group(1) if m_codex else None
 
-        # Extract category and gender badges
+        status_spans = row.xpath('.//span[contains(@class, "status__item")]')
+        has_data = bool(
+            status_spans and "status__item_selected" in (status_spans[0].get("class") or "")
+        )
+        is_cancelled = (
+            bool(
+                len(status_spans) >= 4
+                and "status__item_selected" in (status_spans[3].get("class") or "")
+            )
+            or bool(
+                row.xpath('.//*[contains(concat(" ", normalize-space(@class), " "), " cancelled ")]')
+            )
+            or bool(re.search(r"\bCancelled\b", full_txt, re.I))
+        )
+
+        # Strip date & replacement-date phrases so years (e.g., 2026 in "Replaces: 20.11.2026")
+        # are never mistaken for a 4-digit FIS codex.
+        sanitized_txt = re.sub(r"Replaces:\s*[\d./-]+", " ", full_txt, flags=re.I)
+        sanitized_txt = re.sub(r"\b\d{1,2}[./-]\d{1,2}[./-](?:19|20)\d{2}\b", " ", sanitized_txt)
+        sanitized_txt = re.sub(r"\b(?:19|20)\d{2}-\d{2}-\d{2}\b", " ", sanitized_txt)
+
+        anchor_texts = [_clean(" ".join(a.itertext())) for a in row.xpath('.//a[contains(@href, "results.html")]')]
+        cell_texts = anchor_texts + [
+            _clean(" ".join(el.itertext()))
+            for el in row.xpath('.//div[not(.//div)] | .//span[not(.//span)]')
+        ]
+
+        # Extract race date ("20 Nov" or "20 Nov 2026")
+        date_text = ""
+        race_date_iso: Optional[str] = None
+        for txt in anchor_texts:
+            m_dt = re.match(r"^(\d{1,2})\s+([A-Za-z]{3})(?:\s+(\d{4}))?$", txt)
+            if m_dt and m_dt.group(2).upper() in MONTH_MAP:
+                day_i = int(m_dt.group(1))
+                mon_i = MONTH_MAP[m_dt.group(2).upper()]
+                date_text = txt
+                yr_i = (
+                    int(m_dt.group(3))
+                    if m_dt.group(3)
+                    else (
+                        (effective_season - 1 if mon_i >= 7 else effective_season)
+                        if effective_season is not None
+                        else None
+                    )
+                )
+                if yr_i is not None:
+                    try:
+                        race_date_iso = dt.date(yr_i, mon_i, day_i).isoformat()
+                    except ValueError:
+                        race_date_iso = None
+                break
+        if not date_text:
+            m_dt2 = re.search(
+                r"\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?:\s+(\d{4}))?\b",
+                sanitized_txt,
+                re.I,
+            )
+            if m_dt2:
+                day_i = int(m_dt2.group(1))
+                mon_i = MONTH_MAP[m_dt2.group(2).upper()]
+                date_text = f"{day_i} {m_dt2.group(2).title()}"
+                yr_i = (
+                    int(m_dt2.group(3))
+                    if m_dt2.group(3)
+                    else (
+                        (effective_season - 1 if mon_i >= 7 else effective_season)
+                        if effective_season is not None
+                        else None
+                    )
+                )
+                if yr_i is not None:
+                    try:
+                        race_date_iso = dt.date(yr_i, mon_i, day_i).isoformat()
+                    except ValueError:
+                        race_date_iso = None
+
+        # Extract codex from dedicated cell first, excluding 4-digit years (19xx / 20xx)
+        codex: Optional[str] = None
+        for txt in cell_texts:
+            m_cell = re.fullmatch(r"(\d{4})(?:\s+(?:review|live))?", txt, re.I)
+            if m_cell:
+                cand_codex = m_cell.group(1)
+                if not re.fullmatch(r"(?:19|20)\d{2}", cand_codex):
+                    codex = cand_codex
+                    break
+        if codex is None:
+            m_codex = re.search(r"\b(?!(?:19|20)\d{2}\b)(\d{4})\b", sanitized_txt)
+            codex = m_codex.group(1) if m_codex else None
+
+        # Extract category badge from cells if present
+        category: Optional[str] = None
+        for txt in anchor_texts:
+            up = txt.strip().upper()
+            if up in DEFAULT_CATEGORIES:
+                category = up
+                break
+
+        # Extract gender badge (dedicated cell first, then word boundary)
         gender = ""
-        if re.search(r"\bW\b", full_txt):
-            gender = "W"
-        elif re.search(r"\bM\b", full_txt):
-            gender = "M"
+        for txt in anchor_texts:
+            up = txt.strip().upper()
+            if up in ("W", "M"):
+                gender = up
+                break
+        if not gender:
+            if re.search(r"\bW\b", sanitized_txt):
+                gender = "W"
+            elif re.search(r"\bM\b", sanitized_txt):
+                gender = "M"
 
+        disc_label = "Slalom"
         disc = "SL"
-        for cand in ("Giant Slalom", "Super G", "Super-G", "Downhill", "Alpine Combined", "Slalom"):
+        for cand in (
+            "Super Combined",
+            "Alpine Combined",
+            "Giant Slalom",
+            "Super G",
+            "Super-G",
+            "Downhill",
+            "Slalom",
+        ):
             if cand.lower() in full_txt.lower():
+                disc_label = cand
                 disc = normalize_discipline(cand)
                 break
 
@@ -689,23 +830,38 @@ def parse_event_details_html(raw_bytes: bytes) -> List[Dict[str, Any]]:
             {
                 "race_id": race_id,
                 "codex": codex,
+                "discipline": disc_label,
                 "discipline_code": disc,
                 "gender": gender,
+                "category": category,
+                "race_date": race_date_iso,
+                "date_text": date_text,
+                "has_data": has_data,
+                "is_cancelled": is_cancelled,
                 "summary_text": full_txt,
             }
         )
     return races
 
 
-def fetch_event_details(event_id: int, season: Optional[int] = None) -> List[Dict[str, Any]]:
+def fetch_event_details(
+    event_id: int,
+    season: Optional[int] = None,
+    timeout: int = 8,
+    retries: int = 2,
+) -> List[Dict[str, Any]]:
     q: Dict[str, str] = {"sectorcode": "AL", "eventid": str(event_id)}
     if season is not None:
         q["seasoncode"] = str(season)
     url = f"{EVENT_DETAILS_URL}?{urllib.parse.urlencode(q)}"
     raw = fetch_url_bytes(
-        url, cache_key=f"fis_event:{event_id}:{season or 'any'}", ttl_seconds=3600
+        url,
+        cache_key=f"fis_event:{event_id}:{season or 'any'}",
+        ttl_seconds=3600,
+        timeout=timeout,
+        retries=retries,
     )
-    return parse_event_details_html(raw)
+    return parse_event_details_html(raw, season=season)
 
 
 def parse_listbyfispoints_html(raw_bytes: bytes) -> Dict[str, Dict[str, Any]]:
@@ -1218,7 +1374,8 @@ def parse_athlete_biography(
 
     fis_code = info.get("FIS Code", "")
     birthdate = info.get("Birthdate", "")
-    birth_year = int(birthdate[:4]) if len(birthdate) >= 4 and birthdate[:4].isdigit() else None
+    m_by = re.search(r"\b((?:19|20)\d{2})\b", birthdate)
+    birth_year = int(m_by.group(1)) if m_by else None
     status_str = info.get("Status", "")
     active = status_str.strip().lower() == "active"
     gender_raw = info.get("Gender", "").strip().lower()

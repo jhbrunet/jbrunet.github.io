@@ -9,16 +9,16 @@ const DNF_COPY = {
   en: {
     code: 'DNF / DSQ',
     title: 'You missed a gate.',
-    sub: 'STATUS: OFF COURSE · GATE NOT REGISTERED',
-    backHome: '← BACK TO START GATE (/)',
-    toHub: 'OPEN TIMING ROOM (/HUB) →',
+    sub: 'OFF COURSE · GATE NOT REGISTERED',
+    backHome: '← BACK TO START GATE',
+    toHub: 'TIMING ROOM →',
   },
   fr: {
     code: 'DNF / DSQ',
     title: 'Vous avez manqué une porte.',
-    sub: 'STATUT : HORS TRACÉ · PORTE NON VALIDÉE',
-    backHome: '← RETOUR AU DÉPART (/)',
-    toHub: 'SALLE DE CHRONO (/HUB) →',
+    sub: 'HORS TRACÉ · PORTE NON VALIDÉE',
+    backHome: '← RETOUR AU DÉPART',
+    toHub: 'SALLE DE CHRONO →',
   },
 } as const;
 
@@ -41,7 +41,7 @@ export function NotFoundView() {
       )}
       <main id="start-gate" className="course-main">
         <section className="dnf-container" aria-label="404 DNF DSQ">
-          <div className="dnf-card">
+          <div className="dnf-panel">
             <div className="dnf-code">{t.code}</div>
             <h1 className="dnf-title">{t.title}</h1>
             <p className="dnf-sub">{t.sub}</p>

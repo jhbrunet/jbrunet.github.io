@@ -560,13 +560,19 @@ export async function runTier1(ctx) {
       );
     const before = await getReadout();
     await cdp.evaluate(`(() => {
-      const nodes = Array.from(document.querySelectorAll('#split-curve-svg [role="button"], aside.split-board-col svg [role="button"], aside.split-board svg [role="button"], aside svg [tabindex="0"]'));
+      const primary = Array.from(document.querySelectorAll('#split-curve-svg [role="button"]'));
+      const nodes = primary.length
+        ? primary
+        : Array.from(document.querySelectorAll('aside.split-board-col svg [role="button"], aside.split-board svg [role="button"], aside svg [tabindex="0"]'));
       if (nodes[0]) nodes[0].focus();
     })()`);
     await cdp.pressKey('Enter');
     const afterEnter = await getReadout();
     await cdp.evaluate(`(() => {
-      const nodes = Array.from(document.querySelectorAll('#split-curve-svg [role="button"], aside.split-board-col svg [role="button"], aside.split-board svg [role="button"], aside svg [tabindex="0"]'));
+      const primary = Array.from(document.querySelectorAll('#split-curve-svg [role="button"]'));
+      const nodes = primary.length
+        ? primary
+        : Array.from(document.querySelectorAll('aside.split-board-col svg [role="button"], aside.split-board svg [role="button"], aside svg [tabindex="0"]'));
       const last = nodes[nodes.length - 1];
       if (last) last.focus();
     })()`);
@@ -922,6 +928,8 @@ export async function runTier1(ctx) {
   });
 
   await check('T1-F11-02', '#11 Hub RACE', 'Season 2027 +8 adder and 2xMax/CLAMPED badges render accurately', async () => {
+    await fillFieldMatching(cdp, 'SEASON', '2027');
+    await waitForCondition(cdp, () => /\+8/.test(document.body.innerText) || /32\.25/.test(document.body.innerText), 3000, 50);
     const txt = await getBodyText(cdp);
     assert(/\+8/.test(txt) || /32\.25/.test(txt), 'Missing Season 2027 +8 adder badge/value on MSA 309223');
 

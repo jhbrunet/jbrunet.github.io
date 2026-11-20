@@ -17,8 +17,8 @@ export interface HealthResponse {
   fis_list: HealthFisListInfo;
   cache_mode: string;
   upstream_sources?: {
-    live_timing: boolean;
-    fis_ski: boolean;
+    live_timing: string;
+    fis_ski: string;
   };
 }
 
@@ -333,11 +333,12 @@ export interface TargetTimeResponse {
   target_fis_points: number;
   target_race_points: number;
   achievable: boolean;
-  target_time_ms: number;
-  target_time_seconds: number;
-  target_time_display: string;
-  diff_behind_leader_ms: number;
-  diff_behind_leader_display: string;
+  target_time_ms: number | null;
+  target_time_seconds: number | null;
+  target_time_display: string | null;
+  diff_behind_leader_ms: number | null;
+  diff_behind_leader_display: string | null;
+  margin_vs_leader_ms?: number | null;
   run1_ms: number | null;
   run2_needed_ms: number | null;
   run2_needed_seconds: number | null;

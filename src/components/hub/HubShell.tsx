@@ -32,9 +32,10 @@ export function HubShell() {
 
   const [mode, setMode] = useState<HubMode>('LIVE');
   const [health, setHealth] = useState<HealthResponse | null>(null);
+  const [healthErr, setHealthErr] = useState<boolean>(false);
   const [selectedRace, setSelectedRace] = useState<RaceSelection | null>(null);
-  const [raceSeason, setRaceSeason] = useState<number>(2027);
-  const [raceCategory, setRaceCategory] = useState<string>('FIS');
+  const [raceSeasonOverride, setRaceSeasonOverride] = useState<number | null>(null);
+  const [raceCategoryOverride, setRaceCategoryOverride] = useState<string | null>(null);
   const [raceSubTab, setRaceSubTab] = useState<RaceSubTab>('SHEET');
   const [cachedLiveData, setCachedLiveData] = useState<LiveRaceResponse | null>(null);
   const [cachedFisData, setCachedFisData] = useState<FisRaceResponse | null>(null);
@@ -43,43 +44,64 @@ export function HubShell() {
   const [athleteQuery, setAthleteQuery] = useState<string | null>(null);
 
   useEffect(() => {
-    let active = true;
-    fetch('/api/hub/health', { cache: 'no-store' })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json: HealthResponse | null) => {
-        if (active && json) setHealth(json);
+    const controller = new AbortController();
+    fetch('/api/hub/health', { cache: 'no-store', signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json() as Promise<HealthResponse>;
       })
-      .catch(() => {
-        // Non-blocking health badge
+      .then((json) => {
+        setHealth(json);
+        setHealthErr(false);
+      })
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setHealthErr(true);
       });
     return () => {
-      active = false;
+      controller.abort();
     };
   }, []);
 
+  const selectRace = (sel: RaceSelection) => {
+    setSelectedRace(sel);
+    setRaceSeasonOverride(null);
+    setRaceCategoryOverride(null);
+    setMode('RACE');
+  };
+
   const handleLoadDemoMsa = () => {
-    setSelectedRace({
+    selectRace({
       kind: 'live',
       ltId: 309223,
       sourceType: 'U',
       fisRaceId: 130671,
       label: 'Mont Sainte-Anne · GS (2026-04-11)',
     });
-    setMode('RACE');
   };
+
+  const isDegraded = Boolean(
+    health?.upstream_sources &&
+      (health.upstream_sources.live_timing !== 'ok' ||
+        health.upstream_sources.fis_ski !== 'ok')
+  );
 
   return (
     <div className="hub-container">
       <header className="hub-header">
         <div className="hub-header-meta">
           <span className="hub-page-tag">{t.pageTag}</span>
-          <span className="hub-health-pill">
+          <span
+            className={`hub-health-pill ${
+              isDegraded || healthErr ? 'is-degraded' : ''
+            }`}
+          >
             {health
-              ? `${health.fis_list.list_name} · ${health.fis_list.season}${
-                  health.upstream_sources
-                    ? ` · LT:${health.upstream_sources.live_timing ? 'OK' : 'ERR'} FIS:${health.upstream_sources.fis_ski ? 'OK' : 'ERR'}`
-                    : ''
+              ? `${health.fis_list.list_name}${
+                  isDegraded ? ` · ${t.degradedTag}` : ''
                 }`
+              : healthErr
+              ? t.listOffline
               : t.listLoading}
           </span>
         </div>
@@ -113,10 +135,7 @@ export function HubShell() {
         {mode === 'LIVE' && (
           <LiveBoard
             locale={locale}
-            onSelectRace={(sel) => {
-              setSelectedRace(sel);
-              setMode('RACE');
-            }}
+            onSelectRace={selectRace}
             onLoadDemoMsa={handleLoadDemoMsa}
           />
         )}
@@ -125,10 +144,10 @@ export function HubShell() {
           <RaceTelemetry
             locale={locale}
             selection={selectedRace}
-            season={raceSeason}
-            onSeasonChange={setRaceSeason}
-            category={raceCategory}
-            onCategoryChange={setRaceCategory}
+            seasonOverride={raceSeasonOverride}
+            onSeasonChange={setRaceSeasonOverride}
+            categoryOverride={raceCategoryOverride}
+            onCategoryChange={setRaceCategoryOverride}
             subTab={raceSubTab}
             onSubTabChange={setRaceSubTab}
             liveData={cachedLiveData}

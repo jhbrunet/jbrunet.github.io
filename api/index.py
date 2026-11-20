@@ -4,7 +4,7 @@ import datetime as dt
 from pathlib import Path
 import re
 import sys
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -89,10 +89,57 @@ async def _request_validation_handler(
     )
 
 
+class _CacheControlMiddleware:
+    """Pure ASGI middleware setting explicit Cache-Control headers on every /api/hub/* response."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Dict[str, Any], receive: Any, send: Any) -> None:
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+
+        method = str(scope.get("method", "GET")).upper()
+        path = str(scope.get("path", ""))
+
+        async def _send_with_cache_control(message: Dict[str, Any]) -> None:
+            if message.get("type") == "http.response.start":
+                headers = list(message.get("headers", []))
+                has_cc = any(k.lower() == b"cache-control" for k, _ in headers)
+                if not has_cc:
+                    status_code = int(message.get("status", 200))
+                    if (
+                        status_code >= 400
+                        or method != "GET"
+                        or path == "/api/hub/health"
+                        or path.endswith("/live")
+                        or path.startswith("/api/hub/calc/")
+                    ):
+                        cc_val = b"no-store"
+                    elif path == "/api/hub/races":
+                        cc_val = b"public, max-age=15, stale-while-revalidate=30"
+                    elif path.startswith("/api/hub/athletes/search"):
+                        cc_val = b"public, max-age=60"
+                    elif path.startswith("/api/hub/fis/race/") or path.startswith("/api/hub/athletes/"):
+                        cc_val = b"public, max-age=300"
+                    else:
+                        cc_val = b"no-store"
+                    headers.append((b"cache-control", cc_val))
+                    message = {**message, "headers": headers}
+            await send(message)
+
+        await self.app(scope, receive, _send_with_cache_control)
+
+
+app.add_middleware(_CacheControlMiddleware)
+
+
 @app.get("/api/hub/health", response_model=HealthResponse)
 def hub_health() -> HealthResponse:
     idx = get_bulk_index()
     hdr = idx.header
+    fis_status = "ok" if idx.source != "fallback_embedded" else "degraded"
     return HealthResponse(
         ok=True,
         fis_list={
@@ -107,7 +154,7 @@ def hub_health() -> HealthResponse:
             "source": idx.source,
         },
         cache_mode="memory+tmp",
-        upstream_sources={"live_timing": "ok", "fis_ski": "ok"},
+        upstream_sources={"live_timing": "ok", "fis_ski": fis_status},
     )
 
 

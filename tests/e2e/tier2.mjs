@@ -1243,6 +1243,38 @@ export async function runTier2(ctx) {
     return sticky;
   });
 
+  await check('T2-POLISH-04', '#5 UX & Fonts', 'Desktop .split-board at 1440x900 has zero inner vertical scroll overflow', async () => {
+    await cdp.setViewport(1440, 900);
+    await cdp.navigate(`${baseUrl}/`);
+    const sb = await cdp.evaluate(`(() => {
+      const el = document.querySelector('.split-board');
+      if (!el) return null;
+      return { scrollHeight: el.scrollHeight, clientHeight: el.clientHeight };
+    })()`);
+    assert(sb && sb.scrollHeight <= sb.clientHeight + 1, `.split-board overflows vertically at 1440x900: ${JSON.stringify(sb)}`);
+    return sb;
+  });
+
+  await check('T2-POLISH-05', '#11 Hub RACE', '/hub RACE athlete name column width >= 96px at 320x568 with zero overflow', async () => {
+    await cdp.setViewport(320, 568);
+    await cdp.navigate(`${baseUrl}/hub`);
+    await fillFieldMatching(cdp, 'DATE', '2026-04-11');
+    await waitForCondition(cdp, () => /SUPER SERIE|SKIBEC/i.test(document.body.innerText), 4000, 50);
+    await clickButtonMatching(cdp, '309223|0484');
+    await waitForCondition(cdp, () => /ST-GERMAIN|BRUNET/i.test(document.body.innerText), 4000, 50);
+    await cdp.assertNoHorizontalOverflow(320, '/hub RACE @ 320x568');
+    const nameMetrics = await cdp.evaluate(`(() => {
+      const els = Array.from(document.querySelectorAll('.hub-racer-name'));
+      if (els.length === 0) return { present: false, minW: null };
+      const widths = els.slice(0, 10).map(e => Math.round(e.getBoundingClientRect().width));
+      return { present: true, minW: Math.min(...widths) };
+    })()`);
+    if (nameMetrics.present) {
+      assert(nameMetrics.minW >= 96, `.hub-racer-name squeezed to ${nameMetrics.minW}px < 96px at 320x568`);
+    }
+    return nameMetrics;
+  });
+
   await check('T2-F13-404-TOKENS', '#13 Route Closure', '/not-found at 390x844 enforces border-radius: 0px, <10% accent, and FR translation', async () => {
     await cdp.setViewport(390, 844);
     await cdp.navigate(`${baseUrl}/not-found`, { ignoreStatusErrors: true });

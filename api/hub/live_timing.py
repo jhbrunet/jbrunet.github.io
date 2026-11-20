@@ -1,5 +1,6 @@
 """ISO-8859-1 / HTML-entity live-timing.com parsers, FIS codex join, and live penalty integration."""
 
+from concurrent.futures import ThreadPoolExecutor
 import copy
 import datetime as dt
 from decimal import Decimal
@@ -158,12 +159,20 @@ def _build_report_ref(lt_id: int, raw_val: str) -> Dict[str, Any]:
 
 
 def _normalize_gender(raw: str) -> str:
-    low = (raw or "").strip().lower()
-    if low.startswith(("w", "f", "l")):
-        return "W"
-    if low.startswith("m"):
+    txt = clean_lt_text(raw)
+    if not txt or len(txt) > 20:
+        return ""
+    low = txt.lower().strip()
+    if low in ("m", "men", "mens", "men's", "male", "man", "boys", "homme", "hommes", "masculin"):
         return "M"
-    return clean_lt_text(raw)
+    if low in (
+        "w", "women", "womens", "women's", "woman", "female", "f",
+        "ladies", "lady", "l", "girls", "femme", "femmes", "feminin", "féminin", "dames",
+    ):
+        return "W"
+    if low in ("mixed", "mixte", "coed", "co-ed", "m/w", "w/m", "men/women", "women/men"):
+        return "Mixed"
+    return ""
 
 
 def _season_from_start_time(start_time: str, fallback: int = 2027) -> int:
@@ -190,11 +199,24 @@ def _date_iso_from_start_time(start_time: str) -> Optional[str]:
     return None
 
 
-def parse_daily_races(raw_bytes: bytes) -> Tuple[Optional[float], List[Dict[str, Any]]]:
+def parse_daily_races(
+    raw_bytes: bytes,
+    date_str: Optional[str] = None,
+    today: Optional[dt.date] = None,
+) -> Tuple[Optional[float], List[Dict[str, Any]]]:
     """Parse /dailyRaces/{YYYY}/races_{YYYY-MM-DD}.txt into structured RaceSummary dicts."""
     text = decode_lt_bytes(raw_bytes).strip()
     if not text:
         return None, []
+
+    ref_today = today or dt.date.today()
+    valid_live_dates = (ref_today, ref_today + dt.timedelta(days=1))
+    req_date_obj: Optional[dt.date] = None
+    if date_str:
+        try:
+            req_date_obj = dt.date.fromisoformat(date_str)
+        except ValueError:
+            req_date_obj = None
 
     chunks = [c for c in text.split("~") if c.strip()]
     ms_stamp: Optional[float] = None
@@ -232,11 +254,17 @@ def parse_daily_races(raw_bytes: bytes) -> Tuple[Optional[float], List[Dict[str,
             "message": "",
         }
         raw_reports: List[str] = []
+        race_hms: Optional[float] = None
         for tok in fields:
             if "=" not in tok:
                 continue
             key, val = tok.split("=", 1)
-            if key == "hID" and val.strip().isdigit():
+            if key == "hMS":
+                try:
+                    race_hms = float(val.strip())
+                except ValueError:
+                    race_hms = None
+            elif key == "hID" and val.strip().isdigit():
                 rec["lt_id"] = int(val.strip())
             elif key == "hN":
                 if "=" in val:
@@ -264,7 +292,8 @@ def parse_daily_races(raw_bytes: bytes) -> Tuple[Optional[float], List[Dict[str,
             elif key == "hST":
                 rec["start_time"] = clean_lt_text(val)
             elif key == "hZ":
-                rec["zone_status"] = clean_lt_text(val) or "R"
+                hz = clean_lt_text(val).upper()
+                rec["zone_status"] = hz if hz in ("R", "C", "X") else "R"
             elif key == "hFCODE":
                 v = clean_lt_text(val)
                 rec["fis_codex"] = v if v else None
@@ -280,6 +309,25 @@ def parse_daily_races(raw_bytes: bytes) -> Tuple[Optional[float], List[Dict[str,
 
         if rec["lt_id"] is None:
             continue
+
+        # Match live-timing.com jsRaces.js live detection strictly:
+        # 0 <= (MS - hMS) < 180 seconds AND race date is today or tomorrow.
+        effective_date = req_date_obj
+        if effective_date is None and rec["start_time"]:
+            iso_st = _date_iso_from_start_time(rec["start_time"])
+            if iso_st:
+                try:
+                    effective_date = dt.date.fromisoformat(iso_st)
+                except ValueError:
+                    effective_date = None
+        if (
+            ms_stamp is not None
+            and race_hms is not None
+            and 0 <= (ms_stamp - race_hms) < 180
+            and effective_date is not None
+            and effective_date in valid_live_dates
+        ):
+            rec["zone_status"] = "L"
 
         if rec["resort"].lower() == "thredbo" and not rec["region"]:
             rec["region"] = "Australia"
@@ -319,6 +367,24 @@ def _venue_matches(lt_resort: str, lt_name: str, fis_place: str) -> bool:
     return False
 
 
+_DISC_LABELS = {
+    "SL": "Slalom",
+    "GS": "Giant Slalom",
+    "SG": "Super G",
+    "DH": "Downhill",
+    "AC": "Alpine Combined",
+}
+
+
+def _pad_codex(codex: Optional[str]) -> Optional[str]:
+    c = (codex or "").strip()
+    if not c:
+        return None
+    if c.isdigit() and len(c) < 4:
+        return c.zfill(4)
+    return c
+
+
 def fetch_races_for_date(date_str: str, fis_only: bool = False) -> Dict[str, Any]:
     """Fetch & merge live-timing.com dailyRaces and fis-ski.com calendar for YYYY-MM-DD."""
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date_str or ""):
@@ -331,27 +397,31 @@ def fetch_races_for_date(date_str: str, fis_only: bool = False) -> Dict[str, Any
     today = dt.date.today()
     ttl_lt = 30 if d_obj >= today else 3600
     season = fis_season_for_date(d_obj)
-
     lt_url = DAILY_RACES_URL.format(year=d_obj.year, date=date_str)
-    lt_races: List[Dict[str, Any]] = []
-    live_timing_ok = True
-    try:
-        raw_lt = fetch_url_bytes(
-            lt_url, cache_key=f"lt_daily:{date_str}", ttl_seconds=ttl_lt
-        )
-        _, lt_races = parse_daily_races(raw_lt)
-    except NotFoundError:
-        lt_races = []
-        live_timing_ok = True
-    except UpstreamError:
-        live_timing_ok = False
 
-    cal_events: List[Dict[str, Any]] = []
-    fis_calendar_ok = True
-    try:
-        cal_events, fis_calendar_ok = fetch_calendar_for_date(date_str)
-    except Exception:
-        fis_calendar_ok = False
+    def _fetch_lt() -> Tuple[List[Dict[str, Any]], bool]:
+        try:
+            raw_lt = fetch_url_bytes(
+                lt_url, cache_key=f"lt_daily:{date_str}", ttl_seconds=ttl_lt
+            )
+            _, races = parse_daily_races(raw_lt, date_str=date_str, today=today)
+            return races, True
+        except NotFoundError:
+            return [], True
+        except UpstreamError:
+            return [], False
+
+    def _fetch_cal() -> Tuple[List[Dict[str, Any]], bool]:
+        try:
+            return fetch_calendar_for_date(date_str)
+        except Exception:
+            return [], False
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        lt_fut = pool.submit(_fetch_lt)
+        cal_fut = pool.submit(_fetch_cal)
+        lt_races, live_timing_ok = lt_fut.result()
+        cal_events, fis_calendar_ok = cal_fut.result()
 
     bulk_idx = get_bulk_index()
 
@@ -386,7 +456,9 @@ def fetch_races_for_date(date_str: str, fis_only: bool = False) -> Dict[str, Any
             eid = r["event_id"]
             if eid not in event_races_cache and len(event_races_cache) < 5:
                 try:
-                    event_races_cache[eid] = fetch_event_details(eid, season=season)
+                    event_races_cache[eid] = fetch_event_details(
+                        eid, season=season, timeout=6, retries=1
+                    )
                 except Exception:
                     event_races_cache[eid] = []
             for er in event_races_cache.get(eid, []):
@@ -405,33 +477,191 @@ def fetch_races_for_date(date_str: str, fis_only: bool = False) -> Dict[str, Any
         merged.append(r)
 
     if not fis_only:
-        for ev in cal_events:
-            if ev["event_id"] in matched_event_ids:
+        unmatched_events = [
+            ev for ev in cal_events if ev["event_id"] not in matched_event_ids
+        ]
+
+        # 1. Zero-network index of bulk AL2027rac.csv races matching (event_id, date_str)
+        bulk_races_by_event: Dict[int, List[Dict[str, Any]]] = {}
+        unmatched_eids = {ev["event_id"] for ev in unmatched_events}
+        if unmatched_eids:
+            for rac in bulk_idx.races_by_id.values():
+                reid = rac.get("event_id")
+                if reid in unmatched_eids and rac.get("race_date") == date_str:
+                    bulk_races_by_event.setdefault(reid, []).append(rac)
+
+        # 2. Bounded concurrent fetch of event-details for up to 4 unmatched events with has_data=True
+        eids_to_fetch: List[int] = []
+        for ev in unmatched_events:
+            eid = ev["event_id"]
+            if (
+                not ev["is_cancelled"]
+                and ev["has_data"]
+                and not bulk_races_by_event.get(eid)
+                and eid not in event_races_cache
+                and len(eids_to_fetch) < 4
+            ):
+                eids_to_fetch.append(eid)
+
+        if eids_to_fetch:
+            def _fetch_ev(ev_id: int) -> Tuple[int, List[Dict[str, Any]]]:
+                try:
+                    return ev_id, fetch_event_details(
+                        ev_id, season=season, timeout=5, retries=1
+                    )
+                except Exception:
+                    return ev_id, []
+
+            with ThreadPoolExecutor(max_workers=min(4, len(eids_to_fetch))) as ev_pool:
+                for ev_id, ev_races in ev_pool.map(_fetch_ev, eids_to_fetch):
+                    event_races_cache[ev_id] = ev_races
+
+        for ev in unmatched_events:
+            eid = ev["event_id"]
+            if ev["is_cancelled"]:
+                merged.append(
+                    {
+                        "lt_id": None,
+                        "source_type": "FIS_CALENDAR",
+                        "name": f"{ev['place']} ({ev['category'] or 'FIS'})",
+                        "discipline": ev["disciplines"] or "Alpine",
+                        "discipline_code": None,
+                        "gender": "/".join(ev["genders"]) if ev["genders"] else "",
+                        "country": ev["nation"],
+                        "region": "",
+                        "resort": ev["place"],
+                        "start_time": ev["date_text"],
+                        "zone_status": "X",
+                        "fis_codex": None,
+                        "national_codex": None,
+                        "fis_race_id": None,
+                        "fis_category": ev["category_code"],
+                        "event_id": eid,
+                        "hide_times_mode": 0,
+                        "has_pdf_report": False,
+                        "pdf_reports": [],
+                        "message": "Cancelled",
+                    }
+                )
                 continue
+
+            if ev["has_data"]:
+                # First try zero-network bulk_idx races for this event + date
+                bulk_hits = bulk_races_by_event.get(eid, [])
+                if bulk_hits:
+                    for rac in bulk_hits:
+                        d_code = rac.get("discipline_code") or None
+                        cat_code = rac.get("category") or ev["category_code"]
+                        merged.append(
+                            {
+                                "lt_id": None,
+                                "source_type": "FIS_CALENDAR",
+                                "name": f"{ev['place']} ({cat_code or 'FIS'})",
+                                "discipline": _DISC_LABELS.get(d_code or "", ev["disciplines"] or "Alpine"),
+                                "discipline_code": d_code,
+                                "gender": rac.get("gender") or "",
+                                "country": ev["nation"],
+                                "region": "",
+                                "resort": ev["place"],
+                                "start_time": date_str,
+                                "zone_status": "R",
+                                "fis_codex": _pad_codex(rac.get("codex")),
+                                "national_codex": None,
+                                "fis_race_id": rac["race_id"],
+                                "fis_category": cat_code,
+                                "event_id": eid,
+                                "hide_times_mode": 0,
+                                "has_pdf_report": False,
+                                "pdf_reports": [],
+                                "message": "",
+                            }
+                        )
+                    continue
+
+                # Next try races from event-details.html matching date_str
+                ev_races = event_races_cache.get(eid, [])
+                day_races = [er for er in ev_races if er.get("race_date") == date_str]
+                if day_races:
+                    for er in day_races:
+                        cat_code = er.get("category") or ev["category_code"]
+                        if er.get("is_cancelled"):
+                            merged.append(
+                                {
+                                    "lt_id": None,
+                                    "source_type": "FIS_CALENDAR",
+                                    "name": f"{ev['place']} ({cat_code or 'FIS'})",
+                                    "discipline": er.get("discipline") or ev["disciplines"] or "Alpine",
+                                    "discipline_code": er.get("discipline_code"),
+                                    "gender": er.get("gender") or "",
+                                    "country": ev["nation"],
+                                    "region": "",
+                                    "resort": ev["place"],
+                                    "start_time": er.get("date_text") or ev["date_text"],
+                                    "zone_status": "X",
+                                    "fis_codex": _pad_codex(er.get("codex")),
+                                    "national_codex": None,
+                                    "fis_race_id": None,
+                                    "fis_category": cat_code,
+                                    "event_id": eid,
+                                    "hide_times_mode": 0,
+                                    "has_pdf_report": False,
+                                    "pdf_reports": [],
+                                    "message": "Cancelled",
+                                }
+                            )
+                        else:
+                            z_stat = "R" if er.get("has_data") else "S"
+                            merged.append(
+                                {
+                                    "lt_id": None,
+                                    "source_type": "FIS_CALENDAR",
+                                    "name": f"{ev['place']} ({cat_code or 'FIS'})",
+                                    "discipline": er.get("discipline") or ev["disciplines"] or "Alpine",
+                                    "discipline_code": er.get("discipline_code"),
+                                    "gender": er.get("gender") or "",
+                                    "country": ev["nation"],
+                                    "region": "",
+                                    "resort": ev["place"],
+                                    "start_time": er.get("date_text") or ev["date_text"],
+                                    "zone_status": z_stat,
+                                    "fis_codex": _pad_codex(er.get("codex")),
+                                    "national_codex": None,
+                                    "fis_race_id": er["race_id"],
+                                    "fis_category": cat_code,
+                                    "event_id": eid,
+                                    "hide_times_mode": 0,
+                                    "has_pdf_report": False,
+                                    "pdf_reports": [],
+                                    "message": "",
+                                }
+                            )
+                    continue
+
+            # Fallback stub for upcoming ('S') or unresolved has_data ('R') event — NEVER 'L'
             merged.append(
-            {
-                "lt_id": None,
-                "source_type": "FIS_CALENDAR",
-                "name": f"{ev['place']} ({ev['category'] or 'FIS'})",
-                "discipline": ev["disciplines"] or "Alpine",
-                "discipline_code": None,
-                "gender": "/".join(ev["genders"]) if ev["genders"] else "",
-                "country": ev["nation"],
-                "region": "",
-                "resort": ev["place"],
-                "start_time": ev["date_text"],
-                "zone_status": "C" if ev["is_cancelled"] else ("R" if ev["has_data"] else "L"),
-                "fis_codex": None,
-                "national_codex": None,
-                "fis_race_id": None,
-                "fis_category": ev["category_code"],
-                "event_id": ev["event_id"],
-                "hide_times_mode": 0,
-                "has_pdf_report": False,
-                "pdf_reports": [],
-                "message": "Cancelled" if ev["is_cancelled"] else "",
-            }
-        )
+                {
+                    "lt_id": None,
+                    "source_type": "FIS_CALENDAR",
+                    "name": f"{ev['place']} ({ev['category'] or 'FIS'})",
+                    "discipline": ev["disciplines"] or "Alpine",
+                    "discipline_code": None,
+                    "gender": "/".join(ev["genders"]) if ev["genders"] else "",
+                    "country": ev["nation"],
+                    "region": "",
+                    "resort": ev["place"],
+                    "start_time": ev["date_text"],
+                    "zone_status": "R" if ev["has_data"] else "S",
+                    "fis_codex": None,
+                    "national_codex": None,
+                    "fis_race_id": None,
+                    "fis_category": ev["category_code"],
+                    "event_id": eid,
+                    "hide_times_mode": 0,
+                    "has_pdf_report": False,
+                    "pdf_reports": [],
+                    "message": "",
+                }
+            )
 
     return {
         "date": date_str,
@@ -457,7 +687,7 @@ def _decode_run_token(raw_val: str) -> Tuple[str, str, Optional[int]]:
         val_int = None
 
     if val_int is None or val_int == 0:
-        return disp, "NOT_STARTED", None
+        return ("" if disp == "0" else disp), "NOT_STARTED", None
     if 0 < val_int < SENTINEL_ON_COURSE:
         return disp, "OK", val_int
     if val_int == SENTINEL_ON_COURSE:
@@ -1430,6 +1660,13 @@ def _parse_aj_race_with_state(
         num_runs = 2
     elif any(c["s1"] == "OK" and c["s2"] == "DNS" for c in decoded_comps):
         num_runs = 1
+    elif (
+        not online
+        and not any_r2_active
+        and any(c["s1"] == "OK" and c["r1_disp"] and c["tt"] == c["r1_disp"] for c in decoded_comps)
+        and all(c["s2"] in ("NOT_STARTED", "DNS") for c in decoded_comps)
+    ):
+        num_runs = 1
     else:
         num_runs = 2
 
@@ -1889,9 +2126,10 @@ def fetch_live_race(
         url,
         cache_key=cache_key,
         ttl_seconds=5,
-        timeout=15,
+        timeout=8,
         use_cache=use_cache,
         persist_tmp=use_cache,
+        retries=2,
     )
     text_decoded = decode_lt_bytes(raw_bytes).strip()
     if not text_decoded or text_decoded.startswith("invalidRaceID"):
@@ -1910,7 +2148,7 @@ def fetch_live_race(
                     day_bytes = fetch_url_bytes(
                         day_url, cache_key=f"lt_daily:{iso_date}", ttl_seconds=3600
                     )
-                    _, day_races = parse_daily_races(day_bytes)
+                    _, day_races = parse_daily_races(day_bytes, date_str=iso_date)
                     _cache_daily_race_summaries(day_races)
                     for dr in day_races:
                         if dr.get("lt_id") == lt_id:
@@ -1936,9 +2174,10 @@ def fetch_live_race(
                     redirect_url,
                     cache_key=cache_key,
                     ttl_seconds=5,
-                    timeout=15,
+                    timeout=8,
                     use_cache=use_cache,
                     persist_tmp=use_cache,
+                    retries=2,
                 )
                 text_decoded = decode_lt_bytes(raw_bytes).strip()
                 if not text_decoded or text_decoded.startswith("invalidRaceID"):

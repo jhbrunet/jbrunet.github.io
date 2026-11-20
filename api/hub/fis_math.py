@@ -124,14 +124,14 @@ def normalize_discipline(raw: Optional[str]) -> str:
         return "SL"
     if s in ("SL", "GS", "SG", "DH", "AC"):
         return s
+    if "COMBINED" in s or "KOMBINATION" in s or s == "SC" or re.search(r"\bAC\b", s):
+        return "AC"
     if "GIANT" in s or "GÉANT" in s or "GEANT" in s or "GS" in s:
         return "GS"
     if "SUPER" in s or "SG" in s:
         return "SG"
     if "DOWNHILL" in s or "DESCENTE" in s or "DH" in s:
         return "DH"
-    if "COMBINED" in s or "KOMBINATION" in s or s == "SC" or "AC" in s:
-        return "AC"
     if "SLALOM" in s or "SL" in s:
         return "SL"
     return "SL"
@@ -593,13 +593,13 @@ def calculate_penalty(
     else:
         raw_calc = round_half_up((sum_a + sum_b - sum_c) / Decimal(10))
         provisional_calc = raw_calc + z_value + adder
-        if fis_in_a_count < 3:
+        if fis_finishers_top10_count < 3 and cat_max != ZERO:
             double_max_triggered = True
             clamped = True
             applied_penalty = Decimal(2) * max_points
             status_label = "PROVISIONAL" if is_live_in_progress else "OFFICIAL"
             confidence_note = (
-                f"Double-max floor triggered: only {fis_in_a_count}/3 required FIS-point-holders in Sum A "
+                f"Double-max floor triggered: only {fis_finishers_top10_count}/3 required FIS-point-holders in Top 10 "
                 f"(applied {applied_penalty})."
             )
         else:
@@ -854,14 +854,21 @@ def simulate_next_list(
     parsed: List[Decimal] = []
     for r in results:
         d = to_decimal(r)
-        if d is not None and d >= Decimal("0"):
-            parsed.append(round_half_up(d))
+        if d is None:
+            continue
+        if d < ZERO:
+            raise ValueError(f"Race score cannot be negative: {r}")
+        parsed.append(round_half_up(d))
     parsed.sort()
     used = parsed[:counting_slots]
 
     cur_dec = to_decimal(current_list_points)
+    if cur_dec is not None and cur_dec < ZERO:
+        raise ValueError(f"current_list_points cannot be negative: {current_list_points}")
     cur_rounded = round_half_up(cur_dec) if cur_dec is not None else None
     base_dec = to_decimal(base_list_points)
+    if base_dec is not None and base_dec < ZERO:
+        raise ValueError(f"base_list_points cannot be negative: {base_list_points}")
     base_rounded = round_half_up(base_dec) if base_dec is not None else None
 
     if not used:
