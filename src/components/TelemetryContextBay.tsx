@@ -309,7 +309,7 @@ export function TelemetryContextBay({
 
             {ladderGeom.points.map(({ item, cx, cy }) => {
               const isSelected = inspectedLadder.id === item.id;
-              const hitW = 56;
+              const hitW = 64;
               const hitX = Math.max(0, Math.min(LADDER_W - hitW, cx - hitW / 2));
               return (
                 <g key={item.id}>

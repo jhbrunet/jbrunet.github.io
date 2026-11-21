@@ -1,9 +1,16 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import '@/styles/tokens.css';
 import '@/styles/base.css';
 import '@/styles/layout.css';
 import '@/styles/components.css';
 import '@/styles/utilities.css';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#0a0a0a',
+};
 
 export const metadata: Metadata = {
   title: 'Julian Brunet / FIS 6100596 / Head Coach U18 FIS Men',

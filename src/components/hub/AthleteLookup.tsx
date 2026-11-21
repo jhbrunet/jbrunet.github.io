@@ -130,6 +130,8 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
             <input
               id="athlete-search-input"
               type="text"
+              inputMode="search"
+              enterKeyHint="search"
               className="hub-input"
               placeholder={t.searchPlaceholder}
               value={query}
@@ -339,33 +341,62 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
             <div className="hub-pool-block">
               <h3 className="hub-subhead">{t.recentTitle}</h3>
               <div className="hub-table-wrap">
-                <table className="hub-table">
+                <table className="hub-table hub-recent-table">
                   <thead>
                     <tr>
                       <th>{t.colDate}</th>
                       <th>{t.colPlace}</th>
-                      <th>{t.colCat}</th>
-                      <th>{t.colDisc}</th>
-                      <th>{t.colRank}</th>
-                      <th>{t.colFisPts}</th>
+                      <th className="hub-col-desktop-only">{t.colCat}</th>
+                      <th className="hub-col-desktop-only">{t.colDisc}</th>
+                      <th className="hub-col-num">{t.colRank}</th>
+                      <th className="hub-col-num">{t.colFisPts}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {detail.recent_results.slice(0, 15).map((r, i) => (
-                      <tr key={`${r.date}-${r.race_id ?? i}`}>
-                        <td className="hub-mono">{r.date}</td>
-                        <td>
-                          {r.place}
-                          {r.nation ? ` (${r.nation})` : ''}
-                        </td>
-                        <td className="hub-mono">{r.category}</td>
-                        <td className="hub-mono">{r.discipline}</td>
-                        <td className="hub-mono">{r.rank}</td>
-                        <td className="hub-mono">
-                          {r.fis_points !== null ? r.fis_points.toFixed(2) : '—'}
-                        </td>
-                      </tr>
-                    ))}
+                    {detail.recent_results.slice(0, 15).map((r, i) => {
+                      const discKey = (r.discipline || '').trim().toLowerCase();
+                      const shortDisc =
+                        discKey.includes('giant')
+                          ? 'GS'
+                          : discKey.includes('super')
+                          ? 'SG'
+                          : discKey.includes('downhill')
+                          ? 'DH'
+                          : discKey.includes('combined')
+                          ? 'AC'
+                          : discKey.includes('slalom')
+                          ? 'SL'
+                          : r.discipline;
+                      const mobileSub = [r.category, shortDisc]
+                        .filter(Boolean)
+                        .join(' · ');
+                      return (
+                        <tr key={`${r.date}-${r.race_id ?? i}`}>
+                          <td className="hub-mono">{r.date}</td>
+                          <td className="hub-cell-name">
+                            <span className="hub-cell-primary">
+                              {r.place}
+                              {r.nation ? ` (${r.nation})` : ''}
+                            </span>
+                            {mobileSub && (
+                              <span className="hub-cell-sub">{mobileSub}</span>
+                            )}
+                          </td>
+                          <td className="hub-mono hub-col-desktop-only">
+                            {r.category}
+                          </td>
+                          <td className="hub-mono hub-col-desktop-only">
+                            {r.discipline}
+                          </td>
+                          <td className="hub-mono hub-col-num">{r.rank}</td>
+                          <td className="hub-mono hub-col-num">
+                            {r.fis_points !== null
+                              ? r.fis_points.toFixed(2)
+                              : '—'}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -380,32 +411,32 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
                   <thead>
                     <tr>
                       <th>{t.colList}</th>
-                      <th>GS</th>
-                      <th>SL</th>
-                      <th>SG</th>
-                      <th>DH</th>
+                      <th className="hub-col-num">GS</th>
+                      <th className="hub-col-num">SL</th>
+                      <th className="hub-col-num">SG</th>
+                      <th className="hub-col-num hub-col-desktop-only">DH</th>
                     </tr>
                   </thead>
                   <tbody>
                     {detail.points_history.slice(0, 12).map((h, i) => (
                       <tr key={`${h.list_id ?? h.list_name}-${i}`}>
-                        <td className="hub-mono">{h.list_name}</td>
-                        <td className="hub-mono">
+                        <td className="hub-mono hub-cell-name">{h.list_name}</td>
+                        <td className="hub-mono hub-col-num">
                           {h.points.GS !== null && h.points.GS !== undefined
                             ? h.points.GS.toFixed(2)
                             : '—'}
                         </td>
-                        <td className="hub-mono">
+                        <td className="hub-mono hub-col-num">
                           {h.points.SL !== null && h.points.SL !== undefined
                             ? h.points.SL.toFixed(2)
                             : '—'}
                         </td>
-                        <td className="hub-mono">
+                        <td className="hub-mono hub-col-num">
                           {h.points.SG !== null && h.points.SG !== undefined
                             ? h.points.SG.toFixed(2)
                             : '—'}
                         </td>
-                        <td className="hub-mono">
+                        <td className="hub-mono hub-col-num hub-col-desktop-only">
                           {h.points.DH !== null && h.points.DH !== undefined
                             ? h.points.DH.toFixed(2)
                             : '—'}

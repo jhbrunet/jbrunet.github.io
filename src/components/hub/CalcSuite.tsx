@@ -291,6 +291,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
               <input
                 id="target-penalty"
                 type="number"
+                inputMode="decimal"
                 step="0.01"
                 className="hub-input"
                 value={targetPenalty}
@@ -305,6 +306,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
               <input
                 id="target-pts"
                 type="number"
+                inputMode="decimal"
                 step="0.01"
                 className="hub-input"
                 value={targetPts}
@@ -312,13 +314,14 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
               />
             </div>
 
-            <div className="hub-field">
+            <div className="hub-field hub-field-wide">
               <label htmlFor="target-run1" className="hub-field-label">
                 {t.targetRun1}
               </label>
               <input
                 id="target-run1"
                 type="text"
+                inputMode="decimal"
                 className="hub-input"
                 value={run1Time}
                 onChange={(e) => setRun1Time(e.target.value)}
@@ -328,7 +331,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
 
           <button
             type="submit"
-            className="hub-btn hub-btn-accent"
+            className="hub-btn hub-btn-accent hub-btn-mobile-full"
             disabled={targetBusy}
           >
             {t.targetBtn}
@@ -428,7 +431,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
               />
             </div>
 
-            <div className="hub-field">
+            <div className="hub-field hub-field-wide">
               <label htmlFor="sim-current" className="hub-field-label">
                 {t.simCurrent}
               </label>
@@ -436,6 +439,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
                 id="sim-current"
                 name="current_list_points"
                 type="number"
+                inputMode="decimal"
                 step="0.01"
                 className="hub-input"
                 value={simCurrentPts}
@@ -446,7 +450,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
 
           <button
             type="submit"
-            className="hub-btn hub-btn-accent"
+            className="hub-btn hub-btn-accent hub-btn-mobile-full"
             disabled={simBusy}
           >
             {t.simBtn}
@@ -581,6 +585,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
                 <div key={idx} className="hub-manual-row">
                   <input
                     type="text"
+                    inputMode="numeric"
                     aria-label={`${t.penBibAria} ${idx + 1}`}
                     className="hub-input hub-input-sm"
                     placeholder={t.penBibPlaceholder}
@@ -605,6 +610,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
                   />
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="0.01"
                     aria-label={`${t.penPtsAria} ${idx + 1}`}
                     className="hub-input hub-input-sm"
@@ -618,6 +624,7 @@ export function CalcSuite({ locale, prefillTarget }: CalcSuiteProps) {
                   />
                   <input
                     type="text"
+                    inputMode="decimal"
                     aria-label={`${t.penTimeAria} ${idx + 1}`}
                     className="hub-input hub-input-sm"
                     placeholder={t.penTimePlaceholder}

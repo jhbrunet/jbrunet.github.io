@@ -5,6 +5,7 @@
 .course-shell {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 100dvh;
 }
 
@@ -13,7 +14,10 @@
   position: sticky;
   top: 0;
   z-index: 60;
-  height: var(--topbar-height);
+  min-height: var(--topbar-height);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   background-color: var(--color-bg);
   border-bottom: var(--border-thin);
   display: flex;
@@ -43,9 +47,16 @@
   overflow: clip;
 }
 
+@media (max-width: 359px) {
+  .pitch-hero {
+    padding-inline: var(--space-2);
+  }
+}
+
 @media (min-width: 960px) {
   .course-shell {
     grid-template-columns: var(--rail-width) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
   }
 
   .timing-topbar {
@@ -110,7 +121,7 @@
   gap: 0;
 }
 
-@media (max-width: 479px) {
+@media (max-width: 359px) {
   .course-section {
     padding-inline: var(--space-2);
   }

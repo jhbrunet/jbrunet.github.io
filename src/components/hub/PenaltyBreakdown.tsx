@@ -28,15 +28,17 @@ function PoolTable({
         <div className="hub-state-box">—</div>
       ) : (
         <div className="hub-table-wrap">
-          <table className="hub-table">
+          <table className="hub-table hub-pool-table">
             <thead>
               <tr>
                 <th>{copy.colBib}</th>
                 <th>{copy.colName}</th>
-                <th>{copy.colNat}</th>
-                <th>{copy.colRank}</th>
-                <th>{mode === 'list' ? copy.colListPts : copy.colRacePts}</th>
-                <th>{copy.colCapped}</th>
+                <th className="hub-col-desktop-only">{copy.colNat}</th>
+                <th className="hub-col-num">{copy.colRank}</th>
+                <th className="hub-col-num">
+                  {mode === 'list' ? copy.colListPts : copy.colRacePts}
+                </th>
+                <th className="hub-col-num">{copy.colCapped}</th>
               </tr>
             </thead>
             <tbody>
@@ -50,18 +52,25 @@ function PoolTable({
                 return (
                   <tr key={`${row.bib ?? 'pad'}-${row.fis_code ?? idx}`}>
                     <td className="hub-mono">{row.bib ?? '—'}</td>
-                    <td>
-                      {row.name}
-                      {row.is_padding ? copy.padSuffix : ''}
+                    <td className="hub-cell-name">
+                      <span className="hub-cell-primary">
+                        {row.name}
+                        {row.is_padding ? copy.padSuffix : ''}
+                      </span>
+                      {row.nation && (
+                        <span className="hub-cell-sub">{row.nation}</span>
+                      )}
                     </td>
-                    <td className="hub-mono">{row.nation || '—'}</td>
-                    <td className="hub-mono">{row.rank ?? '—'}</td>
-                    <td className="hub-mono">
+                    <td className="hub-mono hub-col-desktop-only">
+                      {row.nation || '—'}
+                    </td>
+                    <td className="hub-mono hub-col-num">{row.rank ?? '—'}</td>
+                    <td className="hub-mono hub-col-num">
                       {primaryVal !== null && Number.isFinite(primaryVal)
                         ? primaryVal.toFixed(2)
                         : '—'}
                     </td>
-                    <td className="hub-mono">
+                    <td className="hub-mono hub-col-num">
                       {cappedVal !== null && Number.isFinite(cappedVal)
                         ? cappedVal.toFixed(2)
                         : '—'}

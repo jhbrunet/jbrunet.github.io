@@ -122,7 +122,7 @@ export function SplitCurveD3({
   return (
     <div className={`split-curve-wrap ${compact ? 'is-compact' : ''}`}>
       <svg
-        id="split-curve-svg"
+        id={compact ? undefined : 'split-curve-svg'}
         viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
         className="split-curve-svg"
         role="img"
@@ -288,7 +288,11 @@ export function SplitCurveD3({
       </svg>
 
       {/* Live / Inspected Split Readout Strip Directly Below Chart */}
-      <div id="curve-readout" className="split-active-readout" aria-live="polite">
+      <div
+        id={compact ? undefined : 'curve-readout'}
+        className="split-active-readout"
+        aria-live="polite"
+      >
         <div className="readout-row-top">
           <span className="readout-period">{activeDatum.periodLabel[locale]}</span>
           <span className="readout-note">{activeDatum.note[locale]}</span>

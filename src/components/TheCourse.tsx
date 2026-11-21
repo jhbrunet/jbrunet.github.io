@@ -223,7 +223,12 @@ export function TheCourse() {
         document.documentElement.classList.remove('is-drawer-locked');
         document.body.classList.remove('is-drawer-locked');
         lenis.start();
-        const offset = window.innerWidth < 960 ? -56 : -16;
+        const isMobile = window.innerWidth < 960;
+        const offset = isMobile
+          ? href === '#start-gate' || href === '#course-gates'
+            ? -48
+            : -104
+          : -16;
         lenis.scrollTo(targetEl, { offset });
       }
     };
@@ -271,7 +276,13 @@ export function TheCourse() {
         window.location.hash
       );
       if (initialTarget) {
-        const offset = window.innerWidth < 960 ? -56 : -16;
+        const isMobile = window.innerWidth < 960;
+        const offset = isMobile
+          ? window.location.hash === '#start-gate' ||
+            window.location.hash === '#course-gates'
+            ? -48
+            : -104
+          : -16;
         requestAnimationFrame(() => {
           lenis.scrollTo(initialTarget, { offset, immediate: true });
         });
@@ -411,7 +422,31 @@ export function TheCourse() {
             <div
               id="mobile-telemetry-drawer"
               className="mobile-sticky-drawer"
+              data-lenis-prevent
             >
+              <div className="mobile-drawer-curve-head">
+                <span className="mobile-drawer-curve-title">
+                  {copy.boardTitle}
+                </span>
+                <div className="split-legend-inline">
+                  <span className="legend-item legend-gs">
+                    <span className="legend-swatch-gs" aria-hidden="true" />
+                    {copy.curveLegendGs}
+                  </span>
+                  <span className="legend-item legend-sl">
+                    <span className="legend-swatch-sl" aria-hidden="true" />
+                    {copy.curveLegendSl}
+                  </span>
+                </div>
+              </div>
+              <SplitCurveD3
+                locale={locale}
+                progress={courseProgress}
+                activeGate={activeGate}
+                reducedMotion={reducedMotion}
+                compact
+              />
+              <div className="mobile-drawer-divider" />
               <TelemetryContextBay
                 activeGate={activeGate}
                 locale={locale}
