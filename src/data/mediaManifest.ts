@@ -69,48 +69,48 @@ const SLOT_TEXT: Record<
     aspectRatio: '4:5',
     objectPosition: 'top',
     alt: {
-      en: 'Julian Brunet portrait in alpine race gear at Mont Garceau',
-      fr: 'Portrait de Julian Brunet en tenue de course alpine au Mont Garceau',
+      en: 'Julian Brunet carrying Rossignol giant slalom race skis under an alpine sky',
+      fr: 'Julian Brunet portant des skis de slalom géant Rossignol sous un ciel alpin',
     },
     caption: {
-      en: 'START GATE / PORTRAIT 4:5',
-      fr: 'PORTILLON / PORTRAIT 4:5',
+      en: 'JULIAN BRUNET · CAN · FIS 6100596',
+      fr: 'JULIAN BRUNET · CAN · FIS 6100596',
     },
   },
   gate03SuperSeries: {
     aspectRatio: '3:2',
     objectPosition: 'center',
     alt: {
-      en: 'Giant slalom action from the 2021–22 Ski Quebec Alpin Super Series',
-      fr: 'Passage en slalom géant lors de la Super Série Ski Québec Alpin 2021–22',
+      en: 'Julian Brunet in speed suit carving around a blue EDLS giant slalom gate',
+      fr: 'Julian Brunet en combinaison de course contournant une porte bleue de slalom géant EDLS',
     },
     caption: {
-      en: 'U18 SUPER SERIES · GEORGIAN PEAKS / 2022',
-      fr: 'SUPER SÉRIE U18 · GEORGIAN PEAKS / 2022',
+      en: 'EDLS · GIANT SLALOM',
+      fr: 'EDLS · SLALOM GÉANT',
     },
   },
   gate05EquipeQuebec: {
     aspectRatio: '16:9',
     objectPosition: 'center',
     alt: {
-      en: 'Equipe du Quebec giant slalom run during 2024–25 Nor-Am and FIS campaign',
-      fr: 'Descente en slalom géant avec l’Équipe du Québec durant la saison Nor-Am et FIS 2024–25',
+      en: 'Julian Brunet carving a giant slalom turn through snow spray along alpine B-netting',
+      fr: 'Julian Brunet en appui de slalom géant dans une gerbe de neige le long des filets B',
     },
     caption: {
-      en: 'ÉQUIPE DU QUÉBEC · WHITEFACE / NOR-AM ACTION',
-      fr: 'ÉQUIPE DU QUÉBEC · WHITEFACE / ACTION NOR-AM',
+      en: 'GS TRAINING · HIGH-PITCH CARVE',
+      fr: 'GS · APPUI EN PENTE',
     },
   },
   gate08MontGarceau: {
     aspectRatio: '1:1',
     objectPosition: 'center',
     alt: {
-      en: 'Coaching U18 FIS Men athletes on snow at Club de Ski Mont Garceau',
-      fr: 'Entraînement des coureurs U18 FIS masculins sur neige au Club de Ski Mont Garceau',
+      en: 'Julian Brunet tuning race skis at the wax bench with race quiver behind',
+      fr: 'Julian Brunet préparant des skis de course à l’établi avec des skis alignés',
     },
     caption: {
-      en: 'MONT GARCEAU U18 · COACHING & TIMING TOOLS',
-      fr: 'MONT GARCEAU U18 · COACHING & CHRONOMÉTRAGE',
+      en: 'WAX ROOM · RACE PREP',
+      fr: 'ATELIER · PRÉP. SKIS',
     },
   },
 };
