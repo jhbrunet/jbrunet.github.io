@@ -3496,4 +3496,264 @@
   letter-spacing: 0.06em;
 }
 
+/* ==========================================================================
+   UNLINKED EMAIL SIGNATURE ASSETS (/sig)
+   ========================================================================== */
 
+.sig-shell {
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+}
+
+.sig-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-3) var(--space-6);
+}
+
+@media (min-width: 960px) {
+  .sig-container {
+    padding: var(--space-6) var(--space-5) var(--space-7);
+  }
+}
+
+.sig-header {
+  border-top: 2px solid var(--color-accent);
+  border-bottom: var(--border-strong);
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sig-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.sig-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-muted);
+  border: var(--border-thin);
+  background-color: var(--color-surface);
+  padding: var(--space-1) var(--space-2);
+  letter-spacing: 0.06em;
+}
+
+.sig-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@media (min-width: 800px) {
+  .sig-header-row {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+}
+
+.sig-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 6.4vw, 48px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.sig-lead {
+  margin-top: var(--space-2);
+  max-width: 58ch;
+  color: var(--color-ink-muted);
+}
+
+.sig-preview-toggle {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: var(--border-strong);
+  flex-shrink: 0;
+}
+
+.sig-toggle-btn {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-muted);
+  background-color: var(--color-surface);
+  transition: background-color var(--dur-fast) var(--ease-physical),
+              color var(--dur-fast) var(--ease-physical);
+}
+
+.sig-toggle-btn + .sig-toggle-btn {
+  border-left: var(--border-thin);
+}
+
+.sig-toggle-btn:hover {
+  color: var(--color-ink);
+}
+
+.sig-toggle-btn.is-active {
+  background-color: var(--color-accent-dim);
+  color: var(--color-ink);
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+}
+
+.sig-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+@media (min-width: 960px) {
+  .sig-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.sig-card {
+  border: var(--border-strong);
+  background-color: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: border-color var(--dur-fast) var(--ease-physical);
+}
+
+.sig-card:hover {
+  border-color: var(--color-accent);
+}
+
+.sig-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-thin);
+  background-color: var(--color-bg);
+}
+
+.sig-card-index {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--color-accent);
+  letter-spacing: 0.06em;
+}
+
+.sig-card-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+  letter-spacing: 0.03em;
+}
+
+.sig-stage {
+  height: 236px;
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: var(--border-thin);
+  transition: background-color var(--dur-fast) var(--ease-physical);
+}
+
+.sig-stage.is-light {
+  background-color: var(--color-ink);
+}
+
+.sig-stage.is-dark {
+  background-color: var(--color-bg);
+}
+
+.sig-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: var(--border-thin);
+}
+
+.sig-card-body {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.sig-card-title {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--color-ink);
+}
+
+.sig-filename {
+  margin-top: calc(var(--space-2) * -1);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+}
+
+.sig-url-block {
+  border-top: var(--border-thin);
+  padding-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sig-url-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink-faint);
+  letter-spacing: 0.06em;
+}
+
+.sig-url-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--color-ink);
+  word-break: break-all;
+  line-height: 1.45;
+  padding: var(--space-2);
+  border: var(--border-thin);
+  background-color: var(--color-bg);
+  transition: border-color var(--dur-fast) var(--ease-physical),
+              color var(--dur-fast) var(--ease-physical);
+}
+
+.sig-url-link:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.sig-actions {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.sig-actions > :first-child {
+  grid-column: 1 / -1;
+}
+
+.sig-actions .hub-btn.is-copied {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
