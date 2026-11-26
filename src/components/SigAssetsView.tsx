@@ -10,6 +10,7 @@ export interface SigAsset {
   path: string;
   width: number;
   height: number;
+  format: 'PNG' | 'JPG';
   sizeLabel: string;
   alt: string;
 }
@@ -25,6 +26,7 @@ export const SIG_ASSETS: readonly SigAsset[] = [
     path: '/media/sig/emailprofilepicture.png',
     width: 156,
     height: 156,
+    format: 'PNG',
     sizeLabel: '15.7 KB',
     alt: 'Julian Brunet email profile picture',
   },
@@ -32,22 +34,24 @@ export const SIG_ASSETS: readonly SigAsset[] = [
     id: 'jbrunetlogo',
     index: '02',
     label: 'J. Brunet Logo',
-    filename: 'jbrunetlogo.png',
-    path: '/media/sig/jbrunetlogo.png',
+    filename: 'jbrunetlogo.jpg',
+    path: '/media/sig/jbrunetlogo.jpg',
     width: 128,
     height: 128,
-    sizeLabel: '1.8 KB',
+    format: 'JPG',
+    sizeLabel: '4.0 KB',
     alt: 'J. Brunet jbrunet.com logo',
   },
   {
     id: 'skigarceaulogo',
     index: '03',
     label: 'Ski Garceau Logo',
-    filename: 'skigarceaulogo.png',
-    path: '/media/sig/skigarceaulogo.png',
+    filename: 'skigarceaulogo.jpg',
+    path: '/media/sig/skigarceaulogo.jpg',
     width: 128,
     height: 128,
-    sizeLabel: '14.9 KB',
+    format: 'JPG',
+    sizeLabel: '11.4 KB',
     alt: 'Ski Garceau Compétition logo',
   },
 ] as const;
@@ -127,7 +131,7 @@ export function SigAssetsView() {
             <div>
               <h1 className="sig-title">EMAIL SIGNATURE ASSETS</h1>
               <p className="sig-lead">
-                Direct PNG image URLs hosted on jbrunet.com for email signatures.
+                Direct image URLs hosted on jbrunet.com for email signatures.
                 Copy a direct URL to insert by web address, or copy the HTML tag.
               </p>
             </div>
@@ -166,7 +170,7 @@ export function SigAssetsView() {
                 <div className="sig-card-head">
                   <span className="sig-card-index tabular-nums">{asset.index}</span>
                   <span className="sig-card-meta tabular-nums">
-                    {asset.width} × {asset.height} · PNG · {asset.sizeLabel}
+                    {asset.width} × {asset.height} · {asset.format} · {asset.sizeLabel}
                   </span>
                 </div>
 
