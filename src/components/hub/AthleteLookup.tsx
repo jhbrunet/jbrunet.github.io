@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { BrandLogoMark } from '@/components/BrandLogoMark';
 import type { Locale } from '@/data/runStore';
 import { HUB_COPY } from './hubCopy';
 import type {
@@ -212,7 +213,12 @@ export function AthleteLookup({ locale, initialQuery }: AthleteLookupProps) {
         </ul>
       )}
 
-      {detailLoading && <div className="hub-state-box">{t.loadingProfile}</div>}
+      {detailLoading && (
+        <div className="hub-state-box hub-state-loading" role="status" aria-live="polite">
+          <BrandLogoMark variant="inline" loop />
+          <span>{t.loadingProfile}</span>
+        </div>
+      )}
       {detailErr && (
         <div className="hub-state-box hub-state-error" role="alert">
           {detailErr}

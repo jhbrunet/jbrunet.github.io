@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { BrandLogoMark } from '@/components/BrandLogoMark';
 import type { Locale } from '@/data/runStore';
 import type { RaceSubTab } from './HubShell';
 import { HUB_COPY } from './hubCopy';
@@ -451,7 +452,12 @@ export function RaceTelemetry({
         </button>
       </div>
 
-      {loading && <div className="hub-state-box">{t.loading}</div>}
+      {loading && (
+        <div className="hub-state-box hub-state-loading" role="status" aria-live="polite">
+          <BrandLogoMark variant="inline" loop />
+          <span>{t.loading}</span>
+        </div>
+      )}
       {error && (
         <div className="hub-state-box hub-state-error" role="alert">
           <div>{error}</div>

@@ -3757,3 +3757,576 @@
   background-color: var(--color-accent);
   color: var(--color-bg);
 }
+
+/* ==========================================================================
+   BRAND LOGO LOADING ANIMATION — J. BRUNET SKI GATE CARVE
+   ========================================================================== */
+
+.site-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background-color: var(--color-bg);
+  border-bottom: var(--border-accent);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: var(--space-4) var(--space-3);
+  pointer-events: none;
+  transform: translateY(0);
+  transition: transform 380ms var(--ease-physical);
+  will-change: transform;
+}
+
+.site-loader.is-exiting {
+  transform: translateY(-102%);
+}
+
+.site-loader-frame {
+  width: 100%;
+  max-width: 1120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-top: var(--border-thin);
+  border-bottom: var(--border-thin);
+  padding: var(--space-3) 0;
+}
+
+.site-loader-corner-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  letter-spacing: 0.08em;
+  color: var(--color-ink-faint);
+}
+
+.site-loader-status {
+  color: var(--color-accent);
+}
+
+.site-loader-sector {
+  color: var(--color-ink-muted);
+}
+
+.site-loader-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5) 0;
+}
+
+.route-loader {
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5) var(--space-3);
+}
+
+.route-loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.route-loader-tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  letter-spacing: 0.08em;
+  color: var(--color-ink-faint);
+}
+
+.hub-state-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Brand Logo Mark container & sizing variants */
+.jb-brand-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.jb-logo-svg {
+  display: block;
+  overflow: visible;
+}
+
+.jb-brand-loader.is-splash .jb-logo-svg {
+  width: 184px;
+  height: 116px;
+}
+
+@media (min-width: 640px) {
+  .jb-brand-loader.is-splash .jb-logo-svg {
+    width: 216px;
+    height: 136px;
+  }
+}
+
+.jb-brand-loader.is-route .jb-logo-svg {
+  width: 168px;
+  height: 106px;
+}
+
+.jb-brand-loader.is-inline .jb-logo-svg {
+  width: 48px;
+  height: 30px;
+}
+
+.jb-gate-pole,
+.jb-gate-panel,
+.jb-carve-fill,
+.jb-monogram-fill {
+  fill: var(--color-ink);
+}
+
+.jb-carve-spark {
+  stroke: var(--color-accent);
+}
+
+.jb-gate-group {
+  transform-origin: 37px 61px;
+}
+
+.jb-mask-carve,
+.jb-mask-jb-outer,
+.jb-mask-b-stem,
+.jb-mask-b-mid {
+  stroke-dasharray: 102;
+}
+
+.jb-carve-spark {
+  stroke-dasharray: 20 120;
+}
+
+/* Wordmark + 1px timing hairline beneath JB monogram */
+.jb-wordmark-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 184px;
+}
+
+@media (min-width: 640px) {
+  .jb-brand-loader.is-splash .jb-wordmark-stack {
+    width: 216px;
+  }
+}
+
+.jb-wordmark-clip {
+  overflow: hidden;
+  padding: 2px 2px 5px;
+  line-height: 1.1;
+}
+
+.jb-wordmark-text {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+@media (min-width: 640px) {
+  .jb-brand-loader.is-splash .jb-wordmark-text {
+    font-size: 28px;
+  }
+}
+
+.jb-timing-bar {
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-line);
+  position: relative;
+  overflow: hidden;
+}
+
+.jb-timing-bar-fill {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-accent);
+  transform-origin: left center;
+}
+
+/* ---------- One-Shot Splash Choreography (1.18s) ---------- */
+.jb-brand-loader.is-once .jb-gate-group {
+  animation: jbGateOnce 1.18s var(--ease-physical) both;
+}
+
+.jb-brand-loader.is-once .jb-gate-panel {
+  animation: jbGatePanelOnce 1.18s linear both;
+}
+
+.jb-brand-loader.is-once .jb-mask-carve {
+  animation: jbMaskCarveOnce 1.18s var(--ease-physical) both;
+}
+
+.jb-brand-loader.is-once .jb-carve-spark {
+  animation: jbCarveSparkOnce 1.18s var(--ease-physical) both;
+}
+
+.jb-brand-loader.is-once .jb-mask-jb-outer {
+  animation: jbMaskOuterOnce 1.18s cubic-bezier(0.32, 0.08, 0.24, 1) both;
+}
+
+.jb-brand-loader.is-once .jb-mask-b-stem {
+  animation: jbMaskBStemOnce 1.18s var(--ease-physical) both;
+}
+
+.jb-brand-loader.is-once .jb-mask-b-mid {
+  animation: jbMaskBMidOnce 1.18s var(--ease-physical) both;
+}
+
+.jb-brand-loader.is-once .jb-wordmark-text {
+  animation: jbWordmarkOnce 1.18s var(--ease-physical) both;
+}
+
+.jb-brand-loader.is-once .jb-timing-bar-fill {
+  animation: jbTimingBarOnce 1.18s var(--ease-physical) both;
+}
+
+@keyframes jbGateOnce {
+  0% {
+    opacity: 0;
+    transform: translateY(-9px) scaleY(0.15) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(0deg);
+  }
+  23% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(0deg);
+  }
+  31% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(13deg);
+  }
+  39% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(-4deg);
+  }
+  46% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(1.5deg);
+  }
+  53%, 100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(0deg);
+  }
+}
+
+@keyframes jbGatePanelOnce {
+  0%, 23% {
+    fill: var(--color-ink);
+  }
+  29%, 39% {
+    fill: var(--color-accent);
+  }
+  52%, 100% {
+    fill: var(--color-ink);
+  }
+}
+
+@keyframes jbMaskCarveOnce {
+  0%, 15% {
+    stroke-dashoffset: 102;
+  }
+  38%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes jbCarveSparkOnce {
+  0%, 14% {
+    stroke-dashoffset: 22;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  45% {
+    stroke-dashoffset: -102;
+    opacity: 1;
+  }
+  52%, 100% {
+    stroke-dashoffset: -112;
+    opacity: 0;
+  }
+}
+
+@keyframes jbMaskOuterOnce {
+  0%, 28% {
+    stroke-dashoffset: 102;
+  }
+  76%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes jbMaskBStemOnce {
+  0%, 52% {
+    stroke-dashoffset: 102;
+  }
+  72%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes jbMaskBMidOnce {
+  0%, 60% {
+    stroke-dashoffset: 102;
+  }
+  76%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes jbWordmarkOnce {
+  0%, 60% {
+    transform: translateY(115%);
+    opacity: 0;
+  }
+  84%, 100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes jbTimingBarOnce {
+  0%, 56% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  62% {
+    opacity: 1;
+  }
+  88%, 100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- Continuous Looping Choreography (1.9s) ---------- */
+.jb-brand-loader.is-loop .jb-gate-group {
+  animation: jbGateLoop 1.9s var(--ease-physical) infinite;
+}
+
+.jb-brand-loader.is-loop .jb-gate-panel {
+  animation: jbGatePanelLoop 1.9s linear infinite;
+}
+
+.jb-brand-loader.is-loop .jb-mask-carve {
+  animation: jbMaskCarveLoop 1.9s var(--ease-physical) infinite;
+}
+
+.jb-brand-loader.is-loop .jb-carve-spark {
+  animation: jbCarveSparkLoop 1.9s var(--ease-physical) infinite;
+}
+
+.jb-brand-loader.is-loop .jb-mask-jb-outer {
+  animation: jbMaskOuterLoop 1.9s cubic-bezier(0.32, 0.08, 0.24, 1) infinite;
+}
+
+.jb-brand-loader.is-loop .jb-mask-b-stem {
+  animation: jbMaskBStemLoop 1.9s var(--ease-physical) infinite;
+}
+
+.jb-brand-loader.is-loop .jb-mask-b-mid {
+  animation: jbMaskBMidLoop 1.9s var(--ease-physical) infinite;
+}
+
+.jb-brand-loader.is-loop .jb-wordmark-text {
+  animation: jbWordmarkLoop 1.9s var(--ease-physical) infinite;
+}
+
+.jb-brand-loader.is-loop .jb-timing-bar-fill {
+  animation: jbTimingBarLoop 1.9s var(--ease-physical) infinite;
+}
+
+@keyframes jbGateLoop {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scaleY(0.2) rotate(0deg);
+  }
+  11% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(0deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(13deg);
+  }
+  32% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(-4deg);
+  }
+  38%, 80% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1) rotate(0deg);
+  }
+  92%, 100% {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.2) rotate(0deg);
+  }
+}
+
+@keyframes jbGatePanelLoop {
+  0%, 18% {
+    fill: var(--color-ink);
+  }
+  23%, 32% {
+    fill: var(--color-accent);
+  }
+  42%, 100% {
+    fill: var(--color-ink);
+  }
+}
+
+@keyframes jbMaskCarveLoop {
+  0%, 11% {
+    stroke-dashoffset: 102;
+  }
+  29%, 76% {
+    stroke-dashoffset: 0;
+  }
+  90%, 100% {
+    stroke-dashoffset: -102;
+  }
+}
+
+@keyframes jbCarveSparkLoop {
+  0%, 10% {
+    stroke-dashoffset: 22;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  36% {
+    stroke-dashoffset: -102;
+    opacity: 1;
+  }
+  42%, 100% {
+    stroke-dashoffset: -112;
+    opacity: 0;
+  }
+}
+
+@keyframes jbMaskOuterLoop {
+  0%, 21% {
+    stroke-dashoffset: 102;
+  }
+  58%, 76% {
+    stroke-dashoffset: 0;
+  }
+  92%, 100% {
+    stroke-dashoffset: -102;
+  }
+}
+
+@keyframes jbMaskBStemLoop {
+  0%, 40% {
+    stroke-dashoffset: 102;
+  }
+  56%, 76% {
+    stroke-dashoffset: 0;
+  }
+  92%, 100% {
+    stroke-dashoffset: -102;
+  }
+}
+
+@keyframes jbMaskBMidLoop {
+  0%, 46% {
+    stroke-dashoffset: 102;
+  }
+  60%, 76% {
+    stroke-dashoffset: 0;
+  }
+  92%, 100% {
+    stroke-dashoffset: -102;
+  }
+}
+
+@keyframes jbWordmarkLoop {
+  0%, 100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes jbTimingBarLoop {
+  0% {
+    transform: translateX(-100%) scaleX(0.35);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  75% {
+    transform: translateX(0%) scaleX(1);
+    opacity: 1;
+  }
+  95%, 100% {
+    transform: translateX(100%) scaleX(0.35);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-loader {
+    display: none;
+  }
+
+  .jb-gate-group,
+  .jb-gate-panel,
+  .jb-mask-carve,
+  .jb-carve-spark,
+  .jb-mask-jb-outer,
+  .jb-mask-b-stem,
+  .jb-mask-b-mid,
+  .jb-wordmark-text,
+  .jb-timing-bar-fill {
+    animation: none;
+  }
+
+  .jb-mask-carve,
+  .jb-mask-jb-outer,
+  .jb-mask-b-stem,
+  .jb-mask-b-mid {
+    stroke-dashoffset: 0;
+  }
+
+  .jb-carve-spark {
+    opacity: 0;
+  }
+
+  .jb-wordmark-text {
+    opacity: 1;
+    transform: none;
+  }
+
+  .jb-timing-bar-fill {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { SiteLoader } from '@/components/SiteLoader';
 import '@/styles/tokens.css';
 import '@/styles/base.css';
 import '@/styles/layout.css';
@@ -65,6 +66,7 @@ export default function RootLayout({
         <a href="#start-gate" className="skip-link">
           Skip to Start Gate
         </a>
+        <SiteLoader />
         {children}
       </body>
     </html>

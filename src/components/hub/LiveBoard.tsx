@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BrandLogoMark } from '@/components/BrandLogoMark';
 import type { Locale } from '@/data/runStore';
 import { HUB_COPY } from './hubCopy';
 import type { RaceSelection, RacesListResponse, RaceSummary } from './types';
@@ -190,7 +191,12 @@ export function LiveBoard({
         )}
       </div>
 
-      {loading && <div className="hub-state-box">{t.loading}</div>}
+      {loading && (
+        <div className="hub-state-box hub-state-loading" role="status" aria-live="polite">
+          <BrandLogoMark variant="inline" loop />
+          <span>{t.loading}</span>
+        </div>
+      )}
 
       {error && (
         <div className="hub-state-box hub-state-error" role="alert">
